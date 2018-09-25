@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="axa.tex.drive.demo.MainActivity">
+
+    <ImageView
+        android:id="@+id/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/play"
+        android:layout_centerInParent="true"
+        />
+
+    <ImageView
+        android:id="@+id/stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/stop"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+      />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:gravity="bottom"
+        android:orientation="vertical">
+        <TextView
+            android:text="Activity tracking"
+            android:layout_margin="3dp"
+            android:id="@+id/activity_tracking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/gray"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            />
+        <TextView
+            android:text="In vehicle"
+            android:layout_margin="3dp"
+            android:id="@+id/in_vehicle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/gray"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            />
+        <TextView
+            android:text="Speed scanning"
+            android:layout_margin="3dp"
+            android:id="@+id/speed_scanning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/gray"
+            android:gravity="center"
+            />
+        <TextView
+            android:text="Driving"
+            android:layout_margin="3dp"
+            android:id="@+id/driving"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:drawableLeft="@drawable/gray"
+            />
+    </LinearLayout>
+
+</RelativeLayout>
