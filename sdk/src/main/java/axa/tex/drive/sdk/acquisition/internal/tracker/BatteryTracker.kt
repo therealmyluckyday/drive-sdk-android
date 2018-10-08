@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
-import axa.tex.drive.sdk.acquisition.model.BatteryFix
-import axa.tex.drive.sdk.acquisition.model.BatteryState
-import axa.tex.drive.sdk.acquisition.model.Data
+import axa.tex.drive.sdk.acquisition.model.*
 import io.reactivex.subjects.PublishSubject
 import java.lang.IllegalArgumentException
 import java.util.*
@@ -15,7 +13,7 @@ import java.util.*
 
 class BatteryTracker : Tracker, BroadcastReceiver {
 
-    private val fixProducer: PublishSubject<Data> = PublishSubject.create()
+    private val fixProducer: PublishSubject<Fix> = PublishSubject.create()
 
     private val mContext: Context;
     private var isEnabled : Boolean
@@ -41,7 +39,6 @@ class BatteryTracker : Tracker, BroadcastReceiver {
             mContext.unregisterReceiver(this);
         }catch (e : IllegalArgumentException){
             e.printStackTrace()
-            //The receiver not registered
         }
     }
 
@@ -63,7 +60,7 @@ class BatteryTracker : Tracker, BroadcastReceiver {
             }
         }
         val batteryFix = BatteryFix(batteryLevel,batteryState,Date().time)
-        fixProducer.onNext(Data(batteryFix.timestamp,battery=batteryFix))
+        fixProducer.onNext(batteryFix)
     }
 
 

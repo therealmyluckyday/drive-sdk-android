@@ -1,5 +1,11 @@
 package axa.tex.drive.sdk.acquisition.model
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
+
+
 open class Fix {
     private val timestamp: Long
 
@@ -9,5 +15,21 @@ open class Fix {
 
     fun timestamp() : Long{
         return timestamp
+    }
+
+
+
+    fun toJson() : String{
+        return try {
+            val mapper = ObjectMapper();
+            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
+            val jsonStr : String = mapper.writeValueAsString(this);
+            val jsonNode = mapper.readTree(jsonStr)
+            (jsonNode as ObjectNode).put("timestamp",timestamp)
+            jsonNode.toString()
+        }catch (e : Exception){
+            e.printStackTrace()
+            "{}";
+        }
     }
 }

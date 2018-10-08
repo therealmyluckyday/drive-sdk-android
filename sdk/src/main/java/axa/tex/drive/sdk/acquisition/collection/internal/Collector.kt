@@ -1,7 +1,7 @@
 package axa.tex.drive.sdk.acquisition.collection.internal
 
+import axa.tex.drive.sdk.acquisition.internal.tracker.LocationTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
-import axa.tex.drive.sdk.acquisition.model.Data
 import axa.tex.drive.sdk.acquisition.model.Fix
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -11,7 +11,12 @@ import kotlin.reflect.KClass
 internal class Collector {
 
     private val trackers: Array<Tracker>
-    private var trackersMap: Map<String, Tracker>? = null
+
+    //Uses simple name
+   // private var trackersMap: Map<String, Tracker>? = null
+
+    private var trackersMap: Map<KClass<out Tracker>, Tracker>? = null
+
 
      internal companion object {
         private val locations : PublishSubject<Fix> = PublishSubject.create()
@@ -22,9 +27,15 @@ internal class Collector {
 
 
 
-    constructor(vararg trackers: Tracker) {
+    //Uses simple name
+    /*constructor(vararg trackers: Tracker) {
         this.trackers = trackers as Array<Tracker>
         trackersMap = trackers.associateBy({ it.javaClass.simpleName }, { it })
+    }*/
+
+    constructor(vararg trackers: Tracker) {
+        this.trackers = trackers as Array<Tracker>
+        trackersMap = trackers.associateBy({ it::class }, { it })
     }
 
 
@@ -42,30 +53,46 @@ internal class Collector {
     private fun collect(tracker: Tracker) {
         tracker.enableTracking();
         val fixData = tracker.provideFixProducer() as Observable<Any>
-        fixData.subscribeOn(io.reactivex.schedulers.Schedulers.computation()).subscribe { data ->
-            if (data is Data) {
-                if(data.location != null){
-                    locations.onNext(data.location)
+        fixData.subscribeOn(io.reactivex.schedulers.Schedulers.computation()).subscribe { fix ->
+            if (fix is Fix) {
+                if(fix is LocationTracker){
+                    locations.onNext(fix)
                 }
-                Thread { FixProcessor.addFixes(listOf(data)) }.start()
+                Thread { FixProcessor.addFixes(listOf(fix)) }.start()
             } else {
-                Thread { FixProcessor.addFixes(data as List<Data>) }.start()
+                Thread { FixProcessor.addFixes(fix as List<Fix>) }.start()
             }
         }
     }
 
+    //Uses simple name
+    /*fun enableTrackers(vararg trackersClass: KClass<out Tracker>) {
+        for (kClass in trackersClass) {
+            val tracker: Tracker? = trackersMap?.get(kClass.simpleName);
+            tracker?.enableTracking()
+        }
+    }*/
 
     fun enableTrackers(vararg trackersClass: KClass<out Tracker>) {
         for (kClass in trackersClass) {
-            val tracker: Tracker? = trackersMap?.get(kClass.simpleName);
+            val tracker: Tracker? = trackersMap?.get(kClass);
             tracker?.enableTracking()
         }
     }
 
 
-    fun stopCollecting(vararg trackersClass: KClass<out Tracker>) {
+
+    //Uses simple name
+    /*fun stopCollecting(vararg trackersClass: KClass<out Tracker>) {
         for (kClass in trackersClass) {
             val tracker: Tracker? = trackersMap?.get(kClass.simpleName);
+            tracker?.disableTracking()
+        }
+    }*/
+
+    fun stopCollecting(vararg trackersClass: KClass<out Tracker>) {
+        for (kClass in trackersClass) {
+            val tracker: Tracker? = trackersMap?.get(kClass);
             tracker?.disableTracking()
         }
     }

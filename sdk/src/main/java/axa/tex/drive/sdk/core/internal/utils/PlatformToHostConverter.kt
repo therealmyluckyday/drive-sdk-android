@@ -8,7 +8,7 @@ import axa.tex.drive.sdk.core.Platform.TESTING
 
 internal class PlatformToHostConverter(platform: Platform) {
 
-   private var host: String;
+   private var host: String = ""
 
 
     init {
@@ -20,7 +20,6 @@ internal class PlatformToHostConverter(platform: Platform) {
                 this.host = "https://gw-preprod.tex.dil.services/v2.0"
             TESTING ->
                 this.host = "https://gw-uat.tex.dil.services/v2.0"
-            else -> this.host = ""
         }
     }
 

@@ -1,6 +1,5 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
-import android.arch.lifecycle.MutableLiveData
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -9,10 +8,7 @@ import android.hardware.SensorManager
 import android.util.Log
 import android.util.SparseArray
 import android.util.SparseIntArray
-import axa.tex.drive.sdk.acquisition.model.Data
-import axa.tex.drive.sdk.acquisition.model.Fix
-import axa.tex.drive.sdk.acquisition.model.Motion
-import axa.tex.drive.sdk.acquisition.model.MotionFix
+import axa.tex.drive.sdk.acquisition.model.*
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
@@ -39,13 +35,8 @@ internal class MotionTracker : SensorEventListener, Tracker{
     private var accelerationEventTimestamp: Long = 0
     private val motionBufferQueue = LinkedList<Fix>()
 
-    private val fix : MutableLiveData<Fix>;
 
-    private val motionFixes : MutableLiveData<LinkedList<Fix>> = MutableLiveData();
-
-    //private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
-
-    private val fixProducer: PublishSubject<List<Data>> = PublishSubject.create()
+    private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
 
     private val motionBuffer = MotionBuffer()
 
@@ -67,7 +58,6 @@ internal class MotionTracker : SensorEventListener, Tracker{
             }
         }
         accuracies = SparseIntArray()
-        this.fix = MutableLiveData<Fix>()
     }
 
 
@@ -170,24 +160,6 @@ internal class MotionTracker : SensorEventListener, Tracker{
                 motionBufferQueue.removeFirst()
             }
         }
-    }
-
-    private fun streamMotions() {
-        synchronized(motionBufferQueue) {
-
-            //fixProducer.onNext(motionBufferQueue.toList())
-           // motionBufferQueue.clear()
-
-        }
-    }
-
-
-    inner class StreamWorker() : Thread() {
-
-        override fun run() {
-            streamMotions()
-        }
-
     }
 
 

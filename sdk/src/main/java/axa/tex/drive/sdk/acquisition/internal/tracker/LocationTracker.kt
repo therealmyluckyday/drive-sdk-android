@@ -8,14 +8,13 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import axa.tex.drive.sdk.acquisition.model.LocationFix
-import axa.tex.drive.sdk.acquisition.model.Data
+import axa.tex.drive.sdk.acquisition.model.Fix
 import io.reactivex.subjects.PublishSubject
 
 
 class LocationTracker : LocationListener, Tracker {
 
-
-    private val fixProducer: PublishSubject<Data> = PublishSubject.create()
+    private val fixProducer: PublishSubject<Fix> = PublishSubject.create()
     private val context : Context;
     private var locationManager: LocationManager? = null
     private var isEnabled : Boolean
@@ -56,8 +55,14 @@ class LocationTracker : LocationListener, Tracker {
 
     override fun onLocationChanged(location: Location) {
 
-        val locationFix = LocationFix(location.latitude, location.longitude, location.accuracy, location.speed, location.bearing, location.altitude, location.time);
-        fixProducer.onNext(Data(locationFix.timestamp,location=locationFix))
+        val locationFix = LocationFix(location.latitude,
+                location.longitude,
+                location.accuracy,
+                location.speed,
+                location.bearing,
+                location.altitude,
+                location.time)
+        fixProducer.onNext(locationFix)
     }
 
     override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {

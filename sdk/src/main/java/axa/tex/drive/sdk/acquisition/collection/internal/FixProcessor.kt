@@ -3,12 +3,12 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import axa.tex.drive.sdk.internal.extension.toJson
+import axa.tex.drive.sdk.acquisition.model.Fix
 
 
 internal object FixProcessor {
     private const val DEFAULT_PACKET_SIZE = 50
-    private val buffer = mutableListOf<axa.tex.drive.sdk.acquisition.model.Data>()
+    private val buffer = mutableListOf<Fix>()
     private var packetSize : Int = DEFAULT_PACKET_SIZE;
 
 
@@ -17,12 +17,12 @@ internal object FixProcessor {
     }
 
 
-    @Synchronized fun addFixes(fixes : List<axa.tex.drive.sdk.acquisition.model.Data>) {
+    @Synchronized fun addFixes(fixes : List<Fix>) {
 
         for (fix in fixes){
             buffer.add(fix)
             if(buffer.size >= packetSize){
-                val data : Data = Data.Builder().putAll(buffer.associateBy ( {it.timestamp.toString()}, {it.toJson()} )).build()
+                val data : Data = Data.Builder().putAll(buffer.associateBy ( {it.timestamp().toString()}, {it.toJson()} )).build()
                 buffer.clear()
                 val fixUploadWork = OneTimeWorkRequest.Builder(FixWorker::class.java).setInputData(data)
                         .build()
