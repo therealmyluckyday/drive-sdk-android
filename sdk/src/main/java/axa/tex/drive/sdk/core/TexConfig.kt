@@ -1,6 +1,8 @@
 package axa.tex.drive.sdk.core
 
+
 import android.content.Context
+import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.acquisition.internal.tracker.BatteryTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker
@@ -24,12 +26,15 @@ class TexConfig {
         private var user: TexUser? = null
 
 
+
         internal fun init(context: Context) {
+
+            SslCertificateAuthority.configureDefaultSSLSocketFactory(context.getResources().openRawResource(R.raw.tex_elb_ssl))
             val myModule: Module = org.koin.dsl.module.applicationContext {
                 bean(FakeLocationTracker::class.simpleName!!) { FakeLocationTracker(context, locationTrackerEnabled) as Tracker }
                 bean(BatteryTracker::class.simpleName!!) { BatteryTracker(context, batteryTrackerEnabled) as Tracker }
                 bean(MotionTracker::class.simpleName!!) { MotionTracker(context, motionTrackerEnabled) as Tracker }
-                bean { axa.tex.drive.sdk.acquisition.collection.internal.Collector(get(FakeLocationTracker::class.simpleName), get(BatteryTracker::class.simpleName), get(MotionTracker::class.simpleName)) } // get() will resolve service instance
+                bean { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context,get(FakeLocationTracker::class.simpleName), get(BatteryTracker::class.simpleName), get(MotionTracker::class.simpleName)) } // get() will resolve service instance
             }
             try {
                 StandAloneContext.startKoin(listOf(myModule))

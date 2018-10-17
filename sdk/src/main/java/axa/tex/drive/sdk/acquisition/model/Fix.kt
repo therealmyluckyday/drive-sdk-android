@@ -19,7 +19,7 @@ open class Fix {
 
 
 
-    fun toJson() : String{
+    open fun toJson() : String{
         return try {
             val mapper = ObjectMapper();
             mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);

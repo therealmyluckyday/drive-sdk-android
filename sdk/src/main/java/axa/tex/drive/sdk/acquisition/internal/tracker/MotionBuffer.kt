@@ -4,8 +4,8 @@ import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.MotionFix
 import java.util.*
 
-const val DEFAULT_MOTION_AGE_AFTER_ACCELERATION : Int = 5 * 1000
-const val DEFAULT_OLDER_MOTION_AGE = 10 * 1000
+internal  const val DEFAULT_MOTION_AGE_AFTER_ACCELERATION : Int = 5 * 1000
+internal const val DEFAULT_OLDER_MOTION_AGE = 10 * 1000
 
 class MotionBuffer {
 

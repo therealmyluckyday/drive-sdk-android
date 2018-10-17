@@ -3,6 +3,10 @@ package com.axa.tex.drive.demo
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import axa.tex.drive.sdk.acquisition.TripRecorder
+import axa.tex.drive.sdk.acquisition.model.Fix
+import axa.tex.drive.sdk.acquisition.model.TexUser
+import axa.tex.drive.sdk.core.TexConfig
+import axa.tex.drive.sdk.core.TexService
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,25 +24,42 @@ import org.koin.test.KoinTest
 class ExampleInstrumentedTest :KoinTest{
 
     var tripRecorder : TripRecorder? = null;
+    private var lastLocation : Fix? = null;
 
     @Before
     fun beforeTest() {
+        val appContext = InstrumentationRegistry.getTargetContext()
+        val user = TexUser("appId", "FFFDIHOVA3131IJA1")
+        val config : TexConfig = TexConfig.Builder(user,appContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build();
+        tripRecorder = TexService.configure(config)?.getTripRecorder();
+        tripRecorder?.locationObservable()?.subscribe{fix -> lastLocation = fix}
+        tripRecorder?.track()
 
-         tripRecorder = TripRecorder(InstrumentationRegistry.getTargetContext());
-         tripRecorder?.track();
+        Thread.sleep(5000)
+    }
 
+
+
+
+
+    @Test
+    fun testPackage(){
+        val appContext = InstrumentationRegistry.getTargetContext()
+        assertEquals("axa.tex.drive.demo", appContext.packageName)
     }
 
     @Test
-    fun testTrackerInjection() {
+    fun testLastLocation() {
+        assertTrue(lastLocation != null)
+    }
 
-        val appContext = InstrumentationRegistry.getTargetContext()
 
-
-        assertEquals("com.axa.dil.tex", appContext.packageName)
-        Thread.sleep(5000)
-        tripRecorder?.numberOfTracker()!!
-        var numberTracker :Int = tripRecorder?.numberOfTracker()!!
-        assertEquals(3, numberTracker)
+    @Test
+    fun testIsRecording() {
+        assertTrue(tripRecorder?.isRecording() == true)
+        tripRecorder?.stopTracking();
+        Thread.sleep(1000)
+        assertTrue(tripRecorder?.isRecording() == false)
+        tripRecorder?.track();
     }
 }

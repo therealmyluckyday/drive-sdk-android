@@ -8,6 +8,7 @@ import axa.tex.drive.sdk.acquisition.collection.internal.CollectorService
 import android.content.ComponentName
 import android.os.IBinder
 import android.content.ServiceConnection
+import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
 import axa.tex.drive.sdk.acquisition.model.Fix
 import io.reactivex.Observable
 
@@ -28,9 +29,11 @@ internal class TripRecorderImpl(private val context: Context) : ComponentCallbac
     override fun track() {
         val serviceIntent = Intent(context, CollectorService::class.java)
         context.startService(serviceIntent)
+        FixProcessor.startTrip(context)
     }
 
     override fun stopTracking() {
+        FixProcessor.endTrip(context)
         val serviceIntent = Intent(context, CollectorService::class.java);
         context.bindService(serviceIntent, object : ServiceConnection {
 

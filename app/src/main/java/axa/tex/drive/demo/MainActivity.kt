@@ -5,7 +5,9 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.util.Log
 import android.view.View
+import androidx.work.WorkManager
 
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.TexUser
@@ -74,7 +76,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopService(){
-
+        val value = WorkManager.getInstance().getStatusesByTag("9a2dc881-c136-47b6-b3b0-afbc44961055").value;
+        Log.i("WORKS",value.toString())
         tripRecorder?.stopTracking();
     }
 

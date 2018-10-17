@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 
 
-/*fun Any.toJson() : String{
+fun Any.toJson() : String{
     return try {
         val mapper = ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
@@ -13,5 +13,5 @@ import com.fasterxml.jackson.databind.SerializationFeature
         e.printStackTrace()
         "{}";
     }
-}*/
+}
 

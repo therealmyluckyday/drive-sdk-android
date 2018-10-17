@@ -6,9 +6,13 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.support.annotation.RequiresApi
+import android.support.v4.app.NotificationCompat
+import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.core.Constants
 import axa.tex.drive.sdk.core.TexConfig
 
@@ -46,6 +50,19 @@ internal class CollectorService : Service() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(): String{
+        val channelId = Constants.CHANNEL_ID
+        val channelName = Constants.CHANNEL_NAME
+        val chan = NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_NONE)
+        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        service.createNotificationChannel(chan)
+        return channelId
+    }
+
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         TexConfig.init(applicationContext)
@@ -55,15 +72,16 @@ internal class CollectorService : Service() {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
+            val channelId = createNotificationChannel();
             val notification: Notification
             if (intent != null && intent.hasExtra("")) {
                 notification = intent.getParcelableExtra("")
             } else {
-                val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                val notificationChannel = NotificationChannel(Constants.CHANNEL_ID, Constants.CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
-                notificationManager.createNotificationChannel(notificationChannel)
-                notification = Notification.Builder(applicationContext, Constants.CHANNEL_ID).build()
+                val notificationBuilder = NotificationCompat.Builder(this, channelId )
+                notification = notificationBuilder.setOngoing(true)
+                        .setSmallIcon(R.drawable.notification_icon_background)
+                        .setCategory(Notification.CATEGORY_SERVICE)
+                        .build()
             }
             this.startForeground(NOTIFICATION_ID, notification)
         }

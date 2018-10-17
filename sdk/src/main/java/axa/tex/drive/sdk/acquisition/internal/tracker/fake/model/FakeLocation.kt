@@ -1,5 +1,7 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker.fake.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 
 data class FakeLocation(val latitude : Double,
                         val longitude: Double,
@@ -7,7 +9,7 @@ data class FakeLocation(val latitude : Double,
                         val seed : Float,
                         val bearing : Float,
                         val altitude: Double,
-                        val timestamp: Long,
+                        @JsonIgnore val timestamp: Long,
                         val accuracy : Float,
                         val speed : Float,
                         val time : Long)
