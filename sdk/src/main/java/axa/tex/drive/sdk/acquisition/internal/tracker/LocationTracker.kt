@@ -7,17 +7,29 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationTracker
+import axa.tex.drive.sdk.acquisition.internal.tracker.fake.model.FakeLocation
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.Fix
+import axa.tex.drive.sdk.core.internal.utils.Utils
+import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 
 class LocationTracker : LocationListener, Tracker {
 
     private val fixProducer: PublishSubject<Fix> = PublishSubject.create()
-    private val context : Context;
+    private var context : Context? = null;
     private var locationManager: LocationManager? = null
     private var isEnabled : Boolean
+    private var fakeLocationTracker: FakeLocationTracker? = null
+
+    constructor(context: Context?, isEnabled : Boolean = false, fakeLocationTracker: FakeLocationTracker? = null) {
+        this.isEnabled = isEnabled
+        locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        this.context = context
+        this.fakeLocationTracker = fakeLocationTracker
+    }
 
     constructor(context: Context, isEnabled : Boolean = false) {
         this.isEnabled = isEnabled
@@ -27,25 +39,36 @@ class LocationTracker : LocationListener, Tracker {
 
 
     override fun disableTracking() {
+        isEnabled = false
         enableTracking(false)
     }
 
     override fun enableTracking() {
+        isEnabled = true
         enableTracking(true)
     }
 
     private fun enableTracking(track: Boolean) {
-        if(track) {
-            if (Build.VERSION.SDK_INT >= 23) {
-                if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                        context.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
+        if(fakeLocationTracker != null){
+            val fakeLocations = fakeLocationTracker?.provideFixProducer() as Observable<Fix>
+            fakeLocations.subscribe {fix  ->
+                val fakeLocation = fix as LocationFix
+                fixProducer.onNext(fakeLocation)
             }
+            fakeLocationTracker?.enableTracking()
+        }else {
+            if (track) {
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (context?.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                            context?.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                }
 
-            locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, this)
-        }else{
-            locationManager?.removeUpdates(this)
+                locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, this)
+            } else {
+                locationManager?.removeUpdates(this)
+            }
         }
     }
 

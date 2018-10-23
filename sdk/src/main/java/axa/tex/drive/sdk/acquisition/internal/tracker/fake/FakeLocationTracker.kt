@@ -1,23 +1,25 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker.fake
 
 
-import android.content.Context
+import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
 import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
+import java.util.*
 
 
 class FakeLocationTracker : Tracker {
 
-    private val context: Context
+    private val fixProducer: PublishSubject<Fix> = PublishSubject.create()
     private var stopTracking: Boolean = true
     private var isEnabled: Boolean
 
 
-    constructor(context: Context, isEnabled: Boolean = false) {
+    constructor(isEnabled: Boolean = false) {
         this.isEnabled = isEnabled
-        this.context = context
+
     }
 
     override fun isEnabled(): Boolean {
@@ -25,27 +27,33 @@ class FakeLocationTracker : Tracker {
     }
 
     override fun provideFixProducer(): Any {
-        val fixProducer: Observable<Fix> = Observable.create { subscriber ->
-            for (i in 0..10) {
-                if (!stopTracking) {
-                    val fakeFix = LocationFix(12.0, 1.88282, 28.0f, 10.9f, 18.0f, 10.0, 1881);
-                    //subscriber.onNext(Data(fakeFix.timestamp,location = fakeFix))
-                    subscriber.onNext(fakeFix)
-                }
-            }
-
-        }
-
-
 
         return fixProducer;
     }
 
     override fun enableTracking() {
+        isEnabled = true
         stopTracking = false
+        var time : Long = Date().time
+
+        Thread {   while (isEnabled) {
+            if (!stopTracking) {
+
+                val fakeFix = LocationFix(12.0, 1.88282, 28.0f, 10.9f, 18.0f, 10.0, time);
+                time += 1000L
+                //subscriber.onNext(Data(fakeFix.timestamp,location = fakeFix))
+                //subscriber.onNext(fakeFix)
+                Thread.sleep(1000)
+                fixProducer.onNext(fakeFix)
+            }
+        }}.start()
+
+
+
     }
 
     override fun disableTracking() {
+        isEnabled = false
         stopTracking = true
     }
 

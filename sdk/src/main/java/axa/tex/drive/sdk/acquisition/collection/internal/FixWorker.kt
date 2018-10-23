@@ -3,7 +3,7 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 import android.util.Log
 import androidx.work.Data
 import androidx.work.Worker
-import axa.tex.drive.sdk.acquisition.db.PendingTripDao
+import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.Utils
@@ -79,7 +79,7 @@ internal class FixWorker() : Worker() {
                 }
             }
         } else {
-           val pendingTrips = PendingTripDao.deletePendingTrip(applicationContext,id)
+          CollectionDb.deletePendingTrip(applicationContext,id)
         }
     }
 

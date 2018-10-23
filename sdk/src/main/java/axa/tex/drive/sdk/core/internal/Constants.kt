@@ -1,4 +1,4 @@
-package axa.tex.drive.sdk.core
+package axa.tex.drive.sdk.core.internal
 
 object Constants{
     internal const val CHANNEL_ID = "tex-channel-id"

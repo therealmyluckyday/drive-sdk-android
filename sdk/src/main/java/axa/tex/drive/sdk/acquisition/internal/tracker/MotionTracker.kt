@@ -21,9 +21,6 @@ internal class MotionTracker : SensorEventListener, Tracker{
     private val GRAVITY_FORCE = 9.81f
     private val DEFAULT_ACCELERATION_THRESHOLD = 2.5f // [G]
     private val DEFAULT_STRESSED_CAPTURE_RATE = 10 * 1000 // 10 ms = 100 Hz
-    private val DEFAULT_BUFFER_LIMIT = 10 * 1000 // record 10 sec before and 5 sec after the acceleration event
-
-    private var motionBufferLimit = DEFAULT_BUFFER_LIMIT
 
     private val sensors: SparseArray<Sensor>
     private val sensorManager: SensorManager
@@ -33,7 +30,6 @@ internal class MotionTracker : SensorEventListener, Tracker{
     private var accelerationThreshold = DEFAULT_ACCELERATION_THRESHOLD // [G]
     private var isOverAccelerationThreshold = false
     private var accelerationEventTimestamp: Long = 0
-    private val motionBufferQueue = LinkedList<Fix>()
 
 
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
@@ -105,19 +101,10 @@ internal class MotionTracker : SensorEventListener, Tracker{
                         Log.w(MOTION_TAG,"Acceleration event detected")
                         accelerationEventTimestamp = Date().time
 
-                       // streamMotions()
-
-                       // motionFixes.value = motionBufferQueue
-
-                       // streamMotions()
-                       // val streamWorker = StreamWorker()
-                       // streamWorker.start()
 
                         val buf = motionBuffer.flush()
                         fixProducer.onNext(buf)
 
-                      //  mDelegate.onEventDetected(Event.ACCELERATION) // with this callback I flush the accumulated motions
-                       // comp.addEvent(Event.ACCELERATION)
                         isOverAccelerationThreshold = true
                     }
                 } else {
@@ -125,43 +112,15 @@ internal class MotionTracker : SensorEventListener, Tracker{
                         isOverAccelerationThreshold = false
                     }
                 }
-            } else { // add this sensor motion (gravity, linear accel. and magnetometer) to the list of motions
-               /* synchronized(motionBufferQueue) {
-                    val motionFix = event?.let { motionFix(it,event.timestamp, 0) }
-                    motionFix?.let { motionBufferQueue.add(it) }
-                    //removeExpiredMotions()
-                    ExpirartionWorker().start()
-
-                }*/
-                //event?.let { ExpirartionWorker(it).start() }
+            } else {
 
                 val motionFix = event?.let { motionFix(it,event.timestamp) }
                 motionBuffer.addFix(motionFix)
-               /* motionBufferQueue.add(motionFix!!)
-                if(motionBufferQueue.size == 100){
-                    fixProducer.onNext(motionBufferQueue.toList())
-                    motionBufferQueue.clear()
-                }*/
-                //motionFix?.let { fixProducer.onNext(it) }
+
 
 
             }
     }
-
-
-    private fun removeExpiredMotions(event: SensorEvent) {
-        synchronized(motionBufferQueue) {
-
-            val motionFix = event?.let { motionFix(it,event.timestamp) }
-            motionFix?.let { motionBufferQueue.add(it) }
-
-            val currentDate = Date().time
-            while (motionBufferQueue.size > 0 && currentDate - motionBufferQueue.first.timestamp() > motionBufferLimit) {
-                motionBufferQueue.removeFirst()
-            }
-        }
-    }
-
 
 
     private fun enableTracking(track: Boolean) {

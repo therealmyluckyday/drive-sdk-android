@@ -1,7 +1,10 @@
 package axa.tex.drive.sdk.core.internal.utils
 
 import android.content.Context
+import android.location.Location
 import android.os.Build
+import axa.tex.drive.sdk.acquisition.internal.tracker.fake.model.FakeLocation
+import axa.tex.drive.sdk.acquisition.model.LocationFix
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -37,7 +40,7 @@ class Utils {
                 return uId!!
             } else {
                 val uuid = UUID.randomUUID().toString()
-                prefs.edit().putString(UID_KEY, uuid).apply()
+                prefs.edit().putString(TRIP_ID, uuid).apply()
                 return uuid
             }
         }

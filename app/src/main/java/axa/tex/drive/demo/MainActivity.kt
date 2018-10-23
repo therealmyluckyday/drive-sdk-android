@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     val TAG: String = MainActivity::class.java.simpleName
 
     var tripRecorder : TripRecorder? = null
+    var config : TexConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +41,8 @@ class MainActivity : AppCompatActivity() {
         activityTracker.scan(automode)
 
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
-        val config : TexConfig = TexConfig.Builder(user,applicationContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build();
-        tripRecorder = TexService.configure(config)?.getTripRecorder();
+         config  = TexConfig.Builder(user,applicationContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build(applicationContext);
+        tripRecorder = TexService.configure(config!!)?.getTripRecorder();
        // tripRecorder = TripRecorder(applicationContext);
 
         play.setOnClickListener { play.visibility = View.GONE; stop.visibility = View.VISIBLE; startService();}

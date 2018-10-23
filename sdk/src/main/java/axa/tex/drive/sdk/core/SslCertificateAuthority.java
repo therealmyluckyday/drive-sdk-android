@@ -21,8 +21,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-// From https://developer.android.com/training/articles/security-ssl.html#UnknownCa
-
 public class SslCertificateAuthority {
 
 

@@ -6,17 +6,18 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import axa.tex.drive.sdk.R
-import axa.tex.drive.sdk.core.Constants
+import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
+import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.TexConfig
 
 import org.koin.android.ext.android.inject
+import org.koin.standalone.StandAloneContext
 import java.util.*
 
 private const val NOTIFICATION_ID = 7071
@@ -65,7 +66,14 @@ internal class CollectorService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        TexConfig.init(applicationContext)
+        val config  = CollectionDb.getConfig(applicationContext)
+        try {
+            StandAloneContext.closeKoin()
+        }catch (e : Exception){
+
+        }
+
+        TexConfig.init(applicationContext, config)
         val collector: axa.tex.drive.sdk.acquisition.collection.internal.Collector by inject()
         this.collector =  collector
         collector.collect()

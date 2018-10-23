@@ -14,7 +14,7 @@ class FixPacket(@JsonIgnore private val fixes : List<Fix>,
                 val os: String,
                 val timezone:String,
                 val uid: String,
-                val version: String, @JsonProperty("trip_id") val tripId: String){
+                val version: String, val trip_id: String, val app_name : String, val client_id: String){
 
      fun toJson() : String{
          return try {
