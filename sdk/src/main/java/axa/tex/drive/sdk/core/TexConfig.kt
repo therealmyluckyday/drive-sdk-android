@@ -2,6 +2,8 @@ package axa.tex.drive.sdk.core
 
 
 import android.content.Context
+import android.os.Environment
+import axa.tex.drive.sdk.BuildConfig
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
@@ -9,13 +11,18 @@ import axa.tex.drive.sdk.acquisition.internal.tracker.BatteryTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.LocationTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
-import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationTracker
 import axa.tex.drive.sdk.acquisition.model.TexUser
+import axa.tex.drive.sdk.core.internal.Constants
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.orhanobut.logger.CsvFormatStrategy
+import com.orhanobut.logger.DiskLogAdapter
+import com.orhanobut.logger.DiskLogStrategy
+import com.orhanobut.logger.Logger
 import org.koin.dsl.module.Module
 import org.koin.error.AlreadyStartedException
 import org.koin.standalone.StandAloneContext
+import java.io.File
 
 
 class TexConfig {
@@ -29,9 +36,19 @@ class TexConfig {
         private var batteryTrackerEnabled: Boolean = false
         private var user: TexUser? = null
 
+        private fun setupLogs(){
+            val file = File(Environment.getExternalStorageDirectory(), Constants.LOG_DIR)
+            if (!file.exists()) {
+                file.mkdir()
+            }
+            Logger.addLogAdapter(DiskLogAdapter(CsvFormatStrategy.newBuilder().tag("tag").logStrategy(DiskLogStrategy(DiskLogHandler(file.absolutePath, BuildConfig.APPLICATION_ID, 500 * 1024))).build()))
+
+        }
 
 
         internal fun init(context: Context, config : Config?) {
+
+            setupLogs()
 
             TexConfig.locationTrackerEnabled = if(config == null){
                false

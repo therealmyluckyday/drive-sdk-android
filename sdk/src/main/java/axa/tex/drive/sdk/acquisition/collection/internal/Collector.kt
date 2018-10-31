@@ -9,6 +9,8 @@ import io.reactivex.subjects.PublishSubject
 import kotlin.reflect.KClass
 import android.content.Context
 import axa.tex.drive.sdk.core.internal.utils.Utils
+import com.orhanobut.logger.DiskLogAdapter
+import com.orhanobut.logger.Logger
 
 
 internal class Collector {
@@ -38,7 +40,9 @@ internal class Collector {
     fun collect() {
         for (tracker in trackers) {
             if (tracker.isEnabled()) {
+                Logger.i("Enabling tracker ${tracker.javaClass.simpleName}")
                 tracker.enableTracking()
+                Logger.i("${tracker.javaClass.simpleName} enabled = ${tracker.isEnabled()}")
                 collect(tracker)
             }
         }
