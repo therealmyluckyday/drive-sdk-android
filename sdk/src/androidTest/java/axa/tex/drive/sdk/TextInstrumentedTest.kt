@@ -32,7 +32,7 @@ class TextInstrumentedTest : KoinTest {
     fun beforeTest() {
         val appContext = InstrumentationRegistry.getTargetContext()
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
-        val config: TexConfig = TexConfig.Builder(user, appContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build();
+        val config: TexConfig = TexConfig.Builder(user, appContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build(appContext);
         tripRecorder = TexService.configure(config)?.getTripRecorder();
         tripRecorder?.locationObservable()?.subscribe { fix -> lastLocation = fix }
         tripRecorder?.track()

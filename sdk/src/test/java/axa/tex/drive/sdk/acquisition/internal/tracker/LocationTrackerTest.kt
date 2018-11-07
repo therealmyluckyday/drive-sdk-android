@@ -1,4 +1,4 @@
-package axa.tex.drive.sdk
+package axa.tex.drive.sdk.acquisition.internal.tracker
 
 
 import axa.tex.drive.sdk.acquisition.internal.tracker.LocationTracker
