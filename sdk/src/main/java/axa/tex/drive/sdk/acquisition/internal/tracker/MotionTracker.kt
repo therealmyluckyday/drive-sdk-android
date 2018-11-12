@@ -9,6 +9,7 @@ import android.util.Log
 import android.util.SparseArray
 import android.util.SparseIntArray
 import axa.tex.drive.sdk.acquisition.model.*
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
@@ -38,6 +39,7 @@ internal class MotionTracker : SensorEventListener, Tracker{
 
     private var isEnabled : Boolean
 
+    val LOGGER = LoggerFactory.getLogger().logger
 
     constructor(context: Context, isEnabled : Boolean = false){
         this.isEnabled = isEnabled
@@ -62,11 +64,15 @@ internal class MotionTracker : SensorEventListener, Tracker{
     }
 
     override fun enableTracking() {
+        LOGGER.info("Motion Tracker enabled", "MotionTracker", "override fun enableTracking()")
+
         enableTracking(true)
     }
 
     override fun disableTracking() {
         sensorManager.unregisterListener(this)
+        LOGGER.info("Motion Tracker disabled", "MotionTracker", "override fun disableTracking()")
+
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -87,7 +93,8 @@ internal class MotionTracker : SensorEventListener, Tracker{
         if(event != null) {
             for (value in event.values) {
                 if (java.lang.Float.isNaN(value) || java.lang.Float.isInfinite(value)) {
-                    Log.w(MOTION_TAG,"Skipping sensor value NaN or infinite")
+                    LOGGER.warn("Skipping sensor value NaN or infinite", "MotionTracker", "override fun onSensorChanged(event: SensorEvent?)")
+
                     return
                 }
             }
@@ -98,11 +105,13 @@ internal class MotionTracker : SensorEventListener, Tracker{
             if (sensorType == Sensor.TYPE_ACCELEROMETER) { // check if there is and event
                 if (normL2(event.values) >= accelerationThreshold * GRAVITY_FORCE) {
                     if (!isOverAccelerationThreshold) {
-                        Log.w(MOTION_TAG,"Acceleration event detected")
+
+                        LOGGER.info("Acceleration event detected", "MotionTracker", "override fun onSensorChanged(event: SensorEvent?)")
+
                         accelerationEventTimestamp = Date().time
 
-
                         val buf = motionBuffer.flush()
+                        LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "MotionTracker", "override fun onSensorChanged(event: SensorEvent?)")
                         fixProducer.onNext(buf)
 
                         isOverAccelerationThreshold = true

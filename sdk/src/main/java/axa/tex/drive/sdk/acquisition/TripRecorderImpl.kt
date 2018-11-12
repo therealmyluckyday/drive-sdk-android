@@ -13,7 +13,7 @@ import axa.tex.drive.sdk.acquisition.model.Fix
 import io.reactivex.Observable
 
 
-internal class TripRecorderImpl(private val context: Context) : ComponentCallbacks, axa.tex.drive.sdk.acquisition.TripRecorder {
+internal class TripRecorderImpl(private val context: Context) : TripRecorder, ComponentCallbacks {
 
     override fun getCurrentTripId(): String {
         return CollectorService.currentTripId()

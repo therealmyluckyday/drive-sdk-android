@@ -1,5 +1,6 @@
 package axa.tex.drive.demo
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
@@ -17,6 +18,9 @@ import axa.tex.drive.sdk.automode.internal.ActivityTracker
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
+import axa.tex.drive.sdk.core.logger.Logger
+import axa.tex.drive.sdk.core.logger.LoggerFactory
+import io.reactivex.schedulers.Schedulers
 
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -55,6 +59,12 @@ class MainActivity : AppCompatActivity() {
 
 
 
+         val logger  = LoggerFactory.getLogger();
+        logger.getLogStream().subscribeOn(Schedulers.computation()).subscribe {
+            println(it)
+        }
+
+
         //var locationFix = LocationFix(1.000000, 1.614514, 1.6552f, 12.4442f, 13.8f, 16.0, 14414, "124");
 
         //Log.i(TAG, locationFix.toJson())
@@ -85,8 +95,18 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun requestForLocationPermission() {
-        val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+
+
+
+        val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (Build.VERSION.SDK_INT >= 23) {
+
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, permissions, 0)
+            }
+
             if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, permissions, 0)
             }

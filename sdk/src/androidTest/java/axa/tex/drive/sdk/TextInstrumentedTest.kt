@@ -3,10 +3,8 @@ package axa.tex.drive.sdk
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
-import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_MOTION_AGE_AFTER_ACCELERATION
 import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_OLDER_MOTION_AGE
-import axa.tex.drive.sdk.acquisition.internal.tracker.MotionBuffer
 import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.TexUser
@@ -19,7 +17,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.Before
 import org.koin.test.KoinTest
-import java.util.*
 
 
 @RunWith(AndroidJUnit4::class)
