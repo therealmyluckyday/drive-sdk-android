@@ -7,11 +7,12 @@ import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.Utils
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-
+private val LOGGER = LoggerFactory.getLogger().logger
 
 internal class FixWorker() : Worker() {
 
@@ -23,25 +24,31 @@ internal class FixWorker() : Worker() {
 
         val inputData : Data =  inputData
 
-        sendFixes(inputData);
+        val result = sendFixes(inputData)
 
-        return WorkerResult.SUCCESS
-    }
-
-
-    private fun sendFixes(inputData : Data) {
-
-        val data = inputData.keyValueMap
-        Log.i("COLLECTOR_WORKER SIZE :", inputData.keyValueMap.size.toString())
-        for((id , value) in data) {
-            sendData(id,value as String)
-            Log.i(FIX_SENDER_TAG, value as String)
+        return if(result){
+            LOGGER.info("Data sent successfully", "FixWorker", "override fun doWork(): WorkerResult")
+            WorkerResult.SUCCESS
+        }else{
+            WorkerResult.RETRY
         }
     }
 
 
+    private fun sendFixes(inputData : Data) : Boolean{
+        LOGGER.info("Sending data to the server", "FixWorker", "private fun sendFixes(inputData : Data) : Boolean")
+        val data = inputData.keyValueMap
+        Log.i("COLLECTOR_WORKER SIZE :", inputData.keyValueMap.size.toString())
+        for((id , value) in data) {
+            Log.i(FIX_SENDER_TAG, value as String)
+            return  sendData(id,value as String)
+        }
+        return false
+    }
+
+
     @Throws(IOException::class)
-    private fun sendData(id: String, data: String) {
+    private fun sendData(id: String, data: String) : Boolean{
         val platformToHostConverter = PlatformToHostConverter(Platform.PREPROD);
         val url = URL(platformToHostConverter.getHost()+"/data")
 
@@ -78,8 +85,10 @@ internal class FixWorker() : Worker() {
                     throw IOException()
                 }
             }
+            return false
         } else {
           CollectionDb.deletePendingTrip(applicationContext,id)
+            return true
         }
     }
 

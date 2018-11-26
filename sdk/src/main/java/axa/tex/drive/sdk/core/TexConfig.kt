@@ -76,7 +76,7 @@ class TexConfig {
             }
 
             logger.logger.info("Configuring ssl certificate","TexConfig","init")
-            SslCertificateAuthority.configureDefaultSSLSocketFactory(context.getResources().openRawResource(R.raw.tex_elb_ssl))
+            CertificateAuthority.configureDefaultSSLSocketFactory(context.getResources().openRawResource(R.raw.tex_elb_ssl))
             logger.logger.info("Done configuring ssl certificate","TexConfig","init")
 
             logger.logger.info("Create koin module","TexConfig","init")

@@ -8,10 +8,8 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationTracker
-import axa.tex.drive.sdk.acquisition.internal.tracker.fake.model.FakeLocation
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.Fix
-import axa.tex.drive.sdk.core.internal.utils.Utils
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -85,7 +83,7 @@ class LocationTracker : LocationListener, Tracker {
                     }
                 }
 
-                locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, this)
+                locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, this)
                 LOGGER.info("location Tracker enabled", "LocationTracker", "private fun enableTracking(track: Boolean)")
             } else {
                 locationManager?.removeUpdates(this)
@@ -100,10 +98,14 @@ class LocationTracker : LocationListener, Tracker {
 
     override fun onLocationChanged(location: Location) {
         LOGGER.info("Receives location from sensor", "LocationTracker", "override fun onLocationChanged(location: Location)")
+        var speed = location.speed
+        if(!location.hasSpeed()){
+            speed = -1f
+        }
         val locationFix = LocationFix(location.latitude,
                 location.longitude,
                 location.accuracy,
-                location.speed,
+                speed,
                 location.bearing,
                 location.altitude,
                 location.time)

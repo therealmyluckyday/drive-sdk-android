@@ -110,9 +110,13 @@ internal class MotionTracker : SensorEventListener, Tracker{
 
                         accelerationEventTimestamp = Date().time
 
-                        val buf = motionBuffer.flush()
-                        LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "MotionTracker", "override fun onSensorChanged(event: SensorEvent?)")
-                        fixProducer.onNext(buf)
+                        Thread{
+                            val buf = motionBuffer.flush()
+                            LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "MotionTracker", "override fun onSensorChanged(event: SensorEvent?)")
+                            fixProducer.onNext(buf)
+
+                        }
+
 
                         isOverAccelerationThreshold = true
                     }
@@ -124,7 +128,10 @@ internal class MotionTracker : SensorEventListener, Tracker{
             } else {
 
                 val motionFix = event?.let { motionFix(it,event.timestamp) }
-                motionBuffer.addFix(motionFix)
+
+                Thread{
+                    motionBuffer.addFix(motionFix)
+                }.start()
 
 
 

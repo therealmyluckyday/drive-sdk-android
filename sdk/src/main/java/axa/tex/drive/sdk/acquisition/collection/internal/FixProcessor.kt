@@ -32,7 +32,7 @@ internal object FixProcessor {
     }
 
     public fun endTrip(context : Context){
-        val end = Event(listOf("end"), Date().time);
+        val end = Event(listOf("stop"), Date().time);
         tripEnded = true
         addFixes(context,listOf(end))
 

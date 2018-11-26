@@ -3,7 +3,7 @@ package axa.tex.drive.sdk.acquisition
 import axa.tex.drive.sdk.acquisition.model.Fix
 import io.reactivex.Observable
 
-interface TripRecorder  {
+interface TripRecorder{
 
     /**
      * TripID of the currently recorded trip.
