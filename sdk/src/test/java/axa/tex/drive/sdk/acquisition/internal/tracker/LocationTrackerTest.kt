@@ -1,7 +1,7 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
 
-import axa.tex.drive.sdk.acquisition.internal.tracker.LocationTracker
+
 import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationTracker
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix

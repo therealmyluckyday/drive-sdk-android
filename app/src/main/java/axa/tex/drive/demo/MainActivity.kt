@@ -36,18 +36,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         requestForLocationPermission();
 
-        val activityTracker = ActivityTracker(this);
+      /*  val activityTracker = ActivityTracker(this);
         val automode = AutoMode(this)
 
         automode.statePublisher().subscribe{state -> setState(state)}
 
         automode.setCurrentState(activityTracker)
-        activityTracker.scan(automode)
+        activityTracker.scan(automode)*/
 
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
-         config  = TexConfig.Builder(user,applicationContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build(applicationContext);
+         config  = TexConfig.Builder(user,applicationContext).enableBatteryTracker().enableLocationTracker()
+                 .enableMotionTracker().withAppName("BC").withClientId("22910000").build(applicationContext);
         tripRecorder = TexService.configure(config!!)?.getTripRecorder();
-       // tripRecorder = TripRecorder(applicationContext);
+
 
         play.setOnClickListener { play.visibility = View.GONE; stop.visibility = View.VISIBLE; startService();}
         stop.setOnClickListener { stop.visibility = View.GONE; play.visibility = View.VISIBLE; stopService()}
@@ -65,18 +66,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        //var locationFix = LocationFix(1.000000, 1.614514, 1.6552f, 12.4442f, 13.8f, 16.0, 14414, "124");
 
-        //Log.i(TAG, locationFix.toJson())
-       // Log.i(TAG, locationFix.altitude.toString())
-
-       // val collector = Collector(LocationTracker(this), BatteryTracker(this));
-        //collector.collect();
-       // TexConfig("").build(this.applicationContext);
-        //TexConfig.Builder("AppId","user",applicationContext).platformHost(Platform.PREPROD).build()
-
-       // val motionTracker = MotionTracker (this);
-       // motionTracker.enableTracking(true);
 
 
     }
@@ -136,5 +126,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
-

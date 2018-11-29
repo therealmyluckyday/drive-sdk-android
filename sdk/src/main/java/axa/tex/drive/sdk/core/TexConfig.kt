@@ -37,7 +37,9 @@ class TexConfig {
         private var locationTrackerEnabled: Boolean = false
         private var motionTrackerEnabled: Boolean = false
         private var batteryTrackerEnabled: Boolean = false
-        private var user: TexUser? = null
+        internal var user: TexUser? = null
+        internal var appName : String = Constants.DEFAULT_APP_NAME
+        internal var clientId : String = Constants.DEFAULT_CLIENT_ID
 
         private fun setupLogs(){
             val file = File(Environment.getExternalStorageDirectory(), Constants.LOG_DIR)
@@ -74,6 +76,15 @@ class TexConfig {
             }else{
                 config.batteryTrackerEnabled
             }
+
+            if(config != null && !config.appName.isEmpty()){
+                TexConfig.appName = config.appName
+            }
+
+            if(config != null && !config.clientId.isEmpty()){
+                TexConfig.clientId= config.clientId
+            }
+
 
             logger.logger.info("Configuring ssl certificate","TexConfig","init")
             CertificateAuthority.configureDefaultSSLSocketFactory(context.getResources().openRawResource(R.raw.tex_elb_ssl))
@@ -121,6 +132,11 @@ class TexConfig {
         private var motionTrackerEnabled: Boolean = false
         @JsonProperty
         private var batteryTrackerEnabled: Boolean = false
+        @JsonProperty
+        private var appName : String = Constants.DEFAULT_APP_NAME
+
+        @JsonProperty
+        private var clientId : String = Constants.DEFAULT_CLIENT_ID
 
         val logger = LoggerFactory.getLogger()
 
@@ -146,8 +162,10 @@ class TexConfig {
             TexConfig.batteryTrackerEnabled = batteryTrackerEnabled;
             TexConfig.locationTrackerEnabled = locationTrackerEnabled
             TexConfig.motionTrackerEnabled = motionTrackerEnabled
+            TexConfig.appName = appName
+            TexConfig.clientId = clientId
 
-            val config = Config(batteryTrackerEnabled,locationTrackerEnabled,motionTrackerEnabled)
+            val config = Config(batteryTrackerEnabled,locationTrackerEnabled,motionTrackerEnabled, appName, clientId)
 
             CollectionDb.setConfig(context, config)
 
@@ -212,6 +230,16 @@ class TexConfig {
             motionTrackerEnabled = false
             logger.logger.info("Motion tracker disabled","TexConfig.Builder","disableMotionTracker")
 
+            return this
+        }
+
+        fun withAppName(appName : String): Builder{
+            this.appName = appName
+            return this
+        }
+
+        fun withClientId(clientId : String): Builder{
+            this.clientId = clientId
             return this
         }
     }

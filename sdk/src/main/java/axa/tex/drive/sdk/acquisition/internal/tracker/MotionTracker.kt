@@ -8,6 +8,7 @@ import android.hardware.SensorManager
 import android.util.Log
 import android.util.SparseArray
 import android.util.SparseIntArray
+import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeMotionSensor
 import axa.tex.drive.sdk.acquisition.model.*
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.subjects.PublishSubject
@@ -23,14 +24,15 @@ internal class MotionTracker : SensorEventListener, Tracker{
     private val DEFAULT_ACCELERATION_THRESHOLD = 2.5f // [G]
     private val DEFAULT_STRESSED_CAPTURE_RATE = 10 * 1000 // 10 ms = 100 Hz
 
-    private val sensors: SparseArray<Sensor>
-    private val sensorManager: SensorManager
-    private val accuracies: SparseIntArray
+    private var sensors: SparseArray<Sensor>? = null
+    private var sensorManager: SensorManager? = null
+    private var accuracies: SparseIntArray? = null
     private val SENSOR_KEYS = arrayOf("GRAVITY", "LINEAR_ACCELERATION", "MAGNETIC_FIELD", "ACCELERATION")
     private var stressedCaptureRate = DEFAULT_STRESSED_CAPTURE_RATE
     private var accelerationThreshold = DEFAULT_ACCELERATION_THRESHOLD // [G]
     private var isOverAccelerationThreshold = false
     private var accelerationEventTimestamp: Long = 0
+    private var fakeMotionSensor : FakeMotionSensor? = null
 
 
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
@@ -47,9 +49,9 @@ internal class MotionTracker : SensorEventListener, Tracker{
         sensors = SparseArray()
         for (i in SENSORS_TYPES.indices) {
             val type = SENSORS_TYPES[i]
-            val sensor = sensorManager.getDefaultSensor(type)
+            val sensor = sensorManager?.getDefaultSensor(type)
             if (sensor != null) {
-                sensors.put(type, sensor)
+                sensors?.put(type, sensor)
                 Log.d(MOTION_TAG,"Found sensor {} of type: "+ SENSOR_KEYS[i])
             } else {
                 Log.w(MOTION_TAG,"Found no sensor of type : "+SENSOR_KEYS[i])
@@ -58,26 +60,35 @@ internal class MotionTracker : SensorEventListener, Tracker{
         accuracies = SparseIntArray()
     }
 
+    constructor(isEnabled : Boolean = false, fakeMotionSensor : FakeMotionSensor){
+        this.isEnabled = isEnabled
+        this.fakeMotionSensor = fakeMotionSensor
+    }
+
+
 
     override fun provideFixProducer(): Any {
         return fixProducer;
     }
 
     override fun enableTracking() {
-        LOGGER.info("Motion Tracker enabled", "MotionTracker", "override fun enableTracking()")
-
+        if(fakeMotionSensor ==null) {
+            LOGGER.info("Motion Tracker enabled", "MotionTracker", "override fun enableTracking()")
+        }
         enableTracking(true)
     }
 
     override fun disableTracking() {
-        sensorManager.unregisterListener(this)
-        LOGGER.info("Motion Tracker disabled", "MotionTracker", "override fun disableTracking()")
-
+        enableTracking(false)
+        //sensorManager?.unregisterListener(this)
+        if(fakeMotionSensor ==null) {
+            LOGGER.info("Motion Tracker disabled", "MotionTracker", "override fun disableTracking()")
+        }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         if (sensor != null) {
-            accuracies.put(sensor.getType(), accuracy)
+            accuracies?.put(sensor.getType(), accuracy)
         }
     }
 
@@ -87,7 +98,7 @@ internal class MotionTracker : SensorEventListener, Tracker{
 
         // We have to maintain an array of the sensor accuracies as declared in onAccuracyChanged instead of checking
         // event.accuracy because SensorEvent objects do not report correct accuracies on some devices (e.g. Samsung Galaxy S4)
-        val accuracy = sensorType?.let { accuracies.get(it, SensorManager.SENSOR_STATUS_UNRELIABLE) }
+        val accuracy = sensorType?.let { accuracies!!.get(it, SensorManager.SENSOR_STATUS_UNRELIABLE) }
         if (accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) return
         // Check if sensor values are not NaN or infinite
         if(event != null) {
@@ -141,12 +152,26 @@ internal class MotionTracker : SensorEventListener, Tracker{
 
     private fun enableTracking(track: Boolean) {
 
+
+
         if (track) {
-            for (i in 0 until sensors.size()) {
-                sensorManager.registerListener(this, sensors.valueAt(i), stressedCaptureRate)
+            if(fakeMotionSensor != null){
+                fakeMotionSensor?.enableTracking()
+            return
+            }
+            for (i in 0 until sensors!!.size()) {
+
+                    sensorManager!!.registerListener(this, sensors!!.valueAt(i), stressedCaptureRate)
+
+
             }
         } else {
-            sensorManager.unregisterListener(this)
+            if(fakeMotionSensor == null){
+                sensorManager!!.unregisterListener(this)
+            }else{
+                fakeMotionSensor?.disableTracking()
+            }
+
         }
     }
 

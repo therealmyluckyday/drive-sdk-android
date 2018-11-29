@@ -30,6 +30,7 @@ internal class FixWorker() : Worker() {
             LOGGER.info("Data sent successfully", "FixWorker", "override fun doWork(): WorkerResult")
             WorkerResult.SUCCESS
         }else{
+            LOGGER.info("Data were not successfully sent :  Retrying...", "FixWorker", "override fun doWork(): WorkerResult")
             WorkerResult.RETRY
         }
     }
@@ -49,46 +50,51 @@ internal class FixWorker() : Worker() {
 
     @Throws(IOException::class)
     private fun sendData(id: String, data: String) : Boolean{
-        val platformToHostConverter = PlatformToHostConverter(Platform.PREPROD);
-        val url = URL(platformToHostConverter.getHost()+"/data")
 
-        val uid = Utils.getUid(applicationContext);
-        val authToken = "aaa"
-        var appName = "APP-TEST"
+        try {
+            val config  = CollectionDb.getConfig(applicationContext)
+
+            val platformToHostConverter = PlatformToHostConverter(Platform.PREPROD);
+            val url = URL(platformToHostConverter.getHost() + "/data")
+
+            val uid = Utils.getUid(applicationContext);
+            val appName = config?.appName
 
 
-
-        val urlConnection: HttpURLConnection
-        urlConnection = url.openConnection() as HttpURLConnection
-        urlConnection.doOutput = true
-        urlConnection.requestMethod = "PUT"
-        urlConnection.setRequestProperty("Content-Type", "application/json")
-        urlConnection.setRequestProperty("Content-Encoding", "gzip")
-        if (uid != null) {
-            urlConnection.addRequestProperty("X-UserId", uid)
-            if (authToken != null) {
-                urlConnection.addRequestProperty("X-AuthToken", authToken)
+            val urlConnection: HttpURLConnection
+            urlConnection = url.openConnection() as HttpURLConnection
+            urlConnection.doOutput = true
+            urlConnection.requestMethod = "PUT"
+            urlConnection.setRequestProperty("Content-Type", "application/json")
+            urlConnection.setRequestProperty("Content-Encoding", "gzip")
+            if (uid != null) {
+                urlConnection.addRequestProperty("X-UserId", uid)
+                /*if (authToken != null) {
+                    urlConnection.addRequestProperty("X-AuthToken", authToken)
+                }*/
             }
-        }
-        urlConnection.addRequestProperty("X-AppKey", appName)
-        urlConnection.connect()
-        urlConnection.outputStream.write(Utils.compress(data))
-        urlConnection.outputStream.close()
-        Log.i("TEST UPLOAD", "Response code = "+urlConnection.responseCode)
-        if (urlConnection.responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
-            when (urlConnection.responseCode) {
-                HttpURLConnection.HTTP_BAD_REQUEST, HttpURLConnection.HTTP_INTERNAL_ERROR -> {
-                    //mLogger.warn("Error: {}", urlConnection.responseCode)
-                    throw IOException()
+            urlConnection.addRequestProperty("X-AppKey", appName)
+            urlConnection.connect()
+            urlConnection.outputStream.write(Utils.compress(data))
+            urlConnection.outputStream.close()
+            LOGGER.info("UPLOADING DATA/ RESPONSE CODE", "FixWorker" + urlConnection.responseCode)
+            if (urlConnection.responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
+                when (urlConnection.responseCode) {
+                    HttpURLConnection.HTTP_BAD_REQUEST, HttpURLConnection.HTTP_INTERNAL_ERROR -> {
+                        LOGGER.info("UPLOADING DATA ERROR/ RESPONSE CODE", "FixWorker" + urlConnection.responseCode)
+                        throw IOException()
+                    }
+                    else -> {
+                        throw IOException()
+                    }
                 }
-                else -> {
-                    throw IOException()
-                }
+                return false
+            } else {
+                CollectionDb.deletePendingTrip(applicationContext, id)
+                return true
             }
+        }catch (e : Exception){
             return false
-        } else {
-          CollectionDb.deletePendingTrip(applicationContext,id)
-            return true
         }
     }
 

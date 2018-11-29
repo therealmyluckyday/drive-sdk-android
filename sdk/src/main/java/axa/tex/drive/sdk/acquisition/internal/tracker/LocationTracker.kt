@@ -15,7 +15,11 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 
 
+
+
 class LocationTracker : LocationListener, Tracker {
+
+    private var lastocation : Location? = null
     internal val LOGGER = LoggerFactory.getLogger().logger
     private val fixProducer: PublishSubject<Fix> = PublishSubject.create()
     private var context : Context? = null;
@@ -83,7 +87,7 @@ class LocationTracker : LocationListener, Tracker {
                     }
                 }
 
-                locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, this)
+                locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, this)
                 LOGGER.info("location Tracker enabled", "LocationTracker", "private fun enableTracking(track: Boolean)")
             } else {
                 locationManager?.removeUpdates(this)
@@ -98,9 +102,20 @@ class LocationTracker : LocationListener, Tracker {
 
     override fun onLocationChanged(location: Location) {
         LOGGER.info("Receives location from sensor", "LocationTracker", "override fun onLocationChanged(location: Location)")
-        var speed = location.speed
+
+
+        var computedSpeed = 0.0
+        if (this.lastocation != null)
+            computedSpeed = Math.sqrt(
+                    Math.pow(location.longitude - lastocation!!.longitude, 2.0) + Math.pow(location.latitude - lastocation!!.latitude, 2.0)
+            ) / (location.time - this.lastocation!!.time)
+
+        this.lastocation = location
+
+
+         var speed = location.speed
         if(!location.hasSpeed()){
-            speed = -1f
+            speed = (-1.0).toFloat()
         }
         val locationFix = LocationFix(location.latitude,
                 location.longitude,
