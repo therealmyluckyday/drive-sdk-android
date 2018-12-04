@@ -8,6 +8,8 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import kotlin.reflect.KClass
 import android.content.Context
+import androidx.work.*
+import axa.tex.drive.sdk.acquisition.score.internal.ScoreWorker
 import axa.tex.drive.sdk.core.internal.utils.Utils
 import com.orhanobut.logger.DiskLogAdapter
 import com.orhanobut.logger.Logger
@@ -51,6 +53,17 @@ internal class Collector {
 
 
     private fun collect(tracker: Tracker) {
+
+
+        /*val data : Data = Data.Builder().putBoolean("4260e592-008b-4fcf-877d-fe8d3923b5f5",true).build()
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+        val fixUploadWork : OneTimeWorkRequest = OneTimeWorkRequest.Builder(ScoreWorker::class.java).
+                setInputData(data).setConstraints(constraints)
+                .build()
+        WorkManager.getInstance().enqueue(fixUploadWork)*/
+
+
         tracker.enableTracking();
         val fixData = tracker.provideFixProducer() as Observable<Any>
         fixData.subscribeOn(io.reactivex.schedulers.Schedulers.computation()).subscribe { fix ->

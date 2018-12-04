@@ -52,7 +52,7 @@ internal class CollectionDb {
                 val prefs =
                         context?.getSharedPreferences(PENDING_TRIP, Context.MODE_PRIVATE)
                 val json = prefs?.getString(CONFIG,"")
-                val mapper = ObjectMapper();
+                val mapper = ObjectMapper()
                 val node = mapper.readTree(json);
                 mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
                 val conf = mapper.readValue(node.get(Config::class.java.simpleName).toString(), Config::class.java)

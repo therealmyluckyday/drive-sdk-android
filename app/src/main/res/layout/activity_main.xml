@@ -70,4 +70,14 @@
             />
     </LinearLayout>
 
+
+   <Button
+       android:id="@+id/score"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:text="SCORES"
+       android:textSize="20sp"
+       android:background="@color/red"
+       android:textColor="@color/white"
+       android:layout_alignParentBottom="true"/>
 </RelativeLayout>

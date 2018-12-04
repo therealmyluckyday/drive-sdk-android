@@ -86,9 +86,9 @@ class TexConfig {
             }
 
 
-            logger.logger.info("Configuring ssl certificate","TexConfig","init")
+           /* logger.logger.info("Configuring ssl certificate","TexConfig","init")
             CertificateAuthority.configureDefaultSSLSocketFactory(context.getResources().openRawResource(R.raw.tex_elb_ssl))
-            logger.logger.info("Done configuring ssl certificate","TexConfig","init")
+            logger.logger.info("Done configuring ssl certificate","TexConfig","init")*/
 
             logger.logger.info("Create koin module","TexConfig","init")
             val myModule: Module = org.koin.dsl.module.applicationContext {
@@ -158,6 +158,13 @@ class TexConfig {
 
         fun build(context : Context?): TexConfig {
             logger.logger.info("Building configuration","TexConfig.Builder","build")
+
+
+            logger.logger.info("Configuring ssl certificate","TexConfig","init")
+            context?.getResources()?.openRawResource(R.raw.tex_elb_ssl)?.let { CertificateAuthority.configureDefaultSSLSocketFactory(it) }
+            logger.logger.info("Done configuring ssl certificate","TexConfig","init")
+
+
 
             TexConfig.batteryTrackerEnabled = batteryTrackerEnabled;
             TexConfig.locationTrackerEnabled = locationTrackerEnabled

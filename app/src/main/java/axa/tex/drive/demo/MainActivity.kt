@@ -1,6 +1,7 @@
 package axa.tex.drive.demo
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
@@ -12,6 +13,7 @@ import androidx.work.WorkManager
 
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.TexUser
+import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutoMode
 import axa.tex.drive.sdk.automode.AutoModeState
 import axa.tex.drive.sdk.automode.internal.ActivityTracker
@@ -65,8 +67,10 @@ class MainActivity : AppCompatActivity() {
             println(it)
         }
 
-
-
+        score.setOnClickListener{
+            val intent = Intent(this, Trips::class.java)
+            startActivity(intent)
+        }
 
 
     }

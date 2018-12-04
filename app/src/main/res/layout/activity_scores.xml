@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Scores">
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:drawableTop="@drawable/speed"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/speed"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"/>
+
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:drawableTop="@drawable/brake"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/breaking"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/speed"
+        android:textSize="20sp"/>
+
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:drawableTop="@drawable/smoothness"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/smoothness"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/breaking"
+        android:textSize="20sp"/>
+
+
+</RelativeLayout>
