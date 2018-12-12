@@ -3,6 +3,7 @@ package axa.tex.drive.sdk
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
+import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_MOTION_AGE_AFTER_ACCELERATION
 import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_OLDER_MOTION_AGE
 import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker

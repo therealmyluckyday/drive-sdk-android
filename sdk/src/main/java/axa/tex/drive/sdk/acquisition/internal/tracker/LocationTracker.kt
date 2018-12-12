@@ -28,20 +28,25 @@ class LocationTracker : LocationListener, Tracker {
     private var fakeLocationTracker: FakeLocationTracker? = null
 
     constructor(context: Context?, isEnabled : Boolean = false, fakeLocationTracker: FakeLocationTracker? = null) {
-        LOGGER.info("Creating location tracker", "LocationTracker", "constructor(context: Context?, isEnabled : Boolean = false, fakeLocationTracker: FakeLocationTracker? = null)")
+        if(fakeLocationTracker == null) {
+            LOGGER.info("Creating location tracker", "LocationTracker", "constructor(context: Context?, isEnabled : Boolean = false, fakeLocationTracker: FakeLocationTracker? = null)")
+        }
         this.isEnabled = isEnabled
         locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         this.context = context
         this.fakeLocationTracker = fakeLocationTracker
-        LOGGER.info("Location tracker created", "LocationTracker", "constructor(context: Context?, isEnabled : Boolean = false, fakeLocationTracker: FakeLocationTracker? = null)")
-
+        if(fakeLocationTracker == null) {
+            LOGGER.info("Location tracker created", "LocationTracker", "constructor(context: Context?, isEnabled : Boolean = false, fakeLocationTracker: FakeLocationTracker? = null)")
+        }
         if(fakeLocationTracker == null){
             LOGGER.info("Uses real sensor for tracking location", "LocationTracker", "constructor(context: Context?, isEnabled : Boolean = false, fakeLocationTracker: FakeLocationTracker? = null)")
 
-        }else{
+        }
+
+       /* else{
             LOGGER.info("Uses fake sensor for tracking location", "LocationTracker", "constructor(context: Context?, isEnabled : Boolean = false, fakeLocationTracker: FakeLocationTracker? = null)")
 
-        }
+        }*/
 
     }
 
@@ -53,8 +58,9 @@ class LocationTracker : LocationListener, Tracker {
 
 
     override fun disableTracking() {
-        LOGGER.info("Disable locationTracking", "LocationTracker", "disableTracking")
-
+        if(fakeLocationTracker == null) {
+            LOGGER.info("Disable locationTracking", "LocationTracker", "disableTracking")
+        }
         isEnabled = false
         enableTracking(false)
 
@@ -63,7 +69,9 @@ class LocationTracker : LocationListener, Tracker {
     }
 
     override fun enableTracking() {
-        LOGGER.info("Enabling locationTracking", "LocationTracker", "override fun enableTracking()")
+        if(fakeLocationTracker == null) {
+            LOGGER.info("Enabling locationTracking", "LocationTracker", "override fun enableTracking()")
+        }
         isEnabled = true
         enableTracking(true)
     }
@@ -73,7 +81,9 @@ class LocationTracker : LocationListener, Tracker {
             val fakeLocations = fakeLocationTracker?.provideFixProducer() as Observable<Fix>
             fakeLocations.subscribe {fix  ->
                 val fakeLocation = fix as LocationFix
-                LOGGER.info("Sending fake location", "LocationTracker", "private fun enableTracking(track: Boolean)")
+                if(fakeLocationTracker == null) {
+                    LOGGER.info("Sending fake location", "LocationTracker", "private fun enableTracking(track: Boolean)")
+                }
                 fixProducer.onNext(fakeLocation)
             }
             fakeLocationTracker?.enableTracking()

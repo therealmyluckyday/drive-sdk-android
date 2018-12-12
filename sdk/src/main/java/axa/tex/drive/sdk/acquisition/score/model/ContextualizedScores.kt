@@ -1,6 +1,6 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
-import axa.tex.drive.sdk.acquisition.score.Day
+
 
 class  ContextualizedScores{
 

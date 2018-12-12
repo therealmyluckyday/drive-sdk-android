@@ -44,6 +44,10 @@ class MotionBuffer {
         }
     }
 
+    internal fun isBufferEmpty() : Boolean{
+        return buffer.isEmpty()
+    }
+
 
     fun setOlderMotionAge(olderMotionAge : Int){
         this.olderMotionAge = olderMotionAge
@@ -51,5 +55,9 @@ class MotionBuffer {
 
     fun setMotionAgeAfterAcceleration(motionAgeAfterAcceleration : Int){
         this.motionAgeAfterAcceleration = motionAgeAfterAcceleration
+    }
+
+    internal fun getPeriod() : Long{
+       return  buffer.last.timestamp() - buffer.first.timestamp()
     }
 }

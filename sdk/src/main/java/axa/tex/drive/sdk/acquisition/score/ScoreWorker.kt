@@ -5,7 +5,6 @@ import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.score.Score
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
-import axa.tex.drive.sdk.acquisition.score.Test
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
 import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.Platform
@@ -23,9 +22,12 @@ import java.util.*
 
 private val LOGGER = LoggerFactory.getLogger().logger
 
+private const val TIME_TO_WAIT = 5000;
+private const val MAX_ATTEMPT = 5;
+
 internal class ScoreWorker() : Worker() {
 
-
+    private var nbAttempt = 0
 
     override fun doWork(): WorkerResult {
 
@@ -87,17 +89,37 @@ internal class ScoreWorker() : Worker() {
         val mapper = ObjectMapper()
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         val node = mapper.readTree(responseString.toString());
-        val score = mapper.readValue(node.get("scores_dil").toString(), ScoresDil::class.java)
+
+        try {
+            val score = mapper.readValue(node.get("scores_dil").toString(), ScoresDil::class.java)
+            ScoreRetriever.getScoreListener().onNext(score)
+        }catch (e: Exception) {
+            return retry(tripId, finalScore,responseString.toString())
+        }catch (err : Error){
+            return retry(tripId, finalScore,responseString.toString())
+        }
+
         //val score = mapper.readValue(responseString.toString(), Score::class.java)
-        ScoreRetriever.getScoreListener().onNext(score)
+        //ScoreRetriever.getScoreListener().onNext(score)
         /*try {
             val map = mapper.readValue(responseString.toString(), Test::class.java)
         }catch (e :Exception){
             e.printStackTrace()
         }*/
+        nbAttempt = 0
         return responseString.toString()
     }
 
 
+    private fun retry(tripId: String, finalScore: Boolean, recievedPayload : String) : String{
+        if(nbAttempt < MAX_ATTEMPT){
+            nbAttempt++
+            Thread.sleep(TIME_TO_WAIT.toLong())
+           return  scoreRequest(tripId, finalScore)
 
+        }else{
+            nbAttempt = 0
+            return recievedPayload
+        }
+    }
 }

@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeBatterySensor
+import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeMotionSensor
 import axa.tex.drive.sdk.acquisition.model.*
 import io.reactivex.subjects.PublishSubject
 import java.lang.IllegalArgumentException
@@ -15,8 +17,9 @@ class BatteryTracker : Tracker, BroadcastReceiver {
 
     private val fixProducer: PublishSubject<Fix> = PublishSubject.create()
 
-    private val mContext: Context;
+    private val mContext: Context?;
     private var isEnabled : Boolean
+    private var fakeBatterySensor: FakeBatterySensor? = null
 
 
     constructor(context: Context,isEnabled : Boolean = false) {
@@ -24,22 +27,41 @@ class BatteryTracker : Tracker, BroadcastReceiver {
         this.mContext = context;
     }
 
+
+    constructor(fakeBatterySensor: FakeBatterySensor? = null){
+        this.fakeBatterySensor = fakeBatterySensor
+        this.mContext = null
+        this.isEnabled = false
+    }
+
+
     override fun provideFixProducer(): Any {
         return fixProducer
     }
 
     override fun enableTracking() {
-        val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-        mContext.registerReceiver(this, intentFilter)
+        if(fakeBatterySensor != null){
+            fakeBatterySensor?.enableTracking()
+            fakeBatterySensor?.provideFix()?.let { fixProducer.onNext(it) }
+        }else {
+
+            val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+            mContext?.registerReceiver(this, intentFilter)
+        }
         isEnabled = true
     }
 
     override fun disableTracking() {
-        try {
-            mContext.unregisterReceiver(this);
-        }catch (e : IllegalArgumentException){
-            e.printStackTrace()
+        if(fakeBatterySensor != null){
+            fakeBatterySensor?.disableTracking()
+        }else {
+            try {
+                mContext?.unregisterReceiver(this);
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            }
         }
+        isEnabled = false
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {

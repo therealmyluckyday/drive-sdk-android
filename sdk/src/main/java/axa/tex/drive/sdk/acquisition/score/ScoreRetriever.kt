@@ -2,7 +2,6 @@ package axa.tex.drive.sdk.acquisition.score
 
 import androidx.work.*
 import axa.tex.drive.sdk.acquisition.score.internal.ScoreWorker
-import axa.tex.drive.sdk.acquisition.score.model.Scores
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
 import io.reactivex.subjects.PublishSubject
 
@@ -10,10 +9,16 @@ class ScoreRetriever {
 
     companion object {
 
-        private val listener : PublishSubject<ScoresDil> = PublishSubject.create()
+        private val scoreListener : PublishSubject<ScoresDil> = PublishSubject.create()
+
+        private val availableScoreListener : PublishSubject<String> = PublishSubject.create()
 
         fun getScoreListener() : PublishSubject<ScoresDil> {
-            return listener;
+            return scoreListener;
+        }
+
+        fun getAvailableScoreListener() : PublishSubject<String> {
+            return availableScoreListener;
         }
 
         fun retrieveScore(tripId : String){

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 
 
-class FixPacket(@JsonIgnore private val fixes : List<Fix>,
+class FixPacket(@JsonIgnore  val fixes : List<Fix>,
                 val model : String,
                 val os: String,
                 val timezone:String,

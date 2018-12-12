@@ -11,10 +11,15 @@ import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.view.View
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
+import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.TexConfig
+import axa.tex.drive.sdk.core.logger.LoggerFactory
+import axa.tex.drive.sdk.internal.extension.toJson
+import io.reactivex.subjects.PublishSubject
 
 import org.koin.android.ext.android.inject
 import org.koin.standalone.StandAloneContext
@@ -23,7 +28,7 @@ import java.util.*
 private const val NOTIFICATION_ID = 7071
 
 internal class CollectorService : Service() {
-
+    internal val LOGGER = LoggerFactory.getLogger().logger
     companion object {
 
         private var running = false
@@ -98,6 +103,22 @@ internal class CollectorService : Service() {
         if(tripId.isEmpty()) {
             tripId = UUID.randomUUID().toString().toUpperCase(Locale.US)
         }
+
+
+        try {
+            ScoreRetriever.getAvailableScoreListener().subscribe{tripId->
+                ScoreRetriever.getScoreListener().subscribe{score ->
+                    LOGGER.info("The retrieved score : ${score.toJson()}","Collector Service","onStartCommand")
+                }
+                Thread{ ScoreRetriever.retrieveScore(tripId)}.start()
+            }
+        }catch (e : Exception ){
+            e.printStackTrace()
+        }catch (err : Error){
+           err.printStackTrace()
+        }
+
+
         return START_STICKY//super.onStartCommand(intent, flags, startId)
     }
 

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.work.Data
 import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
+import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.Utils
@@ -90,7 +91,12 @@ internal class FixWorker() : Worker() {
                 }
                 return false
             } else {
+
+                val trip = CollectionDb.getPendingTrip(applicationContext, id)
                 CollectionDb.deletePendingTrip(applicationContext, id)
+                if(trip.containsStop){
+                    ScoreRetriever.getAvailableScoreListener().onNext(trip.tripId)
+                }
                 return true
             }
         }catch (e : Exception){

@@ -85,7 +85,7 @@ internal object FixProcessor {
                         .build()
 
 
-                val pendingTrip = PendingTrip(id, tripId)
+                val pendingTrip = PendingTrip(id, tripId, tripEnded)
                 CollectionDb.saveTrip(context,pendingTrip)
                 WorkManager.getInstance().enqueue(fixUploadWork)
             }

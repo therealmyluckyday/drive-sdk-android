@@ -5,18 +5,22 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
 import java.util.*
 
-@Entity
+
 class PendingTrip {
 
-    @PrimaryKey
-    internal var id : String
 
-    @ColumnInfo
-    private  var tripId : String
+     var id : String = ""
+     var tripId : String = ""
+     var containsStop : Boolean = false
+
+    constructor(){
+
+    }
 
 
-    constructor(id: String,tripId : String){
+    constructor(id: String,tripId : String, containsStop: Boolean){
         this.tripId = tripId
         this.id = id;
+        this.containsStop = containsStop
     }
 }

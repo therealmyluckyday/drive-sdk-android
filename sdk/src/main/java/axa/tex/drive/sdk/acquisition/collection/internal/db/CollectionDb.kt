@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 
 const val  PENDING_TRIP: String = "pendin-gtrips"
 const val  CONFIG: String = "config"
+const val  LAST_TRIP: String = "last-trip"
 
 internal class CollectionDb {
 
@@ -20,10 +21,16 @@ internal class CollectionDb {
             prefs.edit().putString(pendingTrip.id, pendingTrip.toJson()).apply()
         }
 
-        internal fun getPendingTrip(context: Context,id : String) {
+        internal fun getPendingTrip(context: Context,id : String) : PendingTrip{
             val prefs =
                     context.getSharedPreferences(PENDING_TRIP, Context.MODE_PRIVATE)
-            prefs.getString(id, "");
+
+            val json = prefs.getString(id, "")
+            val mapper = ObjectMapper()
+
+            val node = mapper.readTree(json);
+            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            return mapper.readValue(node.get(PendingTrip::class.java.simpleName).toString(), PendingTrip::class.java)
         }
 
         internal fun deletePendingTrip(context: Context,id : String) {
@@ -43,6 +50,18 @@ internal class CollectionDb {
             val prefs =
                     context?.getSharedPreferences(PENDING_TRIP, Context.MODE_PRIVATE)
             prefs?.edit()?.putString(CONFIG, config.toJson())?.apply()
+        }
+
+
+        internal fun setLastTrip(context: Context?,trip : String){
+            val prefs =
+                    context?.getSharedPreferences(LAST_TRIP, Context.MODE_PRIVATE)
+            prefs?.edit()?.putString(LAST_TRIP, trip)?.apply()
+        }
+
+        internal fun getLastTrip(context: Context?) : String{
+            val prefs = context?.getSharedPreferences(LAST_TRIP, Context.MODE_PRIVATE)
+            return prefs?.getString(LAST_TRIP, "")!!
         }
 
 

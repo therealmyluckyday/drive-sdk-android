@@ -12,11 +12,17 @@ data class LogDetail(val description : String, val type: LogType, val file : Str
     internal fun reportInStandardOutput(){
         val tag = "File $file  Function = $function"
 
-        when(type){
-            ERROR -> Log.e(tag, description)
-            WARNING -> Log.w(tag, description)
-            INFO -> Log.i(tag, description)
+        try {
+            when(type){
+
+                ERROR -> Log.e(tag, description)
+                WARNING -> Log.w(tag, description)
+                INFO -> Log.i(tag, description)
+            }
+        }catch (e : Exception){
+            e.printStackTrace()
         }
+
     }
 
     internal fun reportInFile(){
