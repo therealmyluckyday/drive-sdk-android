@@ -17,4 +17,12 @@ data class Event (val event: List<String>,
             "{}";
         }
     }
+
+    /*fun isStart() : Boolean{
+        return !event.isEmpty() && event[0] == "start"
+    }
+
+    fun isStop() : Boolean{
+        return !event.isEmpty() && event[0] == "stop"
+    }*/
 }

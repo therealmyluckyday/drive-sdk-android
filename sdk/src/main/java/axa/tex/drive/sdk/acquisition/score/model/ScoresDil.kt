@@ -1,8 +1,23 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+
 class  ScoresDil{
 
-     var acceleration: Double = (- 1).toDouble()
+    internal fun toJson() : String{
+        return try {
+            val mapper = ObjectMapper();
+            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
+            mapper.writeValueAsString(this);
+        }catch (e : Exception){
+            e.printStackTrace()
+            "{}";
+        }
+
+    }
+
+    var acceleration: Double = (- 1).toDouble()
      var braking: Double = (- 1).toDouble()
      var expert: Double = (- 1).toDouble()
      var smoothness: Double = (- 1).toDouble()

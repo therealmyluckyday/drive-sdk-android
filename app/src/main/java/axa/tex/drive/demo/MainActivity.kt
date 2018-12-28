@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
          config  = TexConfig.Builder(user,applicationContext).enableBatteryTracker().enableLocationTracker()
-                 .enableMotionTracker().withAppName("BC").withClientId("22910000").build(applicationContext);
+                 .enableMotionTracker().withAppName("BCISSE").withClientId("22910000").build(applicationContext);
         tripRecorder = TexService.configure(config!!)?.getTripRecorder();
 
 
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
          val logger  = LoggerFactory.getLogger();
         logger.getLogStream().subscribeOn(Schedulers.computation()).subscribe {
-            println(it)
+            //println(it)
         }
 
         score.setOnClickListener{
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startService(){
 
-        tripRecorder?.track();
+        tripRecorder?.startTracking();
     }
 
     private fun stopService(){

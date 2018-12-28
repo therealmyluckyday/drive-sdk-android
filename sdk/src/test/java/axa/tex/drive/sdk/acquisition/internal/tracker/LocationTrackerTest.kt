@@ -2,7 +2,7 @@ package axa.tex.drive.sdk.acquisition.internal.tracker
 
 
 
-import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationTracker
+import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationSensor
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import io.reactivex.Observable
@@ -15,7 +15,11 @@ class LocationTrackerTest {
 
     @Test
     fun locationTrackerCorrectlyEnabled() {
-        val locationTracker : LocationTracker = LocationTracker(context = null,fakeLocationTracker = FakeLocationTracker(false))
+        /*val locationTracker : LocationTracker = LocationTracker(context = null,fakeLocationTracker = FakeLocationTracker(false))
+        Assert.assertFalse(locationTracker.isEnabled());
+        locationTracker.enableTracking()
+        Assert.assertTrue(locationTracker.isEnabled());*/
+        val locationTracker = LocationTracker(FakeLocationSensor())
         Assert.assertFalse(locationTracker.isEnabled());
         locationTracker.enableTracking()
         Assert.assertTrue(locationTracker.isEnabled());
@@ -23,7 +27,12 @@ class LocationTrackerTest {
 
     @Test
     fun locationTrackerCorrectlyDisable() {
-        val locationTracker : LocationTracker = LocationTracker(isEnabled = true,context = null,fakeLocationTracker = FakeLocationTracker(false))
+        /*val locationTracker : LocationTracker = LocationTracker(isEnabled = true,context = null,fakeLocationTracker = FakeLocationTracker(false))
+        Assert.assertTrue(locationTracker.isEnabled());
+        locationTracker.disableTracking()
+        Assert.assertFalse(locationTracker.isEnabled());*/
+        val locationTracker = LocationTracker(FakeLocationSensor())
+        locationTracker.enableTracking()
         Assert.assertTrue(locationTracker.isEnabled());
         locationTracker.disableTracking()
         Assert.assertFalse(locationTracker.isEnabled());
@@ -33,8 +42,8 @@ class LocationTrackerTest {
     @Test
     fun locationTrackerCorrectlyProvidesFixes() {
         val signal = CountDownLatch(1)
-        val fakeLocationTracker = FakeLocationTracker(false);
-        val locationTracker : LocationTracker = LocationTracker(context = null,fakeLocationTracker = fakeLocationTracker)
+        //val fakeLocationTracker = FakeLocationTracker(false);
+        val locationTracker = LocationTracker(FakeLocationSensor())
         locationTracker.enableTracking()
         var failed = false
         val locationProducer = locationTracker?.provideFixProducer() as Observable<Fix>
@@ -50,7 +59,7 @@ class LocationTrackerTest {
            }
 
         }
-        fakeLocationTracker.enableTracking()
+        locationTracker.enableTracking()
         signal.await()
         Assert.assertTrue(!failed)
     }

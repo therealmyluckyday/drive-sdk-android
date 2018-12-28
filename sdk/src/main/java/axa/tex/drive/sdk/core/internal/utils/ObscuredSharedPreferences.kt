@@ -118,6 +118,7 @@ class ObscuredSharedPreferences
         try {
             v = delegate.getString(key, null)
         } catch (e: ClassCastException) {
+            e.printStackTrace()
             return delegate.getBoolean(key, defValue)
         }
 
@@ -146,13 +147,14 @@ class ObscuredSharedPreferences
         try {
             v = delegate.getString(key, null)
         } catch (e: ClassCastException) {
+            e.printStackTrace()
             return delegate.getFloat(key, defValue)
         }
 
         try {
             return java.lang.Float.parseFloat(decrypt(v)!!)
         } catch (e: NumberFormatException) {
-            //could not decrypt the number.  Maybe we are using the wrong key?
+            e.printStackTrace()//could not decrypt the number.  Maybe we are using the wrong key?
             decryptionErrorFlag = true
             Log.e(this.javaClass.name, "Warning, could not decrypt the value.  Possible incorrect key.  " + e.message)
         }
@@ -165,12 +167,14 @@ class ObscuredSharedPreferences
         try {
             v = delegate.getString(key, null)
         } catch (e: ClassCastException) {
+            e.printStackTrace()
             return delegate.getInt(key, defValue)
         }
 
         try {
             return Integer.parseInt(decrypt(v)!!)
         } catch (e: NumberFormatException) {
+            e.printStackTrace()
             //could not decrypt the number.  Maybe we are using the wrong key?
             decryptionErrorFlag = true
             Log.e(this.javaClass.name, "Warning, could not decrypt the value.  Possible incorrect key.  " + e.message)
@@ -184,6 +188,7 @@ class ObscuredSharedPreferences
         try {
             v = delegate.getString(key, null)
         } catch (e: ClassCastException) {
+            e.printStackTrace()
             return delegate.getLong(key, defValue)
         }
 
@@ -191,6 +196,7 @@ class ObscuredSharedPreferences
             return java.lang.Long.parseLong(decrypt(v)!!)
         } catch (e: NumberFormatException) {
             //could not decrypt the number.  Maybe we are using the wrong key?
+            e.printStackTrace()
             decryptionErrorFlag = true
             Log.e(this.javaClass.name, "Warning, could not decrypt the value.  Possible incorrect key.  " + e.message)
         }

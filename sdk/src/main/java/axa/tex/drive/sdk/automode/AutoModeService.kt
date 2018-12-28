@@ -269,6 +269,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
             stopPassiveScan()
         } catch (e: IllegalArgumentException) { // Because of possible unregister of broadcast receiver
            // mLogger.debug("Not serious, but to check: ", e)
+            e.printStackTrace()
         }
 
     }
@@ -287,6 +288,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             locationManager?.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0L, 0.0f, mPassiveLocationListener)
         } catch (e: SecurityException) {
+            e.printStackTrace()
         //    mLogger.info("Cannot fully execute startPassiveScan() due to user restrictions", e)
         }
 
@@ -297,7 +299,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             locationManager?.removeUpdates(mPassiveLocationListener)
         } catch (e: SecurityException) {
-           // mLogger.info("Cannot fully execute stopPasiveScan() due to user restrictions", e)
+           e.printStackTrace()// mLogger.info("Cannot fully execute stopPasiveScan() due to user restrictions", e)
         }
 
     }
@@ -328,7 +330,8 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             unregisterReceiver(mActivityReceiver)
         } catch (e: Exception) {
-          //  mLogger.debug("stopActivityScan() - Not serious, but to check: ", e)
+          e.printStackTrace()
+            //  mLogger.debug("stopActivityScan() - Not serious, but to check: ", e)
         }
 
 
@@ -345,7 +348,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0.0f, mSpeedLocationListener)
         } catch (e: SecurityException) {
-            //mLogger.info("Cannot fully execute startSpeedScan() due to user restrictions", e)
+            e.printStackTrace()//mLogger.info("Cannot fully execute startSpeedScan() due to user restrictions", e)
         }
 
         //mHandler.postDelayed(mSpeedScanEnd, SPEED_SCAN_TIME.toLong())
@@ -358,7 +361,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0.0f, mDrivingLocationListener)
         } catch (e: SecurityException) {
-           // mLogger.info("Cannot fully execute startDrivingMode() due to user restrictions", e)
+           e.printStackTrace()// mLogger.info("Cannot fully execute startDrivingMode() due to user restrictions", e)
         }
 
     }
@@ -369,7 +372,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             locationManager?.removeUpdates(mDrivingLocationListener)
         } catch (e: SecurityException) {
-            //mLogger.info("Cannot fully execute stopDrivingMode() due to user restrictions", e)
+            e.printStackTrace()//mLogger.info("Cannot fully execute stopDrivingMode() due to user restrictions", e)
         }
 
     }
@@ -379,7 +382,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             locationManager?.removeUpdates(mSpeedLocationListener)
         } catch (e: SecurityException) {
-            //mLogger.info("Cannot fully execute stopSpeedScan() due to user restrictions", e)
+            e.printStackTrace()//mLogger.info("Cannot fully execute stopSpeedScan() due to user restrictions", e)
         }
 
        // mHandler.removeCallbacks(mSpeedScanEnd)

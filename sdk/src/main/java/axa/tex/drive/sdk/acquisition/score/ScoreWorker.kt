@@ -1,5 +1,7 @@
 package axa.tex.drive.sdk.acquisition.score.internal
 
+import android.content.ComponentCallbacks
+import android.content.res.Configuration
 import androidx.work.Data
 import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.koin.android.ext.android.inject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -25,7 +28,14 @@ private val LOGGER = LoggerFactory.getLogger().logger
 private const val TIME_TO_WAIT = 5000;
 private const val MAX_ATTEMPT = 5;
 
-internal class ScoreWorker() : Worker() {
+internal class ScoreWorker() : Worker(), ComponentCallbacks {
+    override fun onLowMemory() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     private var nbAttempt = 0
 
@@ -56,7 +66,10 @@ internal class ScoreWorker() : Worker() {
 
     @Throws(Exception::class)
     private fun scoreRequest(tripId: String, finalScore: Boolean): String {
-        val config  = CollectionDb.getConfig(applicationContext)
+        //val config  = CollectionDb.getConfig(applicationContext)
+        val collectorDb: CollectionDb by inject()
+        val scoreRetriever : ScoreRetriever by inject()
+        val config  = collectorDb.getConfig()
         val responseString = StringBuffer("")
         val locale = null
         val serverUrl = PlatformToHostConverter(Platform.PREPROD).getHost()
@@ -92,7 +105,7 @@ internal class ScoreWorker() : Worker() {
 
         try {
             val score = mapper.readValue(node.get("scores_dil").toString(), ScoresDil::class.java)
-            ScoreRetriever.getScoreListener().onNext(score)
+            scoreRetriever.getScoreListener().onNext(score)
         }catch (e: Exception) {
             return retry(tripId, finalScore,responseString.toString())
         }catch (err : Error){

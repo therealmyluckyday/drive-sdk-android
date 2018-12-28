@@ -7,17 +7,17 @@ import io.reactivex.subjects.PublishSubject
 
 class ScoreRetriever {
 
-    companion object {
+    //companion object {
 
         private val scoreListener : PublishSubject<ScoresDil> = PublishSubject.create()
 
-        private val availableScoreListener : PublishSubject<String> = PublishSubject.create()
+        private val availableScoreListener : PublishSubject<String?> = PublishSubject.create()
 
         fun getScoreListener() : PublishSubject<ScoresDil> {
             return scoreListener;
         }
 
-        fun getAvailableScoreListener() : PublishSubject<String> {
+        fun getAvailableScoreListener() : PublishSubject<String?> {
             return availableScoreListener;
         }
 
@@ -30,6 +30,6 @@ class ScoreRetriever {
                     .build()
             WorkManager.getInstance().enqueue(fixUploadWork)
         }
-    }
+   // }
 
 }

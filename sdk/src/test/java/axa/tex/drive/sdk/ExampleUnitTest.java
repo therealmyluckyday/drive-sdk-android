@@ -2,8 +2,6 @@ package axa.tex.drive.sdk;
 
 import org.junit.Test;
 
-import axa.tex.drive.sdk.acquisition.internal.tracker.LocationTracker;
-
 import static org.junit.Assert.*;
 
 /**

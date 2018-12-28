@@ -1,35 +1,40 @@
 package axa.tex.drive.sdk.core
 
 
+import android.content.ComponentCallbacks
 import android.content.Context
-import android.os.Environment
-import axa.tex.drive.sdk.BuildConfig
+import android.content.res.Configuration
 import axa.tex.drive.sdk.R
+import axa.tex.drive.sdk.acquisition.TripRecorder
+import axa.tex.drive.sdk.acquisition.TripRecorderImpl
+import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
+import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
+import axa.tex.drive.sdk.acquisition.internal.sensor.BatterySensor
+import axa.tex.drive.sdk.acquisition.internal.sensor.LocationSensor
+import axa.tex.drive.sdk.acquisition.internal.sensor.MotionSensor
 import axa.tex.drive.sdk.acquisition.internal.tracker.BatteryTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.LocationTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker
-import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
 import axa.tex.drive.sdk.acquisition.model.TexUser
+import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.orhanobut.logger.CsvFormatStrategy
-import com.orhanobut.logger.DiskLogAdapter
-import com.orhanobut.logger.DiskLogStrategy
-import com.orhanobut.logger.Logger
+import org.koin.android.ext.android.inject
 import org.koin.dsl.module.Module
+import org.koin.dsl.module.module
 import org.koin.error.AlreadyStartedException
 import org.koin.standalone.StandAloneContext
-import java.io.File
 
 
 class TexConfig {
 
     internal var context: Context? = null
 
+    //internal var trackers : MutableList<Tracker>  = mutableListOf()
 
 
     internal companion object {
@@ -38,15 +43,31 @@ class TexConfig {
         private var motionTrackerEnabled: Boolean = false
         private var batteryTrackerEnabled: Boolean = false
         internal var user: TexUser? = null
-        internal var appName : String = Constants.DEFAULT_APP_NAME
-        internal var clientId : String = Constants.DEFAULT_CLIENT_ID
+        internal var appName : String? = null//Constants.DEFAULT_APP_NAME
+        internal var clientId : String? = null//Constants.DEFAULT_CLIENT_ID
 
-        private fun setupLogs(){
-            val file = File(Environment.getExternalStorageDirectory(), Constants.LOG_DIR)
-            if (!file.exists()) {
-                file.mkdir()
+
+
+
+        private fun setupKoin(context: Context){
+            val myModule: Module = module(definition = {
+
+                single { ScoreRetriever() }
+                single { CollectionDb(context)}
+                single { FixProcessor(context)}
+                single(LocationTracker::class.simpleName!!) { LocationTracker(LocationSensor(context, locationTrackerEnabled)) as Tracker }
+                single(BatteryTracker::class.simpleName!!) { BatteryTracker(BatterySensor(context, batteryTrackerEnabled)) as Tracker }
+                single(MotionTracker::class.simpleName!!) { MotionTracker(MotionSensor(context, motionTrackerEnabled)) as Tracker }
+
+                single { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context,mutableListOf<Tracker>(get(LocationTracker::class.simpleName!!), get(BatteryTracker::class.simpleName!!), get(MotionTracker::class.simpleName!!))) }
+
+                single { TripRecorderImpl(context) as TripRecorder}
+            })
+            try {
+                StandAloneContext.startKoin(listOf(myModule))
+            } catch (e: AlreadyStartedException) {
+                e.printStackTrace()
             }
-            Logger.addLogAdapter(DiskLogAdapter(CsvFormatStrategy.newBuilder().tag("tag").logStrategy(DiskLogStrategy(DiskLogHandler(file.absolutePath, BuildConfig.APPLICATION_ID, 500 * 1024))).build()))
 
         }
 
@@ -77,46 +98,65 @@ class TexConfig {
                 config.batteryTrackerEnabled
             }
 
-            if(config != null && !config.appName.isEmpty()){
+            if(config?.appName!= null){
                 TexConfig.appName = config.appName
             }
 
-            if(config != null && !config.clientId.isEmpty()){
+            if(config?.clientId != null){
                 TexConfig.clientId= config.clientId
             }
 
 
-           /* logger.logger.info("Configuring ssl certificate","TexConfig","init")
-            CertificateAuthority.configureDefaultSSLSocketFactory(context.getResources().openRawResource(R.raw.tex_elb_ssl))
-            logger.logger.info("Done configuring ssl certificate","TexConfig","init")*/
 
             logger.logger.info("Create koin module","TexConfig","init")
-            val myModule: Module = org.koin.dsl.module.applicationContext {
-                bean(LocationTracker::class.simpleName!!) { LocationTracker(context,locationTrackerEnabled) as Tracker }
-                //bean(FakeLocationTracker::class.simpleName!!) { FakeLocationTracker(locationTrackerEnabled) as Tracker }
-                bean(BatteryTracker::class.simpleName!!) { BatteryTracker(context, batteryTrackerEnabled) as Tracker }
-                bean(MotionTracker::class.simpleName!!) { MotionTracker(context, motionTrackerEnabled) as Tracker }
+            setupKoin(context)
+            /*val myModule: Module = org.koin.dsl.module.applicationContext {
+
+                single { CollectionDb(context)}
+
+                single { FixProcessor()}
+
+                single(LocationTracker::class.simpleName!!) { LocationTracker(LocationSensor(context, locationTrackerEnabled)) as Tracker }
+                //bean(LocationTracker::class.simpleName!!) { LocationTracker(context,locationTrackerEnabled) as Tracker }
+
+
+                single(BatteryTracker::class.simpleName!!) { BatteryTracker(BatterySensor(context, batteryTrackerEnabled)) as Tracker }
+                //bean(BatteryTracker::class.simpleName!!) { BatteryTracker(context, batteryTrackerEnabled) as Tracker }
+
+
+                single(MotionTracker::class.simpleName!!) { MotionTracker(MotionSensor(context, motionTrackerEnabled)) as Tracker }
+                //bean(MotionTracker::class.simpleName!!) { MotionTracker(context, motionTrackerEnabled) as Tracker }
+
+
+
+
                 //bean { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context,get(FakeLocationTracker::class.simpleName), get(BatteryTracker::class.simpleName), get(MotionTracker::class.simpleName)) } // get() will resolve service instance
-                bean { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context,get(LocationTracker::class.simpleName), get(BatteryTracker::class.simpleName), get(MotionTracker::class.simpleName)) }
+                //bean { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context,get(LocationTracker::class.simpleName), get(BatteryTracker::class.simpleName), get(MotionTracker::class.simpleName)) }
+
+
+                single { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context,mutableListOf<Tracker>(get(LocationTracker::class.simpleName!!), get(BatteryTracker::class.simpleName!!), get(MotionTracker::class.simpleName!!))) }
             }
             try {
                 StandAloneContext.startKoin(listOf(myModule))
             } catch (e: AlreadyStartedException) {
                 e.printStackTrace()
-            }
+            }*/
             logger.logger.info("Done create koin module","TexConfig","init")
         }
+
 
 
     }
 
     private constructor(context: Context?) {
         this.context = context
+        //this.trackers = trackers
     }
 
 
 
-    class Builder {
+    class Builder{
+
 
         @JsonProperty
         private var user: TexUser? = null
@@ -136,7 +176,10 @@ class TexConfig {
         private var appName : String = Constants.DEFAULT_APP_NAME
 
         @JsonProperty
-        private var clientId : String = Constants.DEFAULT_CLIENT_ID
+        private var clientId : String? = null
+
+
+
 
         val logger = LoggerFactory.getLogger()
 
@@ -172,9 +215,18 @@ class TexConfig {
             TexConfig.appName = appName
             TexConfig.clientId = clientId
 
-            val config = Config(batteryTrackerEnabled,locationTrackerEnabled,motionTrackerEnabled, appName, clientId)
+            context?.let { setupKoin(it) }
 
-            CollectionDb.setConfig(context, config)
+            val config = Config(batteryTrackerEnabled,locationTrackerEnabled,motionTrackerEnabled, appName, clientId)
+            if (context != null) {
+
+               // val collectorDb : CollectionDb by inject()
+
+                val collectorDb = CollectionDb(context)
+                collectorDb.setConfig(config)
+            }
+
+
 
             logger.logger.info("Done building configuration","TexConfig.Builder","build")
             return TexConfig(context)
@@ -210,7 +262,6 @@ class TexConfig {
 
             batteryTrackerEnabled = true
             logger.logger.info("Battery tracker enabled","TexConfig.Builder","enableBatteryTracker")
-
             return this
         }
 
@@ -227,7 +278,6 @@ class TexConfig {
 
             motionTrackerEnabled = true
             logger.logger.info("Battery tracker enabled","TexConfig.Builder","enableMotionTracker")
-
             return this
         }
 

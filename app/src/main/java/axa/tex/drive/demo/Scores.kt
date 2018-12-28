@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import kotlinx.android.synthetic.main.activity_scores.*
+import org.koin.android.ext.android.inject
 
 class Scores : AppCompatActivity() {
 
@@ -17,7 +18,9 @@ class Scores : AppCompatActivity() {
 
         val tripId = intent.getStringExtra("trip")
 
-        ScoreRetriever.getScoreListener().subscribe{
+        val scoreRetriever : ScoreRetriever by inject()
+
+        scoreRetriever.getScoreListener().subscribe{
             this.runOnUiThread {
                 speed.visibility = View.VISIBLE
                 speed.text = "${it.acceleration}"
@@ -31,7 +34,7 @@ class Scores : AppCompatActivity() {
             println("SCORES ${it.acceleration}")
         }
 
-        Thread{ ScoreRetriever.retrieveScore("4260e592-008b-4fcf-877d-fe8d3923b5f5")}.start()
+        Thread{ scoreRetriever.retrieveScore("4260e592-008b-4fcf-877d-fe8d3923b5f5")}.start()
 
     }
 }

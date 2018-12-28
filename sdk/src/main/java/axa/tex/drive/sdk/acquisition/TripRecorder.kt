@@ -1,6 +1,8 @@
 package axa.tex.drive.sdk.acquisition
 
 import axa.tex.drive.sdk.acquisition.model.Fix
+import axa.tex.drive.sdk.acquisition.model.LocationFix
+import axa.tex.drive.sdk.acquisition.model.TripId
 import io.reactivex.Observable
 
 interface TripRecorder{
@@ -9,12 +11,12 @@ interface TripRecorder{
      * TripID of the currently recorded trip.
      * @return the trip id
      */
-    fun getCurrentTripId(): String
+    fun getCurrentTripId(): TripId?
 
     /**
      * Initiates tracking
      */
-    fun track()
+    fun startTracking()
 
     /**
      * Stops the tracking
@@ -30,8 +32,8 @@ interface TripRecorder{
     /**
      * @return An observable on which we can register to get location fixes.
      */
-    fun locationObservable(): Observable<Fix>
+    fun locationObservable(): Observable<LocationFix>
 
 
-
+    fun tripIdListener(): Observable<TripId>
 }
