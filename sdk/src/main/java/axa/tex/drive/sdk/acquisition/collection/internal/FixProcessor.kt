@@ -37,14 +37,14 @@ internal class FixProcessor : ComponentCallbacks{
         this.packetSize = packetSize
     }
 
-     fun startTrip(/*context : Context*/){
-        val start = Event(listOf("start"), Date().time);
+     fun startTrip(startTime : Long){
+        val start = Event(listOf("start"), startTime);
         tripEnded = false
         addFixes(/*context,*/listOf(start))
     }
 
-     fun endTrip(/*context : Context*/){
-        val end = Event(listOf("stop"), Date().time);
+     fun endTrip(endTime : Long){
+        val end = Event(listOf("stop"), endTime);
         tripEnded = true
         addFixes(/*context,*/listOf(end))
 

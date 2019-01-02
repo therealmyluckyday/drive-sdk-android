@@ -16,12 +16,12 @@ interface TripRecorder{
     /**
      * Initiates tracking
      */
-    fun startTracking()
+    fun startTracking(startTime : Long)
 
     /**
      * Stops the tracking
      */
-    fun stopTracking()
+    fun stopTracking(endTime : Long)
 
     /**
      * Says if we are currently recording

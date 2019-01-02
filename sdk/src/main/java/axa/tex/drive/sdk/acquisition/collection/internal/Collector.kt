@@ -34,10 +34,10 @@ internal class Collector : ComponentCallbacks {
     internal var recording : Boolean = false
 
    // internal companion object {
-        private val locations: PublishSubject<LocationFix> = PublishSubject.create()
-        fun locationObservable(): Observable<LocationFix> {
+         val locations: PublishSubject<LocationFix> = PublishSubject.create()
+       /* fun locationObservable(): Observable<LocationFix> {
             return locations
-        }
+        }*/
     //}
 
     constructor(context: Context, trackers: MutableList<Tracker>?) {

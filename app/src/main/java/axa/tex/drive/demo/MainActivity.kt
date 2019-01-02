@@ -25,6 +25,7 @@ import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.schedulers.Schedulers
 
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
          val logger  = LoggerFactory.getLogger();
         logger.getLogStream().subscribeOn(Schedulers.computation()).subscribe {
-            //println(it)
+            println(it)
         }
 
         score.setOnClickListener{
@@ -77,13 +78,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun startService(){
 
-        tripRecorder?.startTracking();
+        tripRecorder?.startTracking(Date().time);
     }
 
     private fun stopService(){
         val value = WorkManager.getInstance().getStatusesByTag("9a2dc881-c136-47b6-b3b0-afbc44961055").value;
         Log.i("WORKS",value.toString())
-        tripRecorder?.stopTracking();
+        tripRecorder?.stopTracking(Date().time);
     }
 
 

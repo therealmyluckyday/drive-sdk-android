@@ -6,7 +6,7 @@ class Logger {
 
     internal val logger = LogImpl()
 
-    fun getLogStream() : PublishSubject<LogDetail>{
+    fun getLogStream() : PublishSubject<LogMessage>{
         return logger.subjects()
     }
 

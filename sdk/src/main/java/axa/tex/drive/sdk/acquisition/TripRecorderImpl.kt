@@ -53,16 +53,16 @@ internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
     }
 
 
-    override fun startTracking() {
+    override fun startTracking(startTime : Long) {
         val serviceIntent = Intent(context, CollectorService::class.java)
         context.startService(serviceIntent)
         //FixProcessor.startTrip(context)
-        fixProcessor?.startTrip()
+        fixProcessor?.startTrip(startTime)
     }
 
-    override fun stopTracking() {
+    override fun stopTracking(endTime : Long) {
         //FixProcessor.endTrip(context)
-        fixProcessor?.endTrip()
+        fixProcessor?.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
         context.bindService(serviceIntent, object : ServiceConnection {
 
@@ -83,7 +83,7 @@ internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
     }
 
     override fun locationObservable(): Observable<LocationFix> {
-       return collector.locationObservable()
+       return collector.locations
     }
 
     override fun tripIdListener(): Observable<TripId> {

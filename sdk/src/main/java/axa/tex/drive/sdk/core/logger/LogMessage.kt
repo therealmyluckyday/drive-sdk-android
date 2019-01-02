@@ -5,7 +5,7 @@ import axa.tex.drive.sdk.core.logger.LogType.ERROR
 import axa.tex.drive.sdk.core.logger.LogType.INFO
 import java.util.*
 
-data class LogDetail(val description : String, val type: LogType, val file : String, val function:String){
+data class LogMessage(val description : String, val type: LogType, val file : String, val function:String){
 
 
 
