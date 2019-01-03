@@ -8,6 +8,7 @@ import android.hardware.SensorManager
 import android.util.Log
 import android.util.SparseArray
 import android.util.SparseIntArray
+import axa.tex.drive.sdk.acquisition.collection.internal.Collector
 import axa.tex.drive.sdk.acquisition.internal.tracker.MotionBuffer
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.Motion
@@ -24,7 +25,7 @@ class MotionSensor : TexSensor, SensorEventListener {
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
 
 
-    private val MOTION_TAG: String = "MOTION_" + (axa.tex.drive.sdk.acquisition.collection.internal.Collector::class.java.simpleName).toUpperCase();
+    private val MOTION_TAG: String = "MOTION_" + (Collector::class.java.simpleName).toUpperCase();
     private val SENSORS_TYPES = intArrayOf(Sensor.TYPE_GRAVITY, Sensor.TYPE_LINEAR_ACCELERATION, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_ACCELEROMETER)
     private val GRAVITY_FORCE = 9.81f
     private val DEFAULT_ACCELERATION_THRESHOLD = 2.5f // [G]
@@ -39,14 +40,14 @@ class MotionSensor : TexSensor, SensorEventListener {
     private var isOverAccelerationThreshold = false
     private var accelerationEventTimestamp: Long = 0
 
-    internal val LOGGER = LoggerFactory.getLogger().logger
+    internal val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
 
 
     private val motionBuffer = MotionBuffer()
 
-    var canBeEnabled : Boolean
+    var canBeEnabled: Boolean
 
-    constructor(context: Context?,canBeEnabled : Boolean = true) {
+    constructor(context: Context?, canBeEnabled: Boolean = true) {
         this.canBeEnabled = canBeEnabled
         sensorManager = context?.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensors = SparseArray()
@@ -80,19 +81,19 @@ class MotionSensor : TexSensor, SensorEventListener {
     }
 
     fun enableTracking() {
-        LOGGER.info("Motion Tracker enabled", "MotionTracker", "override fun enableTracking()")
+        LOGGER.info("Motion Tracker enabled", "override fun enableTracking()")
         enableTracking(true)
     }
 
     fun disableTracking() {
         enableTracking(false)
-        LOGGER.info("Motion Tracker disabled", "MotionTracker", "override fun disableTracking()")
+        LOGGER.info("Motion Tracker disabled", "override fun disableTracking()")
 
     }
 
 
     override fun enableSensor() {
-        if(canBeEnabled) {
+        if (canBeEnabled) {
             enableTracking()
         }
     }
@@ -124,7 +125,7 @@ class MotionSensor : TexSensor, SensorEventListener {
         if (event != null) {
             for (value in event.values) {
                 if (java.lang.Float.isNaN(value) || java.lang.Float.isInfinite(value)) {
-                    LOGGER.warn("Skipping sensor value NaN or infinite", "MotionTracker", "override fun onSensorChanged(event: SensorEvent?)")
+                    LOGGER.warn("Skipping sensor value NaN or infinite", "override fun onSensorChanged(event: SensorEvent?)")
                     return
                 }
             }
@@ -136,15 +137,15 @@ class MotionSensor : TexSensor, SensorEventListener {
             if (normL2(event.values) >= accelerationThreshold * GRAVITY_FORCE) {
                 if (!isOverAccelerationThreshold) {
 
-                    LOGGER.info("Acceleration event detected", "MotionTracker", "override fun onSensorChanged(event: SensorEvent?)")
+                    LOGGER.info("Acceleration event detected", "override fun onSensorChanged(event: SensorEvent?)")
 
                     accelerationEventTimestamp = Date().time
 
                     Thread {
                         val buf = motionBuffer.flush()
-                        LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "MotionTracker", "override fun onSensorChanged(event: SensorEvent?)")
+                        LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "override fun onSensorChanged(event: SensorEvent?)")
 
-                            fixProducer.onNext(buf)
+                        fixProducer.onNext(buf)
 
                     }.start()
 
@@ -158,9 +159,10 @@ class MotionSensor : TexSensor, SensorEventListener {
             }
         } else {
 
-            val motionFix = event?.let { motionFix(it, event.timestamp) }
+
 
             Thread {
+                val motionFix = event?.let { motionFix(it, event.timestamp) }
                 motionBuffer.addFix(motionFix)
             }.start()
         }

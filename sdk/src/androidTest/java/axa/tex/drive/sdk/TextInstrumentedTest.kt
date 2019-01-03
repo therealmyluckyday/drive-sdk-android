@@ -12,10 +12,9 @@ import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
 import io.reactivex.Observable
 import org.junit.Assert
-
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.Before
 import org.koin.test.KoinTest
 
 

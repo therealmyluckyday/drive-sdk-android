@@ -9,14 +9,13 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 
-private fun getDefaultLooper():Looper {
+private fun getDefaultLooper(): Looper {
     val ht = HandlerThread("AndroidFileLogger")
     ht.start()
     return ht.looper
 }
 
 class DiskLogHandler(looper: Looper?, private val folder: String, private val fileName: String, private val maxFileSize: Int) : Handler(looper) {
-
 
 
     constructor(folder: String, fileName: String, maxFileSize: Int) : this(getDefaultLooper(), folder, fileName, maxFileSize) {}

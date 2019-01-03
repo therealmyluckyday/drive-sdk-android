@@ -3,12 +3,9 @@ package axa.tex.drive.sdk.core
 import android.content.ComponentCallbacks
 import android.content.res.Configuration
 import axa.tex.drive.sdk.acquisition.TripRecorder
-import axa.tex.drive.sdk.acquisition.TripRecorderImpl
-import axa.tex.drive.sdk.acquisition.collection.internal.Collector
-import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import org.koin.android.ext.android.inject
 
-class TexService : ComponentCallbacks{
+class TexService : ComponentCallbacks {
     override fun onLowMemory() {
 
     }
@@ -18,7 +15,7 @@ class TexService : ComponentCallbacks{
     }
 
 
-    companion object : ComponentCallbacks{
+    companion object : ComponentCallbacks {
         override fun onLowMemory() {
 
         }
@@ -28,7 +25,7 @@ class TexService : ComponentCallbacks{
 
         private var instance: TexService? = null
         private var recorder: TripRecorder? = null
-        private var config : TexConfig? = null
+        private var config: TexConfig? = null
 
         fun configure(conf: TexConfig): TexService? {
             config = conf
@@ -42,12 +39,7 @@ class TexService : ComponentCallbacks{
     }
 
 
-    fun getTripRecorder() : TripRecorder?{
-       /* if (recorder == null) {
-            recorder = config?.context?.let { TripRecorderImpl(it) }
-        }
-        return recorder*/
-
+    fun getTripRecorder(): TripRecorder? {
         val tripRecorder: TripRecorder by inject()
         return tripRecorder
     }

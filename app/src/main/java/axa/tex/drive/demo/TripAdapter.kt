@@ -2,7 +2,6 @@ package com.example.android.recyclerview
 
 import android.content.Context
 import android.content.Intent
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -20,10 +19,8 @@ import axa.tex.drive.demo.Scores
  * @param dataSet String[] containing the data to populate views to be used by RecyclerView.
  */
 
-class TripAdapter(private val context : Context, private val dataSet: List<String>?) :
+class TripAdapter(private val context: Context, private val dataSet: List<String>?) :
         RecyclerView.Adapter<TripAdapter.ViewHolder>() {
-
-
 
 
     /**
@@ -34,7 +31,7 @@ class TripAdapter(private val context : Context, private val dataSet: List<Strin
 
         init {
             // Define click listener for the ViewHolder's View.
-           v.setOnClickListener {  }
+            v.setOnClickListener { }
 
         }
     }
@@ -61,7 +58,8 @@ class TripAdapter(private val context : Context, private val dataSet: List<Strin
         viewHolder.itemView.setOnClickListener {
             val intent = Intent(context, Scores::class.java)
             intent.putExtra("trip", dataSet?.get(position))
-            context.startActivity(intent) }
+            context.startActivity(intent)
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)

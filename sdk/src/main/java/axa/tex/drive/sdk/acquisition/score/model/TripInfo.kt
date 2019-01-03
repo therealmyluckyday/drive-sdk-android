@@ -1,17 +1,17 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
-class  TripInfo{
+class TripInfo {
 
-     var battery: Int = -1
-     var daylight_ratio: Int = -1
-     var duration: Int = -1
-     var length: Double = (-1).toDouble()
-     var road_categories: RoadCategories? = null
-     var temperature: Int = -1
-     var weather_categories: WeatherCategories? = null
+    var battery: Int = -1
+    var daylight_ratio: Int = -1
+    var duration: Int = -1
+    var length: Double = (-1).toDouble()
+    var road_categories: RoadCategories? = null
+    var temperature: Int = -1
+    var weather_categories: WeatherCategories? = null
 
 
-    constructor(){
+    constructor() {
 
     }
 

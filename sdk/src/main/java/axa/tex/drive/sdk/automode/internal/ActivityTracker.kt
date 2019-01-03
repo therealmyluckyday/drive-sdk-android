@@ -21,11 +21,11 @@ private const val PENDING_INTENT_REQUEST_CODE = 484
 
 
 class ActivityTracker : AutoModeState {
-    override fun state() :AutoModeState.State{
+    override fun state(): AutoModeState.State {
         return AutoModeState.State.TRACKING_ACTIVITY
     }
 
-    private var activityReceiver : BroadcastReceiver? = null
+    private var activityReceiver: BroadcastReceiver? = null
 
 
     private var context: Context
@@ -51,7 +51,7 @@ class ActivityTracker : AutoModeState {
 
                 val result = ActivityRecognitionResult.extractResult(intent)
                 val activity = result.mostProbableActivity
-                Toast.makeText(context,result.mostProbableActivity.toString(), Toast.LENGTH_LONG).show()
+                Toast.makeText(context, result.mostProbableActivity.toString(), Toast.LENGTH_LONG).show()
                 if (activity.type != DetectedActivity.IN_VEHICLE) {
                     return
                 }
@@ -73,8 +73,8 @@ class ActivityTracker : AutoModeState {
         task.addOnFailureListener(OnFailureListener { print("Unable to connect!") })
     }
 
-    override fun stopScan(){
-        if(activityReceiver != null) {
+    override fun stopScan() {
+        if (activityReceiver != null) {
             context.unregisterReceiver(activityReceiver)
         }
 

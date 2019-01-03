@@ -3,10 +3,10 @@ package axa.tex.drive.sdk.acquisition.score
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
 import axa.tex.drive.sdk.acquisition.score.model.TripInfo
 
-class  Score{
+class Score {
 
     var alerts: List<String>? = null
-    var end_time: Long = - 1
+    var end_time: Long = -1
     var flags: List<String>? = null
     var score_type: String? = null
     var scoregw_version: String? = null
@@ -20,7 +20,7 @@ class  Score{
     var trip_info: TripInfo? = null
     var uid: String? = null
 
-    constructor(){
+    constructor() {
 
     }
 

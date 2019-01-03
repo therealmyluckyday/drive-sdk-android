@@ -17,13 +17,13 @@ class LoctionFixTest {
         val altitude = 15.0
         val timestamp = Date().time
 
-        val locationFix = LocationFix(12.0,2.0,14f,53f,12f,15.0,timestamp)
+        val locationFix = LocationFix(12.0, 2.0, 14f, 53f, 12f, 15.0, timestamp)
 
 
-        Assert.assertTrue(locationFix.timestamp==timestamp)
-        Assert.assertTrue(locationFix.latitude==latitude)
-        Assert.assertTrue(locationFix.longitude==longitude)
-        Assert.assertTrue(locationFix.precision==precision)
+        Assert.assertTrue(locationFix.timestamp == timestamp)
+        Assert.assertTrue(locationFix.latitude == latitude)
+        Assert.assertTrue(locationFix.longitude == longitude)
+        Assert.assertTrue(locationFix.precision == precision)
         Assert.assertTrue(locationFix.speed == speed)
         Assert.assertTrue(locationFix.bearing == bearing)
         Assert.assertTrue(locationFix.altitude == altitude)

@@ -1,20 +1,14 @@
 package axa.tex.drive.sdk.acquisition
 
-import android.content.ComponentCallbacks
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.res.Configuration
-import axa.tex.drive.sdk.acquisition.collection.internal.CollectorService
-import android.content.ComponentName
 import android.os.IBinder
-import android.content.ServiceConnection
 import axa.tex.drive.sdk.acquisition.collection.internal.Collector
+import axa.tex.drive.sdk.acquisition.collection.internal.CollectorService
 import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
-import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.internal.utils.TripManager
-import axa.tex.drive.sdk.core.internal.utils.Utils
 import io.reactivex.Observable
 import org.koin.android.ext.android.inject
 
@@ -24,8 +18,7 @@ internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
 
     private val context: Context
     private var fixProcessor: FixProcessor? = null
-    private var collector : Collector
-
+    private var collector: Collector
 
 
     override fun getCurrentTripId(): TripId? {
@@ -40,27 +33,27 @@ internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
 
     }
 
-    constructor(context: Context){
+    constructor(context: Context) {
         this.context = context
         val collector: Collector by inject()
         this.collector = collector
         try {
             val fixProcessor: FixProcessor by inject()
             this.fixProcessor = fixProcessor
-        }catch (e : Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
 
-    override fun startTracking(startTime : Long) {
+    override fun startTracking(startTime: Long) {
         val serviceIntent = Intent(context, CollectorService::class.java)
         context.startService(serviceIntent)
         //FixProcessor.startTrip(context)
         fixProcessor?.startTrip(startTime)
     }
 
-    override fun stopTracking(endTime : Long) {
+    override fun stopTracking(endTime: Long) {
         //FixProcessor.endTrip(context)
         fixProcessor?.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
@@ -77,16 +70,16 @@ internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
         }, /*Context.BIND_AUTO_CREATE*/0);
     }
 
-    override fun isRecording(): Boolean{
+    override fun isRecording(): Boolean {
         //return CollectorService.isRunning()
         return collector.recording
     }
 
     override fun locationObservable(): Observable<LocationFix> {
-       return collector.locations
+        return collector.locations
     }
 
     override fun tripIdListener(): Observable<TripId> {
-    return  null!!
+        return null!!
     }
 }

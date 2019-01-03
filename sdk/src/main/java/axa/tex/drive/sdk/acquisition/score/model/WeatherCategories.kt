@@ -1,8 +1,8 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
-class  WeatherCategories{
+class WeatherCategories {
 
-     var cloudy: Int = -1
+    var cloudy: Int = -1
     var foggy: Int = -1
     var heavy_ice: Int = -1
     var heavy_rain: Int = -1
@@ -14,7 +14,7 @@ class  WeatherCategories{
     var thundery: Int = -1
     var unknown: Int = -1
 
-    constructor(){
+    constructor() {
 
     }
 

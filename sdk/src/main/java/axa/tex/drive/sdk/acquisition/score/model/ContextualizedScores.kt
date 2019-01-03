@@ -1,21 +1,20 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
 
+class ContextualizedScores {
 
-class  ContextualizedScores{
+    var day: Day? = null
+    var fog: Fog? = null
+    var motorway: Motorway? = null
+    var mountain: Mountain? = null
+    var night: Night? = null
+    var normal: Normal? = null
+    var rain: Rain? = null
+    var rural: Rural? = null
+    var snow: Snow? = null
+    var urban: Urban? = null
 
-     var day: Day? = null
-     var fog: Fog? = null
-     var motorway: Motorway? = null
-     var mountain: Mountain? = null
-     var night: Night? = null
-     var normal: Normal? = null
-     var rain: Rain? = null
-     var rural: Rural? = null
-     var snow: Snow? = null
-     var urban: Urban? = null
-
-    constructor(){
+    constructor() {
 
     }
 

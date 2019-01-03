@@ -1,38 +1,38 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
 
-class PoiDil{
+class PoiDil {
 
-     var alerts: List<String>? = null
-     var base_speed: Int = -1
-     var distance: Double = (-1).toDouble()
-     var intensity: String? = null
-     var intensity_value: Int = -1
-     var latitude: Double = (-1).toDouble()
-     var longitude: Double = (-1).toDouble()
-     var physical_value: Double = (-1).toDouble()
-     var physical_value_unit: String? = null
-     var road_flags: List<String>? = null
-     var timestamp: Long = -1
-     var type: String? = null
-     var weather_code: String? = null
+    var alerts: List<String>? = null
+    var base_speed: Int = -1
+    var distance: Double = (-1).toDouble()
+    var intensity: String? = null
+    var intensity_value: Int = -1
+    var latitude: Double = (-1).toDouble()
+    var longitude: Double = (-1).toDouble()
+    var physical_value: Double = (-1).toDouble()
+    var physical_value_unit: String? = null
+    var road_flags: List<String>? = null
+    var timestamp: Long = -1
+    var type: String? = null
+    var weather_code: String? = null
 
-    constructor(){
+    constructor() {
 
     }
 
     constructor(alerts: List<String>, base_speed: Int,
                 distance: Double,
-                 intensity: String,
-                    intensity_value: Int,
-                 latitude: Double,
+                intensity: String,
+                intensity_value: Int,
+                latitude: Double,
                 longitude: Double,
-                 physical_value: Double,
-                 physical_value_unit: String,
-                 road_flags: List<String>,
-                 timestamp: Long,
-                 type: String,
-                 weather_code: String) {
+                physical_value: Double,
+                physical_value_unit: String,
+                road_flags: List<String>,
+                timestamp: Long,
+                type: String,
+                weather_code: String) {
         this.alerts = alerts
         this.base_speed = base_speed
         this.distance = distance

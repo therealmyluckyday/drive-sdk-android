@@ -2,11 +2,11 @@ package axa.tex.drive.sdk.acquisition.internal.tracker
 
 import axa.tex.drive.sdk.acquisition.internal.sensor.TexSensor
 
-open class TrackerImpl : Tracker{
+open class TrackerImpl : Tracker {
 
-    private var sensor : TexSensor
+    private var sensor: TexSensor
 
-    constructor(sensor: TexSensor){
+    constructor(sensor: TexSensor) {
         this.sensor = sensor
     }
 

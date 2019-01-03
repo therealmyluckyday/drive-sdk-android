@@ -2,20 +2,19 @@ package axa.tex.drive.sdk.acquisition.model
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import java.util.*
 
-class TripId{
+class TripId {
 
-   var value : String = ""
+    var value: String = ""
 
 
-    constructor(value : String){
-        this.value  = value
+    constructor(value: String) {
+        this.value = value
     }
 
     constructor()
 
-    fun toJson() : String{
+    fun toJson(): String {
         val mapper = ObjectMapper();
         mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
         return mapper.writeValueAsString(this)

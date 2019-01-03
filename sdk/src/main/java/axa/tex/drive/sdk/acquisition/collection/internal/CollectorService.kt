@@ -11,39 +11,20 @@ import android.os.Build
 import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
-import android.view.View
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
-import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.TexConfig
-import axa.tex.drive.sdk.core.internal.utils.Utils
+import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory
-import io.reactivex.subjects.PublishSubject
-
 import org.koin.android.ext.android.inject
 import org.koin.standalone.StandAloneContext
-import java.util.*
+
 
 private const val NOTIFICATION_ID = 7071
 
 internal class CollectorService : Service() {
-    private val LOGGER = LoggerFactory.getLogger().logger
-
-    /*companion object {
-
-        private var running = false
-        private var tripId : TripId? = null
-
-        fun isRunning(): Boolean {
-            return running
-        }
-
-        fun currentTripId(): TripId? {
-            return tripId
-        }
-    }*/
+    private val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
 
     private val binder = LocalBinder()
     private var collector: Collector? = null;
@@ -86,10 +67,10 @@ internal class CollectorService : Service() {
         TexConfig.init(applicationContext, config)
         val collector: Collector by inject()
         this.collector = collector
-        collector.collect()
+        collector.startCollecting()
         collector.recording = true
 
-        val scoreRetriever : ScoreRetriever by inject()
+        val scoreRetriever: ScoreRetriever by inject()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = createNotificationChannel();
@@ -116,7 +97,7 @@ internal class CollectorService : Service() {
         try {
             scoreRetriever.getAvailableScoreListener().subscribe { tripId ->
                 scoreRetriever.getScoreListener().subscribe { score ->
-                    LOGGER.info("The retrieved score : ${score.toJson()}", "Collector Service", "onStartCommand")
+                    LOGGER.info("The retrieved score : ${score.toJson()}", "onStartCommand")
                 }
                 Thread { tripId?.let { scoreRetriever.retrieveScore(it) } }.start()
             }
@@ -141,7 +122,4 @@ internal class CollectorService : Service() {
         collector?.recording = true
     }
 
-    /*internal fun numberOfTrackers(): Int {
-        return collector?.numberOfTrackers()!!
-    }*/
 }

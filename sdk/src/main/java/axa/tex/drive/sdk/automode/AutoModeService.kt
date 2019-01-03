@@ -15,10 +15,9 @@ import android.os.IBinder
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.ActivityRecognition
+import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
-import com.google.android.gms.location.ActivityRecognitionClient
-
 
 
 private enum class AutoStartState {
@@ -29,7 +28,7 @@ private enum class AutoStartState {
     drivingAndStill
 }
 
-class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+class AutoModeService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null;
@@ -52,7 +51,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
     private var mActivityPendingIntent: PendingIntent? = null
     private var autoStartState = AutoStartState.idle
 
-    private var activityRecognitionClient : ActivityRecognitionClient = ActivityRecognition.getClient(this)
+    private var activityRecognitionClient: ActivityRecognitionClient = ActivityRecognition.getClient(this)
     private val mDrivingLocationListener = DrivingLocationListener()
 
 
@@ -121,7 +120,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
                 //mLogger.trace("Not enough confidence for car activity: {}", activity.confidence)
                 return
             }
-           // mLogger.debug("Activity Receiver: going to speed scan mode")
+            // mLogger.debug("Activity Receiver: going to speed scan mode")
             autoStartState = AutoStartState.speedScan
             //postStatusEventSticky(AutoModeStatusEvent(AutoModeStatus.scanning_activity))
             stopActivityScan()
@@ -143,10 +142,6 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
             stopActivityScan()
             startSpeedScan()
         }
-
-
-
-
 
 
         override fun onStatusChanged(s: String, i: Int, bundle: Bundle) {}
@@ -194,11 +189,11 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
 
         fun resetGpsWatchdog() {
             stopGpsWatchdog()
-           // mHandler.postDelayed(_gpsWatchdog, sNoGpsTimer)
+            // mHandler.postDelayed(_gpsWatchdog, sNoGpsTimer)
         }
 
         fun stopGpsWatchdog() {
-           // mHandler.removeCallbacks(_gpsWatchdog)
+            // mHandler.removeCallbacks(_gpsWatchdog)
         }
 
         private fun triggerAutoStop() {
@@ -206,9 +201,9 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
             //postStatusEventSticky(AutoModeStatusEvent(AutoModeStatus.stopped))
             stopDrivingMode()
             startActivityScan()
-          //  mLogger.debug("Triggering auto stop")
+            //  mLogger.debug("Triggering auto stop")
 
-           // postDrivingEventSticky(AutoModeDrivingEvent(java.lang.Boolean.FALSE))
+            // postDrivingEventSticky(AutoModeDrivingEvent(java.lang.Boolean.FALSE))
         }
 
         override fun onLocationChanged(location: Location) {
@@ -216,7 +211,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
             when (autoStartState) {
                 AutoStartState.driving -> {
                     if (location.speed < SPEED_MOVEMENT_THRESHOLD) {
-                       // mLogger.debug("Car enter still mode")
+                        // mLogger.debug("Car enter still mode")
                         autoStartState = AutoStartState.drivingAndStill
                         //postStatusEventSticky(AutoModeStatusEvent(AutoModeStatus.stopped))
                         _stopTimeBeginMs = System.currentTimeMillis()
@@ -228,7 +223,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
                         autoStartState = AutoStartState.driving
                         //postStatusEventSticky(AutoModeStatusEvent(AutoModeStatus.driving))
                     } else if (System.currentTimeMillis() - _stopTimeBeginMs > sStopTimer) {
-                       // mLogger.debug("Car stopped value timeout")
+                        // mLogger.debug("Car stopped value timeout")
                         triggerAutoStop()
                     }
                 }
@@ -246,11 +241,11 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
                 LocationProvider.TEMPORARILY_UNAVAILABLE -> stringStatus = "TEMPORARILY_UNAVAILABLE"
                 else -> stringStatus = "UNKNOWN"
             }
-           // mLogger.debug("LocationListener.onStatusChanged() - Status: {}", stringStatus)
+            // mLogger.debug("LocationListener.onStatusChanged() - Status: {}", stringStatus)
         }
 
         override fun onProviderEnabled(s: String) {
-           //mLogger.debug("LocationListener.onProviderEnabled() - GPS enabled by user")
+            //mLogger.debug("LocationListener.onProviderEnabled() - GPS enabled by user")
         }
 
         override fun onProviderDisabled(s: String) {
@@ -261,14 +256,14 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
 
     private fun forceStopAll() {
         autoStartState = AutoStartState.idle
-      //  postStatusEventSticky(AutoModeStatusEvent(AutoModeStatus.service_not_started))
+        //  postStatusEventSticky(AutoModeStatusEvent(AutoModeStatus.service_not_started))
         try {
             stopDrivingMode()
             stopSpeedScan()
             stopActivityScan()
             stopPassiveScan()
         } catch (e: IllegalArgumentException) { // Because of possible unregister of broadcast receiver
-           // mLogger.debug("Not serious, but to check: ", e)
+            // mLogger.debug("Not serious, but to check: ", e)
             e.printStackTrace()
         }
 
@@ -284,12 +279,12 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
     }
 
     private fun startPassiveScan() {
-      //  mLogger.trace("startPassiveScan()")
+        //  mLogger.trace("startPassiveScan()")
         try {
             locationManager?.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0L, 0.0f, mPassiveLocationListener)
         } catch (e: SecurityException) {
             e.printStackTrace()
-        //    mLogger.info("Cannot fully execute startPassiveScan() due to user restrictions", e)
+            //    mLogger.info("Cannot fully execute startPassiveScan() due to user restrictions", e)
         }
 
     }
@@ -299,7 +294,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             locationManager?.removeUpdates(mPassiveLocationListener)
         } catch (e: SecurityException) {
-           e.printStackTrace()// mLogger.info("Cannot fully execute stopPasiveScan() due to user restrictions", e)
+            e.printStackTrace()// mLogger.info("Cannot fully execute stopPasiveScan() due to user restrictions", e)
         }
 
     }
@@ -309,13 +304,13 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         if (locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER)!!) {
             //mLogger.info("GPS is enabled, authorizing activity scan")
         } else {
-           // mLogger.info("GPS is not enabled, waiting for it to activate activity scan")
+            // mLogger.info("GPS is not enabled, waiting for it to activate activity scan")
             forceStopAll()
             return
         }
         registerReceiver(mActivityReceiver, IntentFilter(ACTIVITY_INTENT_ACTION))
 
-       // val activityRecognitionClient = ActivityRecognition.getClient(this)
+        // val activityRecognitionClient = ActivityRecognition.getClient(this)
 
 
         activityRecognitionClient.requestActivityUpdates(ACTIVITY_DETECTION_INTERVAL, mActivityPendingIntent)
@@ -330,7 +325,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
         try {
             unregisterReceiver(mActivityReceiver)
         } catch (e: Exception) {
-          e.printStackTrace()
+            e.printStackTrace()
             //  mLogger.debug("stopActivityScan() - Not serious, but to check: ", e)
         }
 
@@ -344,7 +339,7 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
     }
 
     private fun startSpeedScan() {
-       // mLogger.trace("startSpeedScan()")
+        // mLogger.trace("startSpeedScan()")
         try {
             locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0.0f, mSpeedLocationListener)
         } catch (e: SecurityException) {
@@ -356,12 +351,12 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
 
 
     private fun startDrivingMode() {
-       // mLogger.trace("startDrivingMode()")
+        // mLogger.trace("startDrivingMode()")
         mDrivingLocationListener.resetGpsWatchdog()
         try {
             locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0.0f, mDrivingLocationListener)
         } catch (e: SecurityException) {
-           e.printStackTrace()// mLogger.info("Cannot fully execute startDrivingMode() due to user restrictions", e)
+            e.printStackTrace()// mLogger.info("Cannot fully execute startDrivingMode() due to user restrictions", e)
         }
 
     }
@@ -378,14 +373,14 @@ class AutoModeService : Service(),  GoogleApiClient.ConnectionCallbacks, GoogleA
     }
 
     private fun stopSpeedScan() {
-      //  mLogger.trace("stopSpeedScan()")
+        //  mLogger.trace("stopSpeedScan()")
         try {
             locationManager?.removeUpdates(mSpeedLocationListener)
         } catch (e: SecurityException) {
             e.printStackTrace()//mLogger.info("Cannot fully execute stopSpeedScan() due to user restrictions", e)
         }
 
-       // mHandler.removeCallbacks(mSpeedScanEnd)
+        // mHandler.removeCallbacks(mSpeedScanEnd)
     }
 
 

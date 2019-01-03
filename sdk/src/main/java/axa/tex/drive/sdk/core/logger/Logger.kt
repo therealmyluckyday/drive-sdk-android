@@ -6,11 +6,16 @@ class Logger {
 
     internal val logger = LogImpl()
 
-    fun getLogStream() : PublishSubject<LogMessage>{
+    fun getLogStream(): PublishSubject<LogMessage> {
         return logger.subjects()
     }
 
-    fun stopLogging(){
+    fun stopLogging() {
         logger.subjects().onComplete()
     }
+
+    fun setFile(file: String) {
+        logger.file = file
+    }
+
 }

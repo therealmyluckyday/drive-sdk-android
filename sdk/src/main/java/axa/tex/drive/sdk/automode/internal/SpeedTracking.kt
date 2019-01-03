@@ -49,7 +49,7 @@ class SpeedTracking : AutoModeState {
         }
     }
 
-    override fun state() :AutoModeState.State{
+    override fun state(): AutoModeState.State {
         return AutoModeState.State.SCANNING_SPEED
     }
 }

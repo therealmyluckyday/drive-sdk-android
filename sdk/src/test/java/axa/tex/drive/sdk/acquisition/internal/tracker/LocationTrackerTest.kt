@@ -1,7 +1,6 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
 
-
 import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationSensor
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
@@ -48,15 +47,15 @@ class LocationTrackerTest {
         var failed = false
         val locationProducer = locationTracker?.provideFixProducer() as Observable<Fix>
         locationProducer.subscribe { fix ->
-           try {
-               val locationFix = (fix as LocationFix)
-               Assert.assertTrue(locationFix.latitude==12.0  && locationFix.longitude==1.88282)
-               signal.countDown()
-           }catch (e : Throwable){
-               e.printStackTrace()
-               failed = true
-               signal.countDown()
-           }
+            try {
+                val locationFix = (fix as LocationFix)
+                Assert.assertTrue(locationFix.latitude == 12.0 && locationFix.longitude == 1.88282)
+                signal.countDown()
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                failed = true
+                signal.countDown()
+            }
 
         }
         locationTracker.enableTracking()

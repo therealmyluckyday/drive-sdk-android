@@ -1,7 +1,7 @@
 package axa.tex.drive.demo
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import com.example.android.recyclerview.TripAdapter
@@ -18,8 +18,8 @@ class Trips : AppCompatActivity() {
 
 
         viewManager = LinearLayoutManager(this)
-        val dataSet : List<String> = listOf<String>("4260e592-008b-4fcf-877d-fe8d3923b5f5")
-        viewAdapter = TripAdapter(this,dataSet)
+        val dataSet: List<String> = listOf<String>("4260e592-008b-4fcf-877d-fe8d3923b5f5")
+        viewAdapter = TripAdapter(this, dataSet)
 
         recyclerView = findViewById<RecyclerView>(R.id.trips).apply {
             // use this setting to improve performance if you know that changes

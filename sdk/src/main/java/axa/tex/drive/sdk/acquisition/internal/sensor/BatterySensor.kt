@@ -18,10 +18,10 @@ class BatterySensor : TexSensor, BroadcastReceiver {
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
     private var enabled = true
 
-    var canBeEnabled : Boolean
+    var canBeEnabled: Boolean
 
 
-    constructor(context: Context?, canBeEnabled : Boolean = true) {
+    constructor(context: Context?, canBeEnabled: Boolean = true) {
         this.context = context
         this.canBeEnabled = canBeEnabled
     }
@@ -32,7 +32,7 @@ class BatterySensor : TexSensor, BroadcastReceiver {
     }
 
     override fun enableSensor() {
-        if(canBeEnabled) {
+        if (canBeEnabled) {
             val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             context?.registerReceiver(this, intentFilter)
             enabled = true
@@ -42,7 +42,7 @@ class BatterySensor : TexSensor, BroadcastReceiver {
     override fun disableSensor() {
         try {
             context?.unregisterReceiver(this)
-        }catch (e : IllegalArgumentException){
+        } catch (e: IllegalArgumentException) {
             //The receiver may not be registered yet.
             e.printStackTrace()
         }

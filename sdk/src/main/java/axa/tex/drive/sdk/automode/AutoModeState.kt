@@ -28,9 +28,9 @@ interface AutoModeState {
 
     fun stopScan()
 
-    fun state() : State
+    fun state(): State
 
-    enum class State{
+    enum class State {
         TRACKING_ACTIVITY,
         SCANNING_SPEED,
         IN_VEHICLE,

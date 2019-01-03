@@ -33,7 +33,7 @@ class LocationSensor : TexSensor, LocationListener {
     }
 
     private var lastLocation: Location? = null
-    internal val LOGGER = LoggerFactory.getLogger().logger
+    internal val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
     private var context: Context? = null;
     private var locationManager: LocationManager? = null
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
@@ -69,7 +69,7 @@ class LocationSensor : TexSensor, LocationListener {
                 location.bearing,
                 location.altitude,
                 location.time)
-        LOGGER.info("Sending location", "LocationTracker", "override fun onLocationChanged(location: Location)")
+        LOGGER.info("Sending location", "override fun onLocationChanged(location: Location)")
         fixProducer.onNext(listOf(locationFix))
     }
 
@@ -93,10 +93,10 @@ class LocationSensor : TexSensor, LocationListener {
                 }
             }
             locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, this)
-            LOGGER.info("location Tracker enabled", "LocationTracker", "private fun enableTracking(track: Boolean)")
+            LOGGER.info("location Tracker enabled", "private fun enableTracking(track: Boolean)")
         } else {
             locationManager?.removeUpdates(this)
-            LOGGER.info("location Tracker disabled", "LocationTracker", "private fun enableTracking(track: Boolean)")
+            LOGGER.info("location Tracker disabled", "private fun enableTracking(track: Boolean)")
         }
 
     }

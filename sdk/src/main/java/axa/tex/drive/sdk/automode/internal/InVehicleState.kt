@@ -56,7 +56,7 @@ class InVehicleState : AutoModeState {
     override fun stopScan() {
     }
 
-    override fun state() :AutoModeState.State{
+    override fun state(): AutoModeState.State {
         return AutoModeState.State.IN_VEHICLE
     }
 }

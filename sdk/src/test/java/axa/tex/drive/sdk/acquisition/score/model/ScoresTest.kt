@@ -1,10 +1,7 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
-import axa.tex.drive.sdk.acquisition.model.BatteryFix
-import axa.tex.drive.sdk.acquisition.model.BatteryState
 import org.junit.Assert
 import org.junit.Test
-import java.util.*
 
 class ScoresTest {
 
@@ -16,16 +13,14 @@ class ScoresTest {
         val smoothness: Double = (1).toDouble()
 
 
-
-
         val score = Scores(acceleration,
                 braking,
                 expert,
                 smoothness)
 
-        Assert.assertTrue(score.acceleration==acceleration)
-        Assert.assertTrue(score.braking==braking)
-        Assert.assertTrue(score.expert==expert)
-        Assert.assertTrue(score.smoothness==smoothness)
+        Assert.assertTrue(score.acceleration == acceleration)
+        Assert.assertTrue(score.braking == braking)
+        Assert.assertTrue(score.expert == expert)
+        Assert.assertTrue(score.smoothness == smoothness)
     }
 }

@@ -12,10 +12,10 @@ class BatteryFixTest {
         val level = 20
         val timestamp = Date().time
 
-        val batteryFix = BatteryFix(level,BatteryState.plugged,timestamp)
+        val batteryFix = BatteryFix(level, BatteryState.plugged, timestamp)
 
-        Assert.assertTrue(batteryFix.level==level)
-        Assert.assertTrue(batteryFix.timestamp==timestamp)
-        Assert.assertTrue(batteryFix.state==BatteryState.plugged)
+        Assert.assertTrue(batteryFix.level == level)
+        Assert.assertTrue(batteryFix.timestamp == timestamp)
+        Assert.assertTrue(batteryFix.state == BatteryState.plugged)
     }
 }

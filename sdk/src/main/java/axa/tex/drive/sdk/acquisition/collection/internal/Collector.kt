@@ -2,17 +2,17 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 
 
 import android.content.ComponentCallbacks
-import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
-import axa.tex.drive.sdk.acquisition.model.Fix
-import io.reactivex.Observable
-import io.reactivex.subjects.PublishSubject
 import android.content.Context
 import android.content.res.Configuration
+import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
+import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.internal.utils.TripManager
-import axa.tex.drive.sdk.core.internal.utils.Utils
 import com.orhanobut.logger.Logger
+import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 
@@ -29,15 +29,17 @@ internal class Collector : ComponentCallbacks {
 
     private var context: Context;
 
-    internal var currentTripId : TripId? = null
+    internal var currentTripId: TripId? = null
 
-    internal var recording : Boolean = false
+    internal var recording: Boolean = false
 
-   // internal companion object {
-         val locations: PublishSubject<LocationFix> = PublishSubject.create()
-       /* fun locationObservable(): Observable<LocationFix> {
-            return locations
-        }*/
+    var fixData: Observable<List<Fix>>? = null
+
+    // internal companion object {
+    val locations: PublishSubject<LocationFix> = PublishSubject.create()
+    /* fun locationObservable(): Observable<LocationFix> {
+         return locations
+     }*/
     //}
 
     constructor(context: Context, trackers: MutableList<Tracker>?) {
@@ -48,7 +50,7 @@ internal class Collector : ComponentCallbacks {
     }
 
 
-    fun collect() {
+    fun startCollecting() {
         if (trackers != null) {
             for (tracker in trackers) {
                 if (tracker.isEnabled()) {
@@ -62,33 +64,34 @@ internal class Collector : ComponentCallbacks {
     }
 
 
-
     private fun collect(tracker: Tracker) {
         tracker.enableTracking();
-        val fixData = tracker.provideFixProducer() as Observable<List<Fix>>
-        fixData.subscribeOn(io.reactivex.schedulers.Schedulers.computation()).subscribe { fixes ->
+        fixData = tracker.provideFixProducer() as Observable<List<Fix>>
+        fixData?.subscribeOn(io.reactivex.schedulers.Schedulers.computation())?.subscribe { fixes ->
 
-            Thread { fixProcessor.addFixes(fixes)
-                if(fixes.size == 1 && fixes[0] is LocationFix){
+            Thread {
+                fixProcessor.addFixes(fixes)
+                if (fixes.size == 1 && fixes[0] is LocationFix) {
                     locations.onNext(fixes[0] as LocationFix)
                 }
             }.start()
-          /*  if (fix is Fix) {
-                if (fix is LocationFix) {
-                    locations.onNext(fix)
-                }
-                //Thread { FixProcessor.addFixes(context,listOf(fix)) }.start()
-                Thread { fixProcessor.addFixes(context, listOf(fix)) }.start()
-            }
+            /*  if (fix is Fix) {
+                  if (fix is LocationFix) {
+                      locations.onNext(fix)
+                  }
+                  //Thread { FixProcessor.addFixes(context,listOf(fix)) }.start()
+                  Thread { fixProcessor.addFixes(context, listOf(fix)) }.start()
+              }
 
-            else {
-                Thread { fixProcessor.addFixes(context, fix as List<Fix>) }.start()
-                //Thread { FixProcessor.addFixes(context,fix as List<Fix>) }.start()
-            }*/
+              else {
+                  Thread { fixProcessor.addFixes(context, fix as List<Fix>) }.start()
+                  //Thread { FixProcessor.addFixes(context,fix as List<Fix>) }.start()
+              }*/
         }
     }
 
     fun stopCollecting() {
+        fixData?.unsubscribeOn(Schedulers.computation())
         if (trackers != null) {
             for (tracker in trackers) {
                 tracker.disableTracking()

@@ -1,10 +1,10 @@
 package axa.tex.drive.sdk.internal.extension
+
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPOutputStream
 
 
-
-internal fun String.capitalize() : String{
+internal fun String.capitalize(): String {
     if (this == null || this.isEmpty()) {
         return ""
     }

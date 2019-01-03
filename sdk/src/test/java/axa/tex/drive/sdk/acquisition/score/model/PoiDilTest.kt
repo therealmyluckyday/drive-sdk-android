@@ -21,7 +21,7 @@ class PoiDilTest {
         val type: String = "type test"
         val weather_code: String = "weather code test"
 
-    val poiDil = PoiDil(alerts,base_speed,
+        val poiDil = PoiDil(alerts, base_speed,
                 distance,
                 intensity,
                 intensity_value,
@@ -46,5 +46,5 @@ class PoiDilTest {
         Assert.assertTrue(poiDil.type == type)
         Assert.assertTrue(poiDil.weather_code == weather_code)
 
-}
+    }
 }

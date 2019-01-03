@@ -5,17 +5,13 @@ import android.content.res.Configuration
 import androidx.work.Data
 import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.score.Score
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
-import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.koin.android.ext.android.inject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -23,7 +19,6 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
-private val LOGGER = LoggerFactory.getLogger().logger
 
 private const val TIME_TO_WAIT = 5000;
 private const val MAX_ATTEMPT = 5;
@@ -34,16 +29,17 @@ internal class ScoreWorker() : Worker(), ComponentCallbacks {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     private var nbAttempt = 0
+    private val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
 
     override fun doWork(): WorkerResult {
 
-        val inputData : Data =  inputData
-        for((tripId , state) in inputData.keyValueMap) {
-            scoreRequest(tripId,state as Boolean)
+        val inputData: Data = inputData
+        for ((tripId, state) in inputData.keyValueMap) {
+            scoreRequest(tripId, state as Boolean)
         }
 
 
@@ -51,9 +47,9 @@ internal class ScoreWorker() : Worker(), ComponentCallbacks {
 
     }
 
-    private fun getLocaleId(locale : Locale?): String {
+    private fun getLocaleId(locale: Locale?): String {
         var theLocale = locale
-        if (locale == null){
+        if (locale == null) {
             theLocale = Locale.getDefault()
         }
         var result = theLocale?.language
@@ -68,35 +64,35 @@ internal class ScoreWorker() : Worker(), ComponentCallbacks {
     private fun scoreRequest(tripId: String, finalScore: Boolean): String {
         //val config  = CollectionDb.getConfig(applicationContext)
         val collectorDb: CollectionDb by inject()
-        val scoreRetriever : ScoreRetriever by inject()
-        val config  = collectorDb.getConfig()
+        val scoreRetriever: ScoreRetriever by inject()
+        val config = collectorDb.getConfig()
         val responseString = StringBuffer("")
         val locale = null
         val serverUrl = PlatformToHostConverter(Platform.PREPROD).getHost()
         val url: URL
         val theLocal = getLocaleId(locale)
         if (!finalScore) {
-            url = URL( "$serverUrl/score?trip_id=$tripId&lang=$theLocal")
+            url = URL("$serverUrl/score?trip_id=$tripId&lang=$theLocal")
         } else {
-            url = URL( "$serverUrl/score?trip_id=$tripId&lang=$theLocal&final=true")
+            url = URL("$serverUrl/score?trip_id=$tripId&lang=$theLocal&final=true")
         }
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
-       /* if (!mTexUser.isAnonymous()) {
-            connection.addRequestProperty("X-UserId", getUserID())
-            if (mTexUser.getAuthToken() != null) {
-                connection.addRequestProperty("X-AuthToken", getAuthToken())
-            }
-        }*/
+        /* if (!mTexUser.isAnonymous()) {
+             connection.addRequestProperty("X-UserId", getUserID())
+             if (mTexUser.getAuthToken() != null) {
+                 connection.addRequestProperty("X-AuthToken", getAuthToken())
+             }
+         }*/
         connection.addRequestProperty("X-AppKey", config?.appName)
         connection.connect()
         //mLogger.debug("Scoring server response code: " + connection.responseCode)
         val inputStream = connection.inputStream
         val rd = BufferedReader(InputStreamReader(inputStream))
-        var line =  rd.readLine()
-        while (line  != null) {
+        var line = rd.readLine()
+        while (line != null) {
             responseString.append(line)
-            line =  rd.readLine()
+            line = rd.readLine()
         }
 
         val mapper = ObjectMapper()
@@ -106,10 +102,10 @@ internal class ScoreWorker() : Worker(), ComponentCallbacks {
         try {
             val score = mapper.readValue(node.get("scores_dil").toString(), ScoresDil::class.java)
             scoreRetriever.getScoreListener().onNext(score)
-        }catch (e: Exception) {
-            return retry(tripId, finalScore,responseString.toString())
-        }catch (err : Error){
-            return retry(tripId, finalScore,responseString.toString())
+        } catch (e: Exception) {
+            return retry(tripId, finalScore, responseString.toString())
+        } catch (err: Error) {
+            return retry(tripId, finalScore, responseString.toString())
         }
 
         //val score = mapper.readValue(responseString.toString(), Score::class.java)
@@ -124,13 +120,13 @@ internal class ScoreWorker() : Worker(), ComponentCallbacks {
     }
 
 
-    private fun retry(tripId: String, finalScore: Boolean, recievedPayload : String) : String{
-        if(nbAttempt < MAX_ATTEMPT){
+    private fun retry(tripId: String, finalScore: Boolean, recievedPayload: String): String {
+        if (nbAttempt < MAX_ATTEMPT) {
             nbAttempt++
             Thread.sleep(TIME_TO_WAIT.toLong())
-           return  scoreRequest(tripId, finalScore)
+            return scoreRequest(tripId, finalScore)
 
-        }else{
+        } else {
             nbAttempt = 0
             return recievedPayload
         }

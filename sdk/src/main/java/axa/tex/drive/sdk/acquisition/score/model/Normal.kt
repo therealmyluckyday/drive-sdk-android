@@ -1,13 +1,13 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
-class Normal{
+class Normal {
 
-     var percentage: Int = -1
-     var scores: Scores? = null
+    var percentage: Int = -1
+    var scores: Scores? = null
 
-constructor(){
+    constructor() {
 
-}
+    }
 
     constructor(percentage: Int,
                 scores: Scores) {

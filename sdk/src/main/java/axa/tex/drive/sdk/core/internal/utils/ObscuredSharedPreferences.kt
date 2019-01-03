@@ -13,8 +13,6 @@ import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 
 
-
-
 /**
  * Thanks to emmby at http://stackoverflow.com/questions/785973/what-is-the-most-appropriate-way-to-store-user-settings-in-android-application/6393502#6393502
  *

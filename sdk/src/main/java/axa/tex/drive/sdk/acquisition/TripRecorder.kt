@@ -1,11 +1,10 @@
 package axa.tex.drive.sdk.acquisition
 
-import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import io.reactivex.Observable
 
-interface TripRecorder{
+interface TripRecorder {
 
     /**
      * TripID of the currently recorded trip.
@@ -16,12 +15,12 @@ interface TripRecorder{
     /**
      * Initiates tracking
      */
-    fun startTracking(startTime : Long)
+    fun startTracking(startTime: Long)
 
     /**
      * Stops the tracking
      */
-    fun stopTracking(endTime : Long)
+    fun stopTracking(endTime: Long)
 
     /**
      * Says if we are currently recording

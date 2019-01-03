@@ -7,13 +7,12 @@ class ScoresDilTest {
 
 
     @Test
-    fun testScoreDilInitilization(){
+    fun testScoreDilInitilization() {
         val percentage: Int = 50
         val acceleration: Double = (2).toDouble()
         val braking: Double = (3).toDouble()
         val expert: Double = (20).toDouble()
         val smoothness: Double = (1).toDouble()
-
 
 
         val scores = Scores(acceleration,
@@ -42,11 +41,11 @@ class ScoresDilTest {
         val weather_penalization: Int = 3
 
 
-        val mean = Mean(acceleration,braking,expert,smoothness, speed,weight = 12)
-        val contextualizedScores = ContextualizedScores(day,fog, motorway, mountain, night, normal, rain, rural, snow, urban)
+        val mean = Mean(acceleration, braking, expert, smoothness, speed, weight = 12)
+        val contextualizedScores = ContextualizedScores(day, fog, motorway, mountain, night, normal, rain, rural, snow, urban)
 
 
-        val scoresDil = ScoresDil(acceleration, braking, expert,smoothness,eco_ness,jam,mean,poi_dil,speed,weather_penalization, contextualizedScores)
+        val scoresDil = ScoresDil(acceleration, braking, expert, smoothness, eco_ness, jam, mean, poi_dil, speed, weather_penalization, contextualizedScores)
 
         Assert.assertTrue(scoresDil.acceleration == acceleration)
         Assert.assertTrue(scoresDil.braking == braking)
