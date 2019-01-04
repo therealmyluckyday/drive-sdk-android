@@ -3,6 +3,7 @@ package axa.tex.drive.sdk.core
 import android.content.ComponentCallbacks
 import android.content.res.Configuration
 import axa.tex.drive.sdk.acquisition.TripRecorder
+import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import org.koin.android.ext.android.inject
 
 class TexService : ComponentCallbacks {
@@ -41,6 +42,7 @@ class TexService : ComponentCallbacks {
 
     fun getTripRecorder(): TripRecorder? {
         val tripRecorder: TripRecorder by inject()
+
         return tripRecorder
     }
 }

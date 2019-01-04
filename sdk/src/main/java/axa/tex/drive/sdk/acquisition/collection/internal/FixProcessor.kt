@@ -3,7 +3,6 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 import android.content.ComponentCallbacks
 import android.content.Context
 import android.content.res.Configuration
-import android.util.Log
 import androidx.work.*
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.model.Event
@@ -14,6 +13,7 @@ import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.internal.utils.Utils
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
 import java.util.*
 
@@ -22,6 +22,7 @@ private const val DEFAULT_PACKET_SIZE = 100
 internal class FixProcessor : ComponentCallbacks {
 
     private var context: Context
+    private val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
 
     override fun onLowMemory() {
     }
@@ -87,7 +88,7 @@ internal class FixProcessor : ComponentCallbacks {
 
                     val id = UUID.randomUUID().toString()
                     val data: Data = Data.Builder().putString(id, json).build()
-                    Log.i("DATA FOR WORKER MANAGER", data.toString())
+                    LOGGER.info("DATA FOR WORKER MANAGER", data.toString())
                     buffer.clear()
 
                     val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)

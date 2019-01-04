@@ -12,6 +12,7 @@ import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import axa.tex.drive.sdk.R
+import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.core.TexConfig
@@ -75,8 +76,8 @@ internal class CollectorService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = createNotificationChannel();
             val notification: Notification
-            if (intent != null && intent.hasExtra("")) {
-                notification = intent.getParcelableExtra("")
+            if (intent != null && intent.hasExtra("notif")) {
+                notification = intent.getParcelableExtra("notif")
             } else {
                 val notificationBuilder = NotificationCompat.Builder(this, channelId)
                 notification = notificationBuilder.setOngoing(true)

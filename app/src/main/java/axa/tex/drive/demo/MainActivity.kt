@@ -1,13 +1,18 @@
 package axa.tex.drive.demo
 
 import android.Manifest
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import androidx.work.WorkManager
 import axa.tex.drive.sdk.acquisition.TripRecorder
@@ -15,6 +20,7 @@ import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.automode.AutoModeState
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
+import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
@@ -41,6 +47,7 @@ class MainActivity : AppCompatActivity() {
           activityTracker.scan(automode)*/
 
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
+
         config = TexConfig.Builder(user, applicationContext).enableBatteryTracker().enableLocationTracker()
                 .enableMotionTracker().withAppName("BC").withClientId("22910000").build(applicationContext);
         tripRecorder = TexService.configure(config!!)?.getTripRecorder();
@@ -66,14 +73,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    internal  val CHANNEL_ID = "tex-channel-id"
+    internal  val CHANNEL_NAME = "Notification"
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(): String {
+        val channelId = CHANNEL_ID
+        val channelName = CHANNEL_NAME
+        val chan = NotificationChannel(channelId,
+                channelName, NotificationManager.IMPORTANCE_NONE)
+        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+        val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        service.createNotificationChannel(chan)
+        return channelId
+    }
+
+
     private fun startService() {
 
-        tripRecorder?.startTracking(Date().time);
+
+            var notification : Notification? = null
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channelId = createNotificationChannel();
+                val notificationBuilder = NotificationCompat.Builder(this, channelId)
+                notification  = notificationBuilder.setOngoing(true)
+                        .setSmallIcon(R.drawable.white_hare)
+                        .setCategory(Notification.CATEGORY_SERVICE)
+                        .build()
+
+            }
+
+            tripRecorder?.setCustomNotification(notification)
+
+            tripRecorder?.startTracking(Date().time);
+
+
     }
 
     private fun stopService() {
         val value = WorkManager.getInstance().getStatusesByTag("9a2dc881-c136-47b6-b3b0-afbc44961055").value;
-        Log.i("WORKS", value.toString())
+
         tripRecorder?.stopTracking(Date().time);
     }
 

@@ -1,6 +1,7 @@
 package axa.tex.drive.sdk.core
 
 
+import android.app.Notification
 import android.content.Context
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.TripRecorder
@@ -31,6 +32,7 @@ class TexConfig {
 
     internal var context: Context? = null
 
+
     internal companion object {
 
         private var locationTrackerEnabled: Boolean = false
@@ -39,6 +41,7 @@ class TexConfig {
         internal var user: TexUser? = null
         internal var appName: String? = null
         internal var clientId: String? = null
+
 
 
         private fun setupKoin(context: Context) {
@@ -137,6 +140,7 @@ class TexConfig {
         @JsonProperty
         private var clientId: String? = null
 
+        private var customNotification: Notification? = null
 
         val logger = LoggerFactory.getLogger(this::class.java.name)
 
@@ -170,6 +174,7 @@ class TexConfig {
             TexConfig.motionTrackerEnabled = motionTrackerEnabled
             TexConfig.appName = appName
             TexConfig.clientId = clientId
+
 
             context?.let { setupKoin(it) }
 

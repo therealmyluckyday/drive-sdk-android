@@ -2,7 +2,6 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 
 import android.content.ComponentCallbacks
 import android.content.res.Configuration
-import android.util.Log
 import androidx.work.Data
 import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
@@ -51,9 +50,9 @@ internal class FixWorker() : Worker(), ComponentCallbacks {
     private fun sendFixes(inputData: Data): Boolean {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
         val data = inputData.keyValueMap
-        Log.i("COLLECTOR_WORKER SIZE :", inputData.keyValueMap.size.toString())
+        LOGGER.info("COLLECTOR_WORKER SIZE :", inputData.keyValueMap.size.toString())
         for ((id, value) in data) {
-            Log.i(FIX_SENDER_TAG, value as String)
+            LOGGER.info(FIX_SENDER_TAG, value as String)
             return sendData(id, value as String)
         }
         return false

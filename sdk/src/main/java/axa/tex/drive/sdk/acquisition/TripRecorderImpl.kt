@@ -1,5 +1,6 @@
 package axa.tex.drive.sdk.acquisition
 
+import android.app.Notification
 import android.content.*
 import android.content.res.Configuration
 import android.os.IBinder
@@ -10,19 +11,28 @@ import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 
 internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
 
 
+
     private val context: Context
     private var fixProcessor: FixProcessor? = null
     private var collector: Collector
+    var myCustomNotification : Notification? = null
 
+    var currentTripListener : Observable<TripId> = PublishSubject.create()
+
+
+
+    override fun setCustomNotification(customNotification: Notification?) {
+        myCustomNotification = customNotification
+    }
 
     override fun getCurrentTripId(): TripId? {
-        //return CollectorService.currentTripId()
         return TripManager.tripId(context)
     }
 
@@ -48,6 +58,9 @@ internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
 
     override fun startTracking(startTime: Long) {
         val serviceIntent = Intent(context, CollectorService::class.java)
+        if(myCustomNotification != null) {
+            serviceIntent.putExtra("notif", myCustomNotification)
+        }
         context.startService(serviceIntent)
         //FixProcessor.startTrip(context)
         fixProcessor?.startTrip(startTime)
@@ -77,9 +90,5 @@ internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
 
     override fun locationObservable(): Observable<LocationFix> {
         return collector.locations
-    }
-
-    override fun tripIdListener(): Observable<TripId> {
-        return null!!
     }
 }

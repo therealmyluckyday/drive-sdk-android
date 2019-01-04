@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import kotlinx.android.synthetic.main.activity_scores.*
-import org.koin.android.ext.android.inject
 
 class Scores : AppCompatActivity() {
 
@@ -17,7 +16,7 @@ class Scores : AppCompatActivity() {
 
         val tripId = intent.getStringExtra("trip")
 
-        val scoreRetriever: ScoreRetriever by inject()
+        val scoreRetriever: ScoreRetriever = ScoreRetriever()
 
         scoreRetriever.getScoreListener().subscribe {
             this.runOnUiThread {

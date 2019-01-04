@@ -5,7 +5,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 import android.util.SparseArray
 import android.util.SparseIntArray
 import axa.tex.drive.sdk.acquisition.collection.internal.Collector
@@ -17,6 +16,7 @@ import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
+import kotlin.concurrent.schedule
 
 class MotionSensor : TexSensor, SensorEventListener {
 
@@ -56,9 +56,10 @@ class MotionSensor : TexSensor, SensorEventListener {
             val sensor = sensorManager?.getDefaultSensor(type)
             if (sensor != null) {
                 sensors?.put(type, sensor)
-                Log.d(MOTION_TAG, "Found sensor {} of type: " + SENSOR_KEYS[i])
+                LOGGER.info("$MOTION_TAG, Found sensor {} of type: ${SENSOR_KEYS[i]}")
+
             } else {
-                Log.w(MOTION_TAG, "Found no sensor of type : " + SENSOR_KEYS[i])
+                LOGGER.warn("$MOTION_TAG, Found no sensor of type : ${SENSOR_KEYS[i]}")
             }
         }
         accuracies = SparseIntArray()
@@ -73,10 +74,10 @@ class MotionSensor : TexSensor, SensorEventListener {
     private fun enableTracking(track: Boolean) {
         if (track) {
             for (i in 0 until sensors!!.size()) {
-                sensorManager!!.registerListener(this, sensors!!.valueAt(i), stressedCaptureRate)
+                sensorManager?.registerListener(this, sensors!!.valueAt(i), stressedCaptureRate)
             }
         } else {
-            sensorManager!!.unregisterListener(this)
+            sensorManager?.unregisterListener(this)
         }
     }
 
@@ -119,7 +120,7 @@ class MotionSensor : TexSensor, SensorEventListener {
         val sensorType = event?.sensor?.type
         // We have to maintain an array of the sensor accuracies as declared in onAccuracyChanged instead of checking
         // event.accuracy because SensorEvent objects do not report correct accuracies on some devices (e.g. Samsung Galaxy S4)
-        val accuracy = sensorType?.let { accuracies!!.get(it, SensorManager.SENSOR_STATUS_UNRELIABLE) }
+        val accuracy = sensorType?.let { accuracies?.get(it, SensorManager.SENSOR_STATUS_UNRELIABLE) }
         if (accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) return
         // Check if sensor values are not NaN or infinite
         if (event != null) {
@@ -146,6 +147,11 @@ class MotionSensor : TexSensor, SensorEventListener {
                         LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "override fun onSensorChanged(event: SensorEvent?)")
 
                         fixProducer.onNext(buf)
+                        motionBuffer.acquireMotionAfterAcceleration()
+
+                        Timer("After crash", false).schedule(5000) {
+                            fixProducer.onNext(motionBuffer.flushMotionsAfterAcceleration())
+                        }
 
                     }.start()
 
@@ -163,7 +169,11 @@ class MotionSensor : TexSensor, SensorEventListener {
 
             Thread {
                 val motionFix = event?.let { motionFix(it, event.timestamp) }
-                motionBuffer.addFix(motionFix)
+                if(motionBuffer.afterAcceleration){
+                    motionBuffer.addMotionAfter(motionFix)
+                }else {
+                    motionBuffer.addFix(motionFix)
+                }
             }.start()
         }
     }
@@ -187,4 +197,6 @@ class MotionSensor : TexSensor, SensorEventListener {
             else -> null;
         }
     }
+
+
 }

@@ -1,5 +1,6 @@
 package axa.tex.drive.sdk.acquisition
 
+import android.app.Notification
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import io.reactivex.Observable
@@ -34,5 +35,5 @@ interface TripRecorder {
     fun locationObservable(): Observable<LocationFix>
 
 
-    fun tripIdListener(): Observable<TripId>
+    fun setCustomNotification(notification: Notification?)
 }

@@ -9,7 +9,10 @@ internal const val DEFAULT_OLDER_MOTION_AGE = 10 * 1000
 
 class MotionBuffer {
 
+    internal var afterAcceleration = false
+
     private val buffer = LinkedList<Fix>()
+    internal val afterAccelerationBuffer = LinkedList<Fix>()
 
 
     private var olderMotionAge: Int = DEFAULT_OLDER_MOTION_AGE
@@ -59,5 +62,22 @@ class MotionBuffer {
 
     internal fun getPeriod(): Long {
         return buffer.last.timestamp() - buffer.first.timestamp()
+    }
+
+    fun addMotionAfter(fix : MotionFix?){
+        if(fix != null) {
+            afterAccelerationBuffer.add(fix)
+        }
+    }
+
+    fun flushMotionsAfterAcceleration() : List<Fix>{
+        afterAcceleration = false
+        val fixes = afterAccelerationBuffer.toList()
+        afterAccelerationBuffer.clear()
+        return fixes
+    }
+
+    fun acquireMotionAfterAcceleration(){
+        afterAcceleration = true
     }
 }
