@@ -1,28 +1,13 @@
 package axa.tex.drive.sdk.core
 
-import android.content.ComponentCallbacks
-import android.content.res.Configuration
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.TripRecorderImpl
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import org.koin.android.ext.android.inject
 
-class TexService : ComponentCallbacks {
-    override fun onLowMemory() {
+class TexService : KoinComponentCallbacks{
 
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-
-    }
-
-
-    companion object : ComponentCallbacks {
-        override fun onLowMemory() {
-
-        }
-
-        override fun onConfigurationChanged(newConfig: Configuration?) {
-        }
+    companion object : KoinComponentCallbacks {
 
         private var instance: TexService? = null
         private var recorder: TripRecorder? = null

@@ -1,13 +1,16 @@
 package axa.tex.drive.sdk.acquisition.score.internal
 
-import android.content.ComponentCallbacks
+
 import android.content.res.Configuration
 import androidx.work.Data
 import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
+import axa.tex.drive.sdk.acquisition.score.model.ScoreError
+import axa.tex.drive.sdk.acquisition.score.model.ScoreResult
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
 import axa.tex.drive.sdk.core.Platform
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -23,14 +26,8 @@ import java.util.*
 private const val TIME_TO_WAIT = 5000;
 private const val MAX_ATTEMPT = 5;
 
-internal class ScoreWorker() : Worker(), ComponentCallbacks {
-    override fun onLowMemory() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-
-    }
 
     private var nbAttempt = 0
     private val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
@@ -61,7 +58,7 @@ internal class ScoreWorker() : Worker(), ComponentCallbacks {
     }
 
     @Throws(Exception::class)
-    private fun scoreRequest(tripId: String, finalScore: Boolean): String {
+    private fun scoreRequest(tripId: String, finalScore: Boolean) {
         //val config  = CollectionDb.getConfig(applicationContext)
         val collectorDb: CollectionDb by inject()
         val scoreRetriever: ScoreRetriever by inject()
@@ -101,34 +98,38 @@ internal class ScoreWorker() : Worker(), ComponentCallbacks {
 
         try {
             val score = mapper.readValue(node.get("scores_dil").toString(), ScoresDil::class.java)
-            scoreRetriever.getScoreListener().onNext(score)
+            scoreRetriever.getScoreListener().onNext(ScoreResult(score))
         } catch (e: Exception) {
-            return retry(tripId, finalScore, responseString.toString())
+            LOGGER.info("RESPONSE CODES ${connection.responseCode}", "scoreRequest")
+            if(connection.responseCode.toString().startsWith("2")) {
+                val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
+                scoreRetriever.getScoreListener().onNext(ScoreResult(scoreError = scoreError, response = responseString.toString()))
+            }else if(connection.responseCode.toString().startsWith("5")){
+                 retry(scoreRetriever,tripId, finalScore, responseString.toString())
+            }
+
         } catch (err: Error) {
-            return retry(tripId, finalScore, responseString.toString())
+            if(connection.responseCode.toString().startsWith("5")){
+                 retry(scoreRetriever,tripId, finalScore, responseString.toString())
+            }
         }
 
-        //val score = mapper.readValue(responseString.toString(), Score::class.java)
-        //ScoreRetriever.getScoreListener().onNext(score)
-        /*try {
-            val map = mapper.readValue(responseString.toString(), Test::class.java)
-        }catch (e :Exception){
-            e.printStackTrace()
-        }*/
         nbAttempt = 0
-        return responseString.toString()
+         responseString.toString()
     }
 
 
-    private fun retry(tripId: String, finalScore: Boolean, recievedPayload: String): String {
+
+    private fun retry(scoreRetriever: ScoreRetriever,tripId: String, finalScore: Boolean, recievedPayload: String) {
         if (nbAttempt < MAX_ATTEMPT) {
             nbAttempt++
             Thread.sleep(TIME_TO_WAIT.toLong())
-            return scoreRequest(tripId, finalScore)
+             scoreRequest(tripId, finalScore)
 
         } else {
             nbAttempt = 0
-            return recievedPayload
+            scoreRetriever.getScoreListener().onNext(ScoreResult(response = recievedPayload))
+            // return recievedPayload
         }
     }
 }

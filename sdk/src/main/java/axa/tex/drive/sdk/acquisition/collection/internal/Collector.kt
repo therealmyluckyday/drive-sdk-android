@@ -1,13 +1,12 @@
 package axa.tex.drive.sdk.acquisition.collection.internal
 
 
-import android.content.ComponentCallbacks
 import android.content.Context
-import android.content.res.Configuration
 import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import com.orhanobut.logger.Logger
 import io.reactivex.Observable
@@ -16,12 +15,7 @@ import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 
-internal class Collector : ComponentCallbacks {
-    override fun onLowMemory() {
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-    }
+internal class Collector : KoinComponentCallbacks{
 
     private val trackers: MutableList<Tracker>?
 

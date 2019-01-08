@@ -1,11 +1,9 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
-import android.hardware.Sensor
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.Motion
 import axa.tex.drive.sdk.acquisition.model.MotionFix
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import java.util.*
 
@@ -19,7 +17,7 @@ class MotionBufferTest {
     private val TYPE_MAGNETIC_FIELD: Int = 4
 
     private var olderMotionAge: Int = DEFAULT_OLDER_MOTION_AGE
-    private var motionAgeAfterAcceleration: Int = DEFAULT_MOTION_AGE_AFTER_ACCELERATION
+    private var motionAgeAfterAcceleration: Long = DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION
 
     fun IntRange.random() =
             Random().nextInt((endInclusive + 1) - start) + start

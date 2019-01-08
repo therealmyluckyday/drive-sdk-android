@@ -1,6 +1,5 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
-import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeMotionSensor
 import org.junit.Assert
 import org.junit.Test

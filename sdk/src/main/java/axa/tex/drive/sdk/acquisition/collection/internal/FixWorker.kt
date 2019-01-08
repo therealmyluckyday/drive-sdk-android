@@ -1,12 +1,13 @@
 package axa.tex.drive.sdk.acquisition.collection.internal
 
-import android.content.ComponentCallbacks
-import android.content.res.Configuration
+
 import androidx.work.Data
 import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.core.Platform
+import axa.tex.drive.sdk.core.internal.Constants
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
 import axa.tex.drive.sdk.core.logger.LoggerFactory
@@ -17,14 +18,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-internal class FixWorker() : Worker(), ComponentCallbacks {
+internal class FixWorker() : Worker(), KoinComponentCallbacks{
     private val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
 
-    override fun onLowMemory() {
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-    }
 
     companion object {
         private val FIX_SENDER_TAG: String = "COLLECTOR_" + (FixWorker::class.java.simpleName).toUpperCase();
@@ -50,22 +46,24 @@ internal class FixWorker() : Worker(), ComponentCallbacks {
     private fun sendFixes(inputData: Data): Boolean {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
         val data = inputData.keyValueMap
+        val appName = inputData.getString(Constants.APP_NAME_KEY, "")
+        val clientId = inputData.getString(Constants.CLIENT_ID_KEY, "")
         LOGGER.info("COLLECTOR_WORKER SIZE :", inputData.keyValueMap.size.toString())
         for ((id, value) in data) {
             LOGGER.info(FIX_SENDER_TAG, value as String)
-            return sendData(id, value as String)
+            return sendData(id, value as String, appName, clientId)
         }
         return false
     }
 
 
     @Throws(IOException::class)
-    private fun sendData(id: String, data: String): Boolean {
+    private fun sendData(id: String, data: String, appName: String, clientId: String): Boolean {
 
         try {
             val collectorDb: CollectionDb by inject()
-            val config = collectorDb.getConfig()
-            // val config  = CollectionDb.getConfig(applicationContext)
+           // val config = collectorDb.getConfig()
+
 
             val scoreRetriever: ScoreRetriever by inject()
 
@@ -73,7 +71,7 @@ internal class FixWorker() : Worker(), ComponentCallbacks {
             val url = URL(platformToHostConverter.getHost() + "/data")
 
             val uid = DeviceInfo.getUid(applicationContext);
-            val appName = config?.appName
+            //val appName = config?.appName
 
 
             val urlConnection: HttpURLConnection

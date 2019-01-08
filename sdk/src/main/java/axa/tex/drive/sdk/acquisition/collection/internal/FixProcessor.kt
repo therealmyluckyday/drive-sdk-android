@@ -1,8 +1,7 @@
 package axa.tex.drive.sdk.acquisition.collection.internal
 
-import android.content.ComponentCallbacks
+
 import android.content.Context
-import android.content.res.Configuration
 import androidx.work.*
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.model.Event
@@ -10,6 +9,7 @@ import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.FixPacket
 import axa.tex.drive.sdk.acquisition.model.PendingTrip
 import axa.tex.drive.sdk.core.internal.Constants
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.internal.utils.Utils
@@ -19,16 +19,12 @@ import java.util.*
 
 private const val DEFAULT_PACKET_SIZE = 100
 
-internal class FixProcessor : ComponentCallbacks {
+internal class FixProcessor : KoinComponentCallbacks {
 
     private var context: Context
     private val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
 
-    override fun onLowMemory() {
-    }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-    }
 
     constructor(context: Context) {
         this.context = context
@@ -87,8 +83,10 @@ internal class FixProcessor : ComponentCallbacks {
 
 
                     val id = UUID.randomUUID().toString()
-                    val data: Data = Data.Builder().putString(id, json).build()
-                    LOGGER.info("DATA FOR WORKER MANAGER", data.toString())
+                    val data: Data = Data.Builder().putString(id, json).
+                            putString(Constants.DEFAULT_APP_NAME, appName).
+                            putString(Constants.CLIENT_ID_KEY, clientId).build()
+                    LOGGER.info("PACKET DATA FOR WORKER MANAGER", data.toString())
                     buffer.clear()
 
                     val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
@@ -99,9 +97,18 @@ internal class FixProcessor : ComponentCallbacks {
 
                     val pendingTrip = PendingTrip(id, tripId?.value, tripEnded)
                     collectorDb.saveTrip(pendingTrip)
-                    WorkManager.getInstance().enqueue(fixUploadWork)
+
+
+                    val workContinuation = tripId?.value?.let { WorkManager.getInstance().beginUniqueWork(it,ExistingWorkPolicy.APPEND,fixUploadWork) }
+                    workContinuation?.enqueue()
+
+                   // WorkManager.getInstance().enqueue(fixUploadWork)
                 }
             }
         }
+    }
+
+    fun processInOrder(fixes : List<Fix>){
+
     }
 }

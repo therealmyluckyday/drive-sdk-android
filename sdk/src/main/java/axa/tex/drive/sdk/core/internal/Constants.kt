@@ -9,5 +9,8 @@ object Constants {
     internal const val DEFAULT_APP_NAME = "youdrive_france_prospect"
     internal const val DEFAULT_CLIENT_ID = "00001111"
 
+    internal const val APP_NAME_KEY = "appName"
+    internal const val CLIENT_ID_KEY = "clientId"
+
 
 }

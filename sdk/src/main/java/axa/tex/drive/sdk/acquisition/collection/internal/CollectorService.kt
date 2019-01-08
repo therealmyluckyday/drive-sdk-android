@@ -56,8 +56,8 @@ internal class CollectorService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        val collectorDb = CollectionDb(applicationContext)
-        //val collectorDb: CollectionDb by inject()
+        //val collectorDb = CollectionDb(applicationContext)
+        val collectorDb: CollectionDb by inject()
         val config = collectorDb.getConfig()
         try {
             StandAloneContext.stopKoin()
@@ -97,8 +97,13 @@ internal class CollectorService : Service() {
 
         try {
             scoreRetriever.getAvailableScoreListener().subscribe { tripId ->
-                scoreRetriever.getScoreListener().subscribe { score ->
-                    LOGGER.info("The retrieved score : ${score.toJson()}", "onStartCommand")
+                scoreRetriever.getScoreListener().subscribe { scoreResult ->
+                    if(scoreResult.scoreDil == null){
+                        LOGGER.info("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "onStartCommand")
+                    }else{
+                        LOGGER.info("The retrieved score : ${scoreResult.scoreDil.toJson()}", "onStartCommand")
+                    }
+
                 }
                 Thread { tripId?.let { scoreRetriever.retrieveScore(it) } }.start()
             }

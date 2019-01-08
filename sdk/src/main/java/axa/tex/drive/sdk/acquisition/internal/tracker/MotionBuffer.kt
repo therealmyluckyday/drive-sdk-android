@@ -4,7 +4,7 @@ import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.MotionFix
 import java.util.*
 
-internal const val DEFAULT_MOTION_AGE_AFTER_ACCELERATION: Int = 5 * 1000
+internal const val DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION: Long = 5 * 1000
 internal const val DEFAULT_OLDER_MOTION_AGE = 10 * 1000
 
 class MotionBuffer {
@@ -15,8 +15,8 @@ class MotionBuffer {
     internal val afterAccelerationBuffer = LinkedList<Fix>()
 
 
-    private var olderMotionAge: Int = DEFAULT_OLDER_MOTION_AGE
-    private var motionAgeAfterAcceleration: Int = DEFAULT_MOTION_AGE_AFTER_ACCELERATION
+    internal var olderMotionAge: Int = DEFAULT_OLDER_MOTION_AGE
+    internal var motionPeriodAfterAcceleration: Long = DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION
 
     fun addFix(fix: MotionFix?) {
         synchronized(buffer) {
@@ -38,7 +38,7 @@ class MotionBuffer {
                 buffer.removeFirst()
             }
 
-            while (buffer.size > 0 && ((buffer.first().timestamp() - buffer.last().timestamp()) > motionAgeAfterAcceleration)) {
+            while (buffer.size > 0 && ((buffer.first().timestamp() - buffer.last().timestamp()) > motionPeriodAfterAcceleration)) {
                 buffer.removeLast()
             }
             val fixes = buffer.toList()
@@ -52,13 +52,8 @@ class MotionBuffer {
     }
 
 
-    fun setOlderMotionAge(olderMotionAge: Int) {
-        this.olderMotionAge = olderMotionAge
-    }
 
-    fun setMotionAgeAfterAcceleration(motionAgeAfterAcceleration: Int) {
-        this.motionAgeAfterAcceleration = motionAgeAfterAcceleration
-    }
+
 
     internal fun getPeriod(): Long {
         return buffer.last.timestamp() - buffer.first.timestamp()

@@ -48,6 +48,7 @@ class MotionSensor : TexSensor, SensorEventListener {
     var canBeEnabled: Boolean
 
     constructor(context: Context?, canBeEnabled: Boolean = true) {
+        motionBuffer.motionPeriodAfterAcceleration = 5000
         this.canBeEnabled = canBeEnabled
         sensorManager = context?.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensors = SparseArray()
@@ -149,7 +150,7 @@ class MotionSensor : TexSensor, SensorEventListener {
                         fixProducer.onNext(buf)
                         motionBuffer.acquireMotionAfterAcceleration()
 
-                        Timer("After crash", false).schedule(5000) {
+                        Timer("After acceleration event", false).schedule(motionBuffer.motionPeriodAfterAcceleration) {
                             fixProducer.onNext(motionBuffer.flushMotionsAfterAcceleration())
                         }
 

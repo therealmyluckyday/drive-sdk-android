@@ -20,19 +20,22 @@ class Scores : AppCompatActivity() {
 
         scoreRetriever.getScoreListener().subscribe {
             this.runOnUiThread {
-                speed.visibility = View.VISIBLE
-                speed.text = "${it.acceleration}"
+                if (it.scoreDil != null) {
+                    speed.visibility = View.VISIBLE
+                    speed.text = "${it.scoreDil?.acceleration}"
 
-                breaking.visibility = View.VISIBLE
-                breaking.text = "${it.braking}"
+                    breaking.visibility = View.VISIBLE
+                    breaking.text = "${it.scoreDil?.braking}"
 
-                smoothness.visibility = View.VISIBLE
-                smoothness.text = "${it.smoothness}"
+                    smoothness.visibility = View.VISIBLE
+                    smoothness.text = "${it.scoreDil?.smoothness}"
+                }
+                println("SCORES ${it.scoreDil?.acceleration}")
             }
-            println("SCORES ${it.acceleration}")
         }
 
-        Thread { scoreRetriever.retrieveScore("4260e592-008b-4fcf-877d-fe8d3923b5f5") }.start()
+        //Thread { scoreRetriever.retrieveScore("4260e592-008b-4fcf-877d-fe8d3923b5f5") }.start()
+        Thread { scoreRetriever.retrieveScore("65747F5D-8F8B-495E-BFA7-1E12B70997C7") }.start()
 
     }
 }

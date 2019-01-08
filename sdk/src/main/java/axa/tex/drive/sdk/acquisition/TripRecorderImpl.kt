@@ -9,13 +9,14 @@ import axa.tex.drive.sdk.acquisition.collection.internal.CollectorService
 import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 
-internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
+internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
 
 
@@ -36,12 +37,7 @@ internal class TripRecorderImpl : TripRecorder, ComponentCallbacks {
         return TripManager.tripId(context)
     }
 
-    override fun onLowMemory() {
-    }
 
-    override fun onConfigurationChanged(configuration: Configuration?) {
-
-    }
 
     constructor(context: Context) {
         this.context = context

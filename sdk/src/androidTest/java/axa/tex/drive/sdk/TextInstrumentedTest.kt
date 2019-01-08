@@ -4,7 +4,7 @@ package axa.tex.drive.sdk
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
 import axa.tex.drive.sdk.acquisition.TripRecorder
-import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_MOTION_AGE_AFTER_ACCELERATION
+import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION
 import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_OLDER_MOTION_AGE
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.TexUser
@@ -61,7 +61,7 @@ class TextInstrumentedTest : KoinTest {
 
     private fun testMotionBuffer(fixes: List<Fix>): Boolean {
         Assert.assertFalse(fixes.isEmpty())
-        Assert.assertTrue((fixes.first().timestamp() - fixes.last().timestamp()) <= DEFAULT_OLDER_MOTION_AGE + DEFAULT_MOTION_AGE_AFTER_ACCELERATION)
+        Assert.assertTrue((fixes.first().timestamp() - fixes.last().timestamp()) <= DEFAULT_OLDER_MOTION_AGE + DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION)
         return false;
     }
 
@@ -73,7 +73,7 @@ class TextInstrumentedTest : KoinTest {
         fixData.subscribe { fixes ->
             Assert.assertFalse((fixes as List<Fix>).isEmpty());
             Assert.assertTrue((fixes as List<Fix>).first().timestamp() - (fixes as List<Fix>).first().timestamp() <=
-                    DEFAULT_OLDER_MOTION_AGE + DEFAULT_MOTION_AGE_AFTER_ACCELERATION)
+                    DEFAULT_OLDER_MOTION_AGE + DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION)
         }
     }
 }

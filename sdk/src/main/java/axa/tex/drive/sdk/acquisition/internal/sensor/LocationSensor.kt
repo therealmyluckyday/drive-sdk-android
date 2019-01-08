@@ -92,7 +92,7 @@ class LocationSensor : TexSensor, LocationListener {
                     return;
                 }
             }
-            locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, this)
+            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, this)
             LOGGER.info("location Tracker enabled", "private fun enableTracking(track: Boolean)")
         } else {
             locationManager?.removeUpdates(this)
