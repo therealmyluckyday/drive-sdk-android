@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,43 +15,47 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.Toast
 import androidx.work.WorkManager
+import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.TexUser
+import axa.tex.drive.sdk.automode.AutoMode
 import axa.tex.drive.sdk.automode.AutoModeState
+import axa.tex.drive.sdk.automode.internal.ActivityTracker
+
+import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
-import axa.tex.drive.sdk.core.internal.Constants
-import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    val TAG: String = MainActivity::class.java.simpleName
-
-    var tripRecorder: TripRecorder? = null
-    var config: TexConfig? = null
+    private var tripRecorder: TripRecorder? = null
+    private var config: TexConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         requestForLocationPermission();
 
-        /*  val activityTracker = ActivityTracker(this);
-          val automode = AutoMode(this)
 
-          automode.statePublisher().subscribe{state -> setState(state)}
 
-          automode.setCurrentState(activityTracker)
-          activityTracker.scan(automode)*/
 
-        val user = TexUser("appId", "FFFDIHOVA3131IJA1")
 
-        config = TexConfig.Builder(user, applicationContext).enableBatteryTracker().enableLocationTracker()
-                .enableMotionTracker().withAppName("BC").withClientId("22910000").build(applicationContext);
-        tripRecorder = TexService.configure(config!!)?.getTripRecorder();
+       /* config = TexConfig.Builder(user, applicationContext).enableBatteryTracker().enableLocationTracker()
+                .enableMotionTracker().withAppName("BCI").withClientId("22910000").build(applicationContext);
+        */
+        //config = TexConfig.Builder(user, applicationContext).enableTrackers().withAppName("BCI").withClientId("22910000").platformHost(Platform.PREPROD).build();
+
+        config = TexConfig.Builder(applicationContext,"APP-TEST","22910000").
+                enableTrackers().build();
+
+
+        val service:TexService? = TexService.configure(config!!)
+        tripRecorder = service?.getTripRecorder();
 
 
         play.setOnClickListener { play.visibility = View.GONE; stop.visibility = View.VISIBLE; startService(); }
@@ -62,15 +67,79 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        val logger = LoggerFactory.getLogger();
-        logger.getLogStream().subscribeOn(Schedulers.computation()).subscribe {
-            println(it)
+        service?.logStream()?.subscribeOn(Schedulers.computation())?.subscribe {
+            Thread{
+                println(it)
+            }.start()
+
         }
+
+        val scoreRetriever = service?.scoreRetriever()
+        scoreRetriever?.getScoreListener()?.subscribe {
+            it?.let { score ->
+                println(score) }
+        }
+
+        tripRecorder?.endedTripListener()?.subscribe {
+            print(it)
+        }
+
+        //scoreRetriever?.retrieveScore(tripId = "ECDAF109-513A-4D0E-88AF-8F69724B86A1")
 
         score.setOnClickListener {
             val intent = Intent(this, Trips::class.java)
             startActivity(intent)
         }
+
+        WorkManager.getInstance().getStatusesForUniqueWork("B9FBFF8B-D60C-4DA5-B37D-2B054E64612E").observe(this,Observer { stats ->
+            run {
+                if (stats != null) {
+                    for (s in stats){
+                        println("id = ${s.id} state = ${s.state} ")
+                    }
+                    println("THIS is the size : ${stats.size} ")
+                }
+            }
+        })
+
+
+
+        //==========================================================================================
+     /*      val activityTracker = ActivityTracker(this);
+
+       val automode = AutoMode(this)
+
+          automode.statePublisher().subscribe{state ->
+              when (state){
+                 AutoModeState.State.DRIVING -> {
+                     runOnUiThread{
+                         play.visibility = View.GONE
+                         stop.visibility = View.VISIBLE
+                         Toast.makeText(this@MainActivity, "Now starting collect", Toast.LENGTH_SHORT).show()
+
+                         startService()
+                     }
+
+                 }
+                  AutoModeState.State.IDLE-> try {
+                      runOnUiThread{
+                          play.visibility = View.VISIBLE
+                          stop.visibility = View.GONE
+                          Toast.makeText(this@MainActivity, "Now stopping collect", Toast.LENGTH_SHORT).show()
+                          stopService()
+                      }
+                  }catch (e: Exception){
+                      e.printStackTrace()
+                  }
+              }
+          }
+
+         automode.setCurrentState(activityTracker)*/
+        //automode.setCurrentState(activityTracker)
+        //activityTracker.scan(automode)
+
+        //==========================================================================================
+
     }
 
     internal  val CHANNEL_ID = "tex-channel-id"
@@ -100,37 +169,52 @@ class MainActivity : AppCompatActivity() {
                         .setSmallIcon(R.drawable.white_hare)
                         .setCategory(Notification.CATEGORY_SERVICE)
                         .build()
-
             }
 
             tripRecorder?.setCustomNotification(notification)
 
-            tripRecorder?.startTracking(Date().time);
-
+        try {
+            val tripId =  tripRecorder?.startTracking(Date().time);
+            println(tripId)
+        }catch (e: PermissionException){
+            e.printStackTrace()
+        }
 
     }
 
     private fun stopService() {
-        val value = WorkManager.getInstance().getStatusesByTag("9a2dc881-c136-47b6-b3b0-afbc44961055").value;
+        Thread{
+            try {
+                tripRecorder?.stopTracking(Date().time)
+            }catch (e: PermissionException){
+                e.printStackTrace()
+            }
+            }.start()
 
-        tripRecorder?.stopTracking(Date().time);
     }
 
 
     private fun requestForLocationPermission() {
 
 
-        val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
+      /*val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)*/
+
+        val locationPermission = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        val storageLocation = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
         if (Build.VERSION.SDK_INT >= 23) {
 
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, permissions, 0)
-            }
+            /*if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, storageLocation, 0)
+            }*/
 
             if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, permissions, 0)
+                ActivityCompat.requestPermissions(this, locationPermission, 0)
             }
         }
     }

@@ -4,7 +4,10 @@ import io.reactivex.subjects.PublishSubject
 
 internal class LogImpl : Log {
 
-    private val logSubject: PublishSubject<LogMessage> = PublishSubject.create()
+    companion object {
+        private val logSubject: PublishSubject<LogMessage> = PublishSubject.create()
+    }
+
     internal var file: String? = null
 
     override fun print(description: String, type: LogType, function: String) {

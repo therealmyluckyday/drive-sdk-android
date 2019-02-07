@@ -1,6 +1,11 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
+
+def getVersionName = { ->
+    return "v3.0.0"
+}
 
 android {
     compileSdkVersion 28
@@ -11,11 +16,14 @@ android {
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
-        versionName "1.1"
+        versionName getVersionName()
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
+
+        project.archivesBaseName = "sdk"
+        project.version = getVersionName()
     }
 
     buildTypes {
@@ -50,10 +58,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7"
 
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
 
-    //Logger
-    implementation 'com.orhanobut:logger:2.2.0'
 
     testImplementation 'org.koin:koin-test:0.9.3'
     androidTestImplementation "org.koin:koin-test:0.9.3"
@@ -62,9 +67,9 @@ repositories {
     mavenCentral()
 }
 
-def artifactId = 'drive.sdk'
-def groupId = 'axa.tex'
-publishing {
+//def artifactId = 'drive.sdk'
+//def groupId = 'axa.tex'
+/*publishing {
     publications {
         library(MavenPublication) {
             setGroupId(groupId)
@@ -84,5 +89,58 @@ publishing {
             }
         }
 
+    }
+}
+*/
+
+
+
+def libraryGroupId = 'axa.tex.drive'
+def libraryArtifactId = "${archivesBaseName}".toLowerCase()
+def libraryVersion = getVersionName()
+
+publishing {
+    publications {
+        android.libraryVariants.all { variant ->
+            variant.outputs.each { output ->
+                def buildType = output.name // output.name is {debug, release}
+                "${buildType}"(MavenPublication) {
+                    //groupId libraryGroupId
+                    version libraryVersion
+                    //artifactId "${libraryArtifactId}-sdk-${buildType}" // texdrive-sdk-{release,debug}
+                    artifact("$buildDir/outputs/aar/sdk-release.aar") // TexDrive-{release,debug}-v2.1.3.aar
+
+
+                    pom.withXml {
+                        def dependencies = asNode().appendNode('dependencies')
+                        configurations.getByName("releaseCompileClasspath").getResolvedConfiguration().getFirstLevelModuleDependencies().each {
+                            def dependency = dependencies.appendNode('dependency')
+                            dependency.appendNode('groupId', it.moduleGroup)
+                            dependency.appendNode('artifactId', it.moduleName)
+                            dependency.appendNode('version', it.moduleVersion)
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+
+artifactory {
+    contextUrl = 'https://axadil.jfrog.io/axadil/'
+    publish {
+        repository {
+            repoKey = 'android-tex'
+            username = artifactory_username
+            password = artifactory_password
+        }
+        defaults {
+            publications('release')
+            publishArtifacts = true
+            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
+            publishPom = true
+        }
     }
 }

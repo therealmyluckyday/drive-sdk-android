@@ -1,6 +1,5 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
-import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.Motion
 import axa.tex.drive.sdk.acquisition.model.MotionFix
 import org.junit.Assert
@@ -9,14 +8,12 @@ import java.util.*
 
 class MotionBufferTest {
 
-    private val buffer = LinkedList<Fix>()
     private val TYPE_LINEAR_ACCELERATION: Int = 0
     private val TYPE_ACCELEROMETER: Int = 1
     private val TYPE_GRAVITY: Int = 2
     private val TYPE_GYROSCOPE: Int = 3
     private val TYPE_MAGNETIC_FIELD: Int = 4
 
-    private var olderMotionAge: Int = DEFAULT_OLDER_MOTION_AGE
     private var motionAgeAfterAcceleration: Long = DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION
 
     fun IntRange.random() =
@@ -75,7 +72,6 @@ class MotionBufferTest {
 
             timestamp = Date().time
             i++
-
         }
         val newBuf = buffer.flush()
         Assert.assertTrue(newBuf.last().timestamp() - newBuf.first().timestamp() <= motionAgeAfterAcceleration)

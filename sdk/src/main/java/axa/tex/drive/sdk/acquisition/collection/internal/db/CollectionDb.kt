@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 const val PENDING_TRIP: String = "pendin-gtrips"
 const val CONFIG: String = "config"
 const val LAST_TRIP: String = "last-trip"
+const val LAST_PACKET: String = "last-packet"
+
+const val NUMBER_PACKETS: String = "number-packets"
 
 internal class CollectionDb {
 
@@ -26,13 +29,15 @@ internal class CollectionDb {
         prefs?.edit()?.putString(pendingTrip.id, pendingTrip.toJson())?.apply()
     }
 
-    internal fun getPendingTrip(id: String): PendingTrip {
+    internal fun getPendingTrip(id: String): PendingTrip? {
         val prefs =
                 context?.getSharedPreferences(PENDING_TRIP, Context.MODE_PRIVATE)
 
         val json = prefs?.getString(id, "")
         val mapper = ObjectMapper()
-
+        if(json == null || json.isEmpty()){
+            return null
+        }
         val node = mapper.readTree(json);
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         return mapper.readValue(node.get(PendingTrip::class.java.simpleName).toString(), PendingTrip::class.java)
@@ -85,6 +90,45 @@ internal class CollectionDb {
             e.printStackTrace()
             return null
         }
+
+    }
+
+    @Synchronized
+    internal fun setPacketNumber(trip : String, packetNumber : Int){
+        val prefs =
+                context?.getSharedPreferences(LAST_PACKET, Context.MODE_PRIVATE)
+        prefs?.edit()?.putInt(trip, packetNumber)?.apply()
+
+    }
+
+    @Synchronized
+    internal fun getPacketNumber(trip : String) : Int{
+        val prefs =
+                context?.getSharedPreferences(LAST_PACKET, Context.MODE_PRIVATE)
+        return prefs?.getInt(trip, -1)!!
+    }
+
+
+    @Synchronized
+    internal fun setNumberPackets(trip : String, packetNumber : Int){
+        val prefs =
+                context?.getSharedPreferences(NUMBER_PACKETS, Context.MODE_PRIVATE)
+        prefs?.edit()?.putInt(trip, packetNumber)?.apply()
+
+    }
+
+    @Synchronized
+    internal fun getNumberPackets(trip : String) : Int{
+        val prefs =
+                context?.getSharedPreferences(NUMBER_PACKETS, Context.MODE_PRIVATE)
+        return prefs?.getInt(trip, -1)!!
+    }
+
+    @Synchronized
+    internal fun deleteTripNumberPackets(trip : String){
+        val prefs =
+                context?.getSharedPreferences(NUMBER_PACKETS, Context.MODE_PRIVATE)
+        prefs?.edit()?.clear()?.apply()
 
     }
 }

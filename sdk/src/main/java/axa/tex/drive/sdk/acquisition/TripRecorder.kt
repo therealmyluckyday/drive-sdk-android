@@ -3,7 +3,9 @@ package axa.tex.drive.sdk.acquisition
 import android.app.Notification
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
+import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 
 interface TripRecorder {
 
@@ -16,7 +18,7 @@ interface TripRecorder {
     /**
      * Initiates tracking
      */
-    fun startTracking(startTime: Long)
+    fun startTracking(startTime: Long) : TripId?
 
     /**
      * Stops the tracking
@@ -36,4 +38,7 @@ interface TripRecorder {
 
 
     fun setCustomNotification(notification: Notification?)
+
+
+    fun endedTripListener() : PublishSubject<String?>
 }

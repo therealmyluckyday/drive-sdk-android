@@ -30,7 +30,7 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
 
 
     private var nbAttempt = 0
-    private val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     override fun doWork(): WorkerResult {
 
@@ -59,13 +59,19 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
 
     @Throws(Exception::class)
     private fun scoreRequest(tripId: String, finalScore: Boolean) {
+        try {
+            Thread.sleep(5)
+        }catch (e : Exception){
+            e.printStackTrace()
+        }
+
         //val config  = CollectionDb.getConfig(applicationContext)
         val collectorDb: CollectionDb by inject()
         val scoreRetriever: ScoreRetriever by inject()
         val config = collectorDb.getConfig()
         val responseString = StringBuffer("")
         val locale = null
-        val serverUrl = PlatformToHostConverter(Platform.PREPROD).getHost()
+        val serverUrl = PlatformToHostConverter(Platform.PRODUCTION).getHost()
         val url: URL
         val theLocal = getLocaleId(locale)
         if (!finalScore) {

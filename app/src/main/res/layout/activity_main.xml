@@ -5,6 +5,15 @@
     android:layout_height="match_parent"
     tools:context="axa.tex.drive.demo.MainActivity">
 
+    <TextView
+        android:id="@+id/packets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+
+        android:layout_centerHorizontal="true" />
+
+
     <ImageView
         android:id="@+id/play"
         android:layout_width="wrap_content"
@@ -19,6 +28,7 @@
         android:src="@drawable/stop"
         android:visibility="gone"
         android:layout_centerInParent="true" />
+
 
 
     <LinearLayout
@@ -75,6 +85,7 @@
         android:layout_height="wrap_content"
         android:text="SCORES"
         android:textSize="20sp"
+        android:visibility="gone"
         android:background="@color/red"
         android:textColor="@color/white"
         android:layout_alignParentBottom="true" />

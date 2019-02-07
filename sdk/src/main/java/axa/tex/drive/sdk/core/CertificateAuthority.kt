@@ -18,7 +18,7 @@ class CertificateAuthority {
 
     companion object {
 
-        internal val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
+        internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
         private class UnifiedTrustManager @Throws(KeyStoreException::class)
         constructor(localKeyStore: KeyStore) : X509TrustManager {
             private var defaultTrustManager: X509TrustManager? = null

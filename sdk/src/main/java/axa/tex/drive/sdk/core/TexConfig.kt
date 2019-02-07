@@ -8,6 +8,7 @@ import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
+import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.PersistentQueue
 import axa.tex.drive.sdk.acquisition.internal.sensor.BatterySensor
 import axa.tex.drive.sdk.acquisition.internal.sensor.LocationSensor
 import axa.tex.drive.sdk.acquisition.internal.sensor.MotionSensor
@@ -19,6 +20,8 @@ import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
+import axa.tex.drive.sdk.core.internal.utils.TripManager
+import axa.tex.drive.sdk.core.logger.Logger
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -44,9 +47,12 @@ class TexConfig {
 
 
 
-        private fun setupKoin(context: Context) {
+        internal fun setupKoin(context: Context) {
             val myModule: Module = module(definition = {
 
+
+                single { TripManager() }
+                single { PersistentQueue(context) }
                 single { ScoreRetriever() }
                 single { CollectionDb(context) }
                 single { FixProcessor(context) }
@@ -71,7 +77,7 @@ class TexConfig {
 
             //setupLogs()
 
-            val logger = LoggerFactory.getLogger(this::class.java.name)
+            val logger = LoggerFactory().getLogger(this::class.java.name)
 
             logger.logger.info("Initializing sdk", "init")
 
@@ -104,7 +110,7 @@ class TexConfig {
 
 
             logger.logger.info("Create koin module", "init")
-            setupKoin(context)
+            //setupKoin(context)
             logger.logger.info("Done create koin module", "init")
         }
 
@@ -125,7 +131,7 @@ class TexConfig {
         @JsonIgnore
         private var context: Context? = null
         @JsonIgnore
-        private var platform: Platform = Platform.TESTING
+        private var platform: Platform = Platform.PRODUCTION
         @JsonProperty
         private var platformHost: String? = null;
         @JsonProperty
@@ -142,7 +148,7 @@ class TexConfig {
 
         private var customNotification: Notification? = null
 
-        val logger = LoggerFactory.getLogger(this::class.java.name)
+        val logger = LoggerFactory().getLogger(this::class.java.name)
 
 
         constructor() {
@@ -159,7 +165,15 @@ class TexConfig {
 
         }
 
-        fun build(context: Context?): TexConfig {
+        constructor(context: Context?, appName: String, clientId: String) {
+
+            logger.logger.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
+            this.context = context
+            this.appName = appName
+            this.clientId = clientId
+        }
+
+        fun build(): TexConfig {
             logger.logger.info("Building configuration", "build")
 
 
@@ -178,7 +192,7 @@ class TexConfig {
 
             context?.let { setupKoin(it) }
 
-            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId)
+            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform)
             if (context != null) {
 
                 // val collectorDb : CollectionDb by inject()
@@ -248,6 +262,11 @@ class TexConfig {
             logger.logger.info("Motion tracker disabled", "disableMotionTracker")
 
             return this
+        }
+
+        fun enableTrackers() : Builder{
+            return enableBatteryTracker().enableLocationTracker()
+                    .enableMotionTracker()
         }
 
         fun withAppName(appName: String): Builder {

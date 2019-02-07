@@ -3,7 +3,7 @@ package axa.tex.drive.sdk.acquisition.internal.sensor
 import axa.tex.drive.sdk.acquisition.model.Fix
 import io.reactivex.Observable
 
-interface TexSensor {
+ interface TexSensor {
     fun producer(): Observable<List<Fix>>
 
     fun enableSensor()

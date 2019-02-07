@@ -1,6 +1,7 @@
 package axa.tex.drive.sdk.acquisition.model
 
 
+import axa.tex.drive.sdk.core.internal.Constants
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -22,13 +23,17 @@ class FixPacket(@JsonIgnore val fixes: List<Fix>,
             val jsonNode = mapper.readTree(mapper.writeValueAsString(this))
             val fixesNode: ArrayNode = mapper.readTree("[]") as ArrayNode;
             for (fix in fixes) {
-                fixesNode.add(mapper.readTree(fix.toJson()))
+                if(fix != null) {
+                    fixesNode.add(mapper.readTree(fix.toJson()))
+                }else{
+                    println("Fix is nul")
+                }
             }
             (jsonNode as ObjectNode).set("fixes", fixesNode);
             jsonNode.toString()
         } catch (e: Exception) {
             e.printStackTrace()
-            "{}";
+            Constants.EMPTY_PACKET
         }
     }
 }

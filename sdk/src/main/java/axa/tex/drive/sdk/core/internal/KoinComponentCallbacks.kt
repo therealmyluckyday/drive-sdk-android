@@ -8,12 +8,12 @@ interface KoinComponentCallbacks : ComponentCallbacks{
 
 
     override fun onLowMemory() {
-        val logger = LoggerFactory.getLogger(this::class.java.name).logger
+        val logger = LoggerFactory().getLogger(this::class.java.name).logger
         logger.warn("LOW MEMORY DETECTED", "onLowMemory")
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
-        val logger = LoggerFactory.getLogger(this::class.java.name).logger
+        val logger = LoggerFactory().getLogger(this::class.java.name).logger
         logger.warn("Configuration changed.", "onConfigurationChanged")
     }
 }

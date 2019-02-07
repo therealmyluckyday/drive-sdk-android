@@ -25,7 +25,7 @@ import org.koin.standalone.StandAloneContext
 private const val NOTIFICATION_ID = 7071
 
 internal class CollectorService : Service() {
-    private val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     private val binder = LocalBinder()
     private var collector: Collector? = null;
@@ -58,12 +58,27 @@ internal class CollectorService : Service() {
 
         //val collectorDb = CollectionDb(applicationContext)
         val collectorDb: CollectionDb by inject()
-        val config = collectorDb.getConfig()
+
+
         try {
-            StandAloneContext.stopKoin()
-        } catch (e: Exception) {
-            e.printStackTrace()
+            if(collectorDb == null) {
+                try {
+                    StandAloneContext.stopKoin()
+                    TexConfig.setupKoin(applicationContext)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }catch (e : IllegalStateException){
+            try {
+                StandAloneContext.stopKoin()
+                TexConfig.setupKoin(applicationContext)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+
+        val config = collectorDb.getConfig()
 
         TexConfig.init(applicationContext, config)
         val collector: Collector by inject()

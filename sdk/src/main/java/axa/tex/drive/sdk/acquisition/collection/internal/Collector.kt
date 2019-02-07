@@ -8,7 +8,8 @@ import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.utils.TripManager
-import com.orhanobut.logger.Logger
+import axa.tex.drive.sdk.core.logger.LoggerFactory
+
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
@@ -18,6 +19,7 @@ import org.koin.android.ext.android.inject
 internal class Collector : KoinComponentCallbacks{
 
     private val trackers: MutableList<Tracker>?
+    val logger = LoggerFactory().getLogger(this::class.java.name)
 
     private var fixProcessor: FixProcessor
 
@@ -48,9 +50,11 @@ internal class Collector : KoinComponentCallbacks{
         if (trackers != null) {
             for (tracker in trackers) {
                 if (tracker.isEnabled()) {
-                    Logger.i("Enabling tracker ${tracker.javaClass.simpleName}")
+                    logger.logger.info("Enabling tracker ${tracker.javaClass.simpleName}", "startCollecting")
+
                     tracker.enableTracking()
-                    Logger.i("${tracker.javaClass.simpleName} enabled = ${tracker.isEnabled()}")
+                    logger.logger.info("${tracker.javaClass.simpleName} enabled = ${tracker.isEnabled()}", "startCollecting")
+
                     collect(tracker)
                 }
             }
@@ -91,7 +95,8 @@ internal class Collector : KoinComponentCallbacks{
                 tracker.disableTracking()
             }
         }
-        TripManager.removeTripId(context)
+        val tripManager : TripManager by inject()
+        tripManager.removeTripId(context)
     }
 
     fun numberOfTrackers(): Int {

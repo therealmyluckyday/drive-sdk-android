@@ -1,6 +1,11 @@
 package axa.tex.drive.sdk.automode
 
-interface AutoModeState {
+import android.content.Context
+import java.io.File
+import java.io.FileOutputStream
+import java.io.FileWriter
+
+ interface AutoModeState {
 
 
     /**
@@ -31,10 +36,31 @@ interface AutoModeState {
     fun state(): State
 
     enum class State {
+        IDLE,
         TRACKING_ACTIVITY,
         SCANNING_SPEED,
         IN_VEHICLE,
         DRIVING
+    }
+
+     fun log(context : Context?, data  : String){
+        try {
+            val rootPath = context?.getExternalFilesDir("AUTOMODES")
+            val root = File(rootPath?.toURI())
+            if (!root.exists()) {
+                root.mkdirs()
+            }
+            val f = File(rootPath?.path + "/log.txt")
+            if (!f.exists()) {
+                f.createNewFile()
+            }
+            val out = FileOutputStream(f, true)
+            out.write(data.toByteArray())
+            out.flush()
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }

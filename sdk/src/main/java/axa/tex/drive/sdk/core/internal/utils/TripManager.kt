@@ -11,7 +11,7 @@ private const val TRIP_ID = "TRIP_ID"
 class TripManager {
 
 
-    companion object {
+   // companion object {
         internal fun tripId(context: Context): TripId? {
             val prefs = context.getSharedPreferences(TRIP_ID, Context.MODE_PRIVATE)
             if (prefs.contains(TRIP_ID)) {
@@ -34,5 +34,5 @@ class TripManager {
                 prefs.edit().clear().apply()
             }
         }
-    }
+    //}
 }

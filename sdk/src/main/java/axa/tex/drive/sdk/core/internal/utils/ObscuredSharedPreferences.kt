@@ -40,7 +40,7 @@ class ObscuredSharedPreferences
  */
 (protected var context: Context, protected var delegate: SharedPreferences) : SharedPreferences {
 
-    internal val LOGGER = LoggerFactory.getLogger(this::class.java.name).logger
+    internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     init {
         //updated thanks to help from bkhall on github

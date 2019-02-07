@@ -12,7 +12,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
-class BatterySensor : TexSensor, BroadcastReceiver {
+internal class BatterySensor : TexSensor, BroadcastReceiver {
 
     private val context: Context?
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()

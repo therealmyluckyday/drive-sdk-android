@@ -11,4 +11,15 @@ data class MotionFix(val rotationRate: Motion? = null,
                      val rawAcceleration: Motion? = null,
                      val gravity: Motion? = null,
                      val magnetometer: Motion? = null,
-                     @JsonIgnore val timestamp: Long) : Fix(timestamp)
+                     @JsonIgnore val timestamp: Long) : Fix(timestamp){
+
+    fun norm(): Double {
+        if(acceleration != null){
+            var value = 0f
+
+            value = acceleration.x*acceleration.x + acceleration.y*acceleration.y + acceleration.z*acceleration.z
+            return Math.sqrt(value.toDouble())
+        }
+        return -1.0
+    }
+}

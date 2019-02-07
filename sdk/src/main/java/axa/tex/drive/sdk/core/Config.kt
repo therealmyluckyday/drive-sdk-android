@@ -9,6 +9,7 @@ internal class Config {
     var motionTrackerEnabled: Boolean = false
     var appName: String? = null//Constants.DEFAULT_APP_NAME
     var clientId: String? = null
+    var endPoint : Platform? = Platform.PRODUCTION
 
     constructor() {
 
@@ -17,12 +18,13 @@ internal class Config {
     constructor(batteryTrackerEnabled: Boolean,
                 locationTrackerEnabled: Boolean,
                 motionTrackerEnabled: Boolean,
-                appName: String?, clientId: String?) {
+                appName: String?, clientId: String?,endPoint : Platform?) {
         this.batteryTrackerEnabled = batteryTrackerEnabled
         this.locationTrackerEnabled = locationTrackerEnabled
         this.motionTrackerEnabled = motionTrackerEnabled
         this.appName = appName
         this.clientId = clientId
+        this.endPoint = endPoint
     }
 
     internal fun toJson(): String {

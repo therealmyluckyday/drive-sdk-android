@@ -18,7 +18,6 @@ class AutoMode(context: Context) {
 
     fun setFormerState(formerState: AutoModeState) {
         this.formerState = formerState
-        formerState.scan(this)
     }
 
     fun statePublisher(): PublishSubject<AutoModeState.State> {
