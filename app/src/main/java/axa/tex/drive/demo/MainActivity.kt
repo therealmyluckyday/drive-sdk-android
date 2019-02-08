@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         //config = TexConfig.Builder(user, applicationContext).enableTrackers().withAppName("BCI").withClientId("22910000").platformHost(Platform.PREPROD).build();
 
         config = TexConfig.Builder(applicationContext,"APP-TEST","22910000").
-                enableTrackers().build();
+                enableTrackers().platformHost(Platform.PREPROD).build();
 
 
         val service:TexService? = TexService.configure(config!!)

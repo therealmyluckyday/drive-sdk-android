@@ -120,7 +120,9 @@ internal class CollectorService : Service() {
                     }
 
                 }
-                Thread { tripId?.let { scoreRetriever.retrieveScore(it) } }.start()
+                Thread {
+                    Thread.sleep(10000)
+                    tripId?.let { scoreRetriever.retrieveScore(it) } }.start()
             }
         } catch (e: Exception) {
             e.printStackTrace()
