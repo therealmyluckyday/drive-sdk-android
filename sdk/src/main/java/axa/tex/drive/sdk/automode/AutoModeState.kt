@@ -5,7 +5,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
 
- interface AutoModeState {
+  interface AutoModeState {
 
 
     /**

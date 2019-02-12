@@ -14,7 +14,7 @@ import kotlin.concurrent.schedule
 private const val LOCATION_ACCURACY_THRESHOLD = 20
 private const val SPEED_START_THRESHOLD = 20 * 0.28f
 
- class SpeedTracking : AutoModeState {
+internal class SpeedTracking : AutoModeState {
     override fun stopScan() {
     }
 

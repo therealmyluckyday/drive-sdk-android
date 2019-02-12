@@ -15,7 +15,7 @@ private const val LOCATION_ACCURACY_THRESHOLD = 20
 private const val SPEED_MOVEMENT_THRESHOLD = 10 * 0.28f
 private const val SPEED_START_THRESHOLD = 20 * 0.28f
 
- class InVehicleState : AutoModeState {
+internal class InVehicleState : AutoModeState {
 
 
     private var context: Context

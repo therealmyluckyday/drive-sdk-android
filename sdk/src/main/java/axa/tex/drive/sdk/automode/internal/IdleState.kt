@@ -4,7 +4,7 @@ import android.content.Context
 import axa.tex.drive.sdk.automode.AutoMode
 import axa.tex.drive.sdk.automode.AutoModeState
 
- class IdleState : AutoModeState{
+ internal class IdleState : AutoModeState{
 
     private var context: Context
 

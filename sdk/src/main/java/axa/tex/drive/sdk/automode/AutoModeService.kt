@@ -28,7 +28,7 @@ private enum class AutoStartState {
     drivingAndStill
 }
 
-class AutoModeService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+internal class AutoModeService : Service(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null;

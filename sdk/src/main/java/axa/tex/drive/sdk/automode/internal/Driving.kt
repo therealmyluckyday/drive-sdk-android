@@ -15,7 +15,7 @@ private const val LOCATION_ACCURACY_THRESHOLD = 20
 private const val TIME_TO_WAIT_FOR_SPEED = 1000 * 60 * 3L
 private const val TIME_TO_WAIT_FOR_GPS = 1000 * 60 * 4L
 
- class Driving : AutoModeState {
+ internal class Driving : AutoModeState {
 
     private var context: Context
     private var locationManager: LocationManager? = null
