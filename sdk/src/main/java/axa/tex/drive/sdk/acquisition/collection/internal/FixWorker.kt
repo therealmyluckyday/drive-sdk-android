@@ -36,10 +36,10 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
 
         val inputData: Data = inputData
         val tag = inputData.getInt(Constants.WORK_TAG_KEY, -1)
-       if(isRunning(tag.toString())){
+       /*if(isRunning(tag.toString())){
            LOGGER.info("Waiting for precedent packet to be sent...", "override fun doWork(): WorkerResult")
           return  WorkerResult.RETRY
-       }
+       }*/
 
         val result = sendFixes(inputData)
 
@@ -89,7 +89,6 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
             return sendData(id, value as String, appName, clientId)
         }*/
         return sendData(id, data, appName, clientId)
-        return false
     }
 
 
@@ -136,16 +135,21 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
             LOGGER.info("UPLOADING DATA/ RESPONSE CODE", "FixWorker" + urlConnection.responseCode)
             if (urlConnection.responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
                 LOGGER.info("SENDING : FAILED CODE = ${urlConnection.responseCode}")
-                when (urlConnection.responseCode) {
-                    HttpURLConnection.HTTP_BAD_REQUEST, HttpURLConnection.HTTP_INTERNAL_ERROR -> {
+                return when (urlConnection.responseCode) {
+                    HttpURLConnection.HTTP_BAD_REQUEST -> {
                         LOGGER.info("UPLOADING DATA ERROR/ RESPONSE CODE", "FixWorker" + urlConnection.responseCode)
-                        throw IOException()
+                        // throw IOException()
+                        true
+                    }
+                    HttpURLConnection.HTTP_INTERNAL_ERROR ->{
+                        LOGGER.info("UPLOADING DATA ERROR/ RESPONSE CODE", "FixWorker" + urlConnection.responseCode)
+                        false
                     }
                     else -> {
-                        throw IOException()
+                        //throw IOException()
+                        true
                     }
                 }
-                return false
             } else {
                 LOGGER.info("SENDING : SUCCEEDED CODE = ${urlConnection.responseCode}")
                 val trip = collectorDb.getPendingTrip(id)

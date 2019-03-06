@@ -18,13 +18,17 @@ import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
 import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
+import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.TripManager
-import axa.tex.drive.sdk.core.logger.Logger
 import axa.tex.drive.sdk.core.logger.LoggerFactory
+import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import axa.tex.drive.sdk.automode.AutomodeHandler
+import axa.tex.drive.sdk.automode.internal.Automode
+import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
 import org.koin.dsl.module.Module
 import org.koin.dsl.module.module
 import org.koin.error.AlreadyStartedException
@@ -51,6 +55,12 @@ class TexConfig {
             val myModule: Module = module(definition = {
 
 
+                single { AutomodeHandler() }
+                single { SpeedFilter() }
+                single { AutoModeTracker(context) as TexActivityTracker }
+                single { Automode(get()) }
+
+
                 single { TripManager() }
                 single { PersistentQueue(context) }
                 single { ScoreRetriever() }
@@ -71,6 +81,25 @@ class TexConfig {
             }
 
         }
+
+
+        fun loadAutoModeModule(context: Context){
+
+            val myModule: Module = module(definition = {
+                single { AutomodeHandler() }
+                single { SpeedFilter() }
+                single { AutoModeTracker(context) as TexActivityTracker }
+                single { Automode(get()) }
+            })
+
+            try {
+                StandAloneContext.startKoin(listOf(myModule))
+            } catch (e: AlreadyStartedException) {
+                e.printStackTrace()
+            }
+
+        }
+
 
 
         internal fun init(context: Context, config: Config?) {

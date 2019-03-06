@@ -1,26 +1,28 @@
-package integration.tex.com.automode.internal.states
+package axa.tex.drive.sdk.automode.internal.states
 
-import axa.tex.drive.sdk.automode.internal.new.SpeedFilter
+import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.newautomode.automode.Message
-import integration.tex.com.automode.AutomodeHandler
-import integration.tex.com.automode.internal.Automode
+import axa.tex.drive.sdk.automode.internal.tracker.model.Message
+import axa.tex.drive.sdk.automode.AutomodeHandler
+import axa.tex.drive.sdk.automode.internal.Automode
 import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 import java.util.*
 import kotlin.concurrent.schedule
 
-private const val TIME_TO_WAIT_FOR_GPS = 1000 * 60 * 4L
-private const val ACCEPTABLE_STOPPED_DURATION = 1000 * 60 * 3L
 
-class DrivingState : AutomodeState, KoinComponentCallbacks {
 
+
+internal class DrivingState : AutomodeState, KoinComponentCallbacks {
+
+
+    //private var timeToWaitForGps = TIME_TO_WAIT_FOR_GPS
     private var automode: Automode
     private val filterer: SpeedFilter by inject()
+    private var disabled = false
 
-    private var notMoving: Boolean = false
-    private var noGPS: Boolean = false
+    private var notMoving: Boolean = true
+    private var noGPS: Boolean = true
     //private val timerMessages: PublishSubject<Message> = PublishSubject.create()
    // private val eventMessage: PublishSubject<AutomodeHandler.State> = PublishSubject.create()
 
@@ -32,7 +34,7 @@ class DrivingState : AutomodeState, KoinComponentCallbacks {
 
     constructor(automode: Automode) {
         this.automode = automode
-        automodeHandler.messages.onNext(Message("Now driving..."))
+        automodeHandler.messages.onNext(Message(Date().toString()+":Now driving..."))
         automodeHandler.state.onNext(AutomodeHandler.State.DRIVING)
 
         watchGPS()
@@ -43,7 +45,7 @@ class DrivingState : AutomodeState, KoinComponentCallbacks {
         //val filterer = automode.activityTracker.filter()
 
         disposables.add(filterer.locationOutputUnderMovementSpeedWhatEverTheAccuracy.subscribe {
-            automodeHandler.messages.onNext(Message("Speed equals to  ${it.speed} : May be the the vehicle is not moving"))
+            automodeHandler.messages.onNext(Message(Date().toString()+":Speed equals to  ${it.speed} : May be the the vehicle is not moving"))
             notMoving = true
             if (speedWatcher == null) {
                 watchSpeed()
@@ -52,18 +54,19 @@ class DrivingState : AutomodeState, KoinComponentCallbacks {
 
         disposables.add(filterer.locationOutputOverOrEqualsToMovementSpeedWhatEverTheAccuracy.subscribe {
             notMoving = false
-            automodeHandler.messages.onNext(Message("Speed equals to  ${it.speed} : We restart moving"))
-            if (speedWatcher != null) {
+            automodeHandler.messages.onNext(Message(Date().toString()+":Speed equals to  ${it.speed} : We restart moving"))
+            /*if (speedWatcher != null) {
                 speedWatcher?.cancel()
                 speedWatcher = null
-            }
+            }*/
+            watchSpeed()
         })
 
 
         disposables.add(filterer.gpsStream.subscribe {
             noGPS = false
-            gpsWatcher?.cancel()
-            gpsWatcher = null
+           // gpsWatcher?.cancel()
+          //  gpsWatcher = null
             watchGPS()
         })
 
@@ -78,29 +81,65 @@ class DrivingState : AutomodeState, KoinComponentCallbacks {
     }
 
     private fun watchSpeed() {
-        speedWatcher = Timer("Timer for speed", false).schedule(ACCEPTABLE_STOPPED_DURATION) {
+        if(speedWatcher == null){
+        speedWatcher = Timer("Timer for speed").schedule(automode.acceptableStopDuration,automode.acceptableStopDuration) {
             if (notMoving) {
                 stopAllTimers()
-                automodeHandler.messages.onNext(Message("Speed = 0, We need to stop"))
+                automodeHandler.messages.onNext(Message(Date().toString()+": Speed = 0, We need to stop. from speedWatcher"))
                 automodeHandler.state.onNext(AutomodeHandler.State.IDLE)
                 automode.setCurrentState(IdleState(automode))
                 automode.activityTracker.stopSpeedScanning()
+                automode.getCurrentState().disable(false)
                 automode.next()
                 dispose()
             }
+            notMoving = true
+        }
+
+
         }
 
     }
-
 
     private fun watchGPS() {
+
+        if (gpsWatcher == null){
+            gpsWatcher = Timer("Timer for gps").schedule(automode.timeToWaitForGps, automode.timeToWaitForGps) {
+                if (noGPS) {
+                    cancel()
+                    stopAllTimers()
+                    //automode.setCurrentState(IdleState(automode))
+
+                    if(!automode.states.containsKey(AutomodeHandler.State.IDLE)){
+                        automode.setCurrentState(IdleState(automode))
+                    }else{
+                        val idleState = automode.states[AutomodeHandler.State.IDLE]
+                        idleState?.let { automode.setCurrentState(it) }
+                    }
+                    automodeHandler.state.onNext(AutomodeHandler.State.IDLE)
+                    automode.getCurrentState().disable(false)
+                    automodeHandler.messages.onNext(Message(Date().toString()+":No gps:Stop driving. from watchGPS"))
+
+
+                    automode.activityTracker.stopSpeedScanning()
+                    automode.next()
+
+                    dispose()
+                }
+                noGPS = true
+            }
+    }
+
+    }
+
+    /*private fun watchGPS() {
         noGPS = true
-        gpsWatcher = Timer("Timer for gps", false).schedule(TIME_TO_WAIT_FOR_GPS) {
+        gpsWatcher = Timer("Timer for gps", false).schedule(automode.timeToWaitForGps) {
             if (noGPS) {
                 stopAllTimers()
+                automode.setCurrentState(IdleState(automode))
                 automodeHandler.messages.onNext(Message("No gps:Stop driving"))
                 automodeHandler.state.onNext(AutomodeHandler.State.IDLE)
-                automode.setCurrentState(IdleState(automode))
                 automode.activityTracker.stopSpeedScanning()
                 automode.next()
                 dispose()
@@ -108,7 +147,7 @@ class DrivingState : AutomodeState, KoinComponentCallbacks {
         }
 
     }
-
+*/
     private fun stopAllTimers() {
         try {
             gpsWatcher?.cancel()
@@ -125,5 +164,12 @@ class DrivingState : AutomodeState, KoinComponentCallbacks {
             disposable.dispose()
         }
         disposables.clear()
+    }
+
+    override fun disable(disabled: Boolean) {
+        this.disabled = disabled
+    }
+    override fun sate(): AutomodeHandler.State {
+        return AutomodeHandler.State.DRIVING
     }
 }

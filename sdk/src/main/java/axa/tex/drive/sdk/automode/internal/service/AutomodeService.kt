@@ -1,4 +1,4 @@
-package integration.tex.com.automode.internal.service
+package axa.tex.drive.sdk.automode.internal.service
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -12,8 +12,11 @@ import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import axa.tex.drive.sdk.R
+import axa.tex.drive.sdk.acquisition.TripRecorder
+import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.TexConfig
-import integration.tex.com.automode.internal.Automode
+import axa.tex.drive.sdk.automode.internal.Automode
+import axa.tex.drive.sdk.automode.internal.states.DrivingState
 import org.koin.android.ext.android.inject
 
 
@@ -66,7 +69,8 @@ internal class AutomodeService : Service() {
             this.startForeground(NOTIFICATION_ID, notification)
         }
 
-
+        val automodeHandler: AutomodeHandler by inject()
+        automodeHandler.running = false
 
         return START_STICKY
     }
@@ -79,9 +83,17 @@ internal class AutomodeService : Service() {
 
     }
 
-    private fun activateAutomode() {
-       TexConfig.setupKoin(applicationContext)
+    private fun activateAutomode(){
+        try {
+            TexConfig.setupKoin(applicationContext)
+        }catch (e : Exception){}
+
         val automode: Automode by inject()
-        automode.next()
+        val tripRecorder: TripRecorder by inject()
+        if(tripRecorder.isRecording()){
+            automode.setCurrentState(DrivingState(automode))
+        }else{
+            automode.next()
+        }
     }
 }

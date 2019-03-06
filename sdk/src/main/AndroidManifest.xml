@@ -16,5 +16,9 @@
         <service
             android:name=".acquisition.collection.internal.CollectorService"
             android:stopWithTask="false" />
+        <service
+            android:name=".automode.internal.service.AutomodeService"
+            android:stopWithTask="false" />
+
     </application>
 </manifest>

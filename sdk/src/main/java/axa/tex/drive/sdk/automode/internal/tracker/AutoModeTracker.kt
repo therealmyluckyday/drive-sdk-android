@@ -1,4 +1,4 @@
-package integration.tex.com.automode.internal.tracker
+package axa.tex.drive.sdk.automode.internal.tracker
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -11,18 +11,16 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.widget.Toast
-import axa.tex.drive.sdk.automode.internal.new.SpeedFilter
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.newautomode.automode.internal.tracker.TexActivityTracker
-import axa.tex.drive.sdk.newautomode.automode.internal.tracker.model.TexLocation
+import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
-import integration.tex.com.automode.internal.tracker.model.TexSpeed
-import integration.tex.com.automode.internal.tracker.model.TexActivity
-import integration.tex.com.automode.internal.tracker.model.Where
+import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
+import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
+import axa.tex.drive.sdk.automode.internal.tracker.model.Where
 import org.koin.android.ext.android.inject
 
 

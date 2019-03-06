@@ -12,8 +12,8 @@ class MotionTrackerTest {
         val motionSensor = FakeMotionSensor()
         val motionTracker = MotionTracker(FakeMotionSensor())
         motionTracker.enableTracking()
-        Assert.assertTrue(motionSensor.isEnabled());
-        Assert.assertFalse(!motionSensor.isEnabled());
+        Assert.assertTrue(motionTracker.isEnabled());
+        Assert.assertFalse(!motionTracker.isEnabled());
     }
 
     @Test

@@ -1,6 +1,5 @@
 package axa.tex.drive.demo
 
-import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -19,22 +18,23 @@ import android.widget.Toast
 import androidx.work.WorkManager
 import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
-import axa.tex.drive.sdk.acquisition.model.TexUser
-import axa.tex.drive.sdk.automode.AutoMode
-import axa.tex.drive.sdk.automode.AutoModeState
-import axa.tex.drive.sdk.automode.internal.ActivityTracker
+
+
 
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
+import axa.tex.drive.sdk.automode.AutomodeHandler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private var tripRecorder: TripRecorder? = null
-    private var config: TexConfig? = null
+    //private var config: TexConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,13 +50,15 @@ class MainActivity : AppCompatActivity() {
         */
         //config = TexConfig.Builder(user, applicationContext).enableTrackers().withAppName("BCI").withClientId("22910000").platformHost(Platform.PREPROD).build();
 
-        config = TexConfig.Builder(applicationContext,"APP-TEST","22910000").
-                enableTrackers().platformHost(Platform.PREPROD).build();
+       /* config = TexConfig.Builder(applicationContext,"APP-TEST","22910000").
+                enableTrackers().platformHost(Platform.PREPROD).build();*/
 
 
-        val service:TexService? = TexService.configure(config!!)
-        tripRecorder = service?.getTripRecorder();
+       // val service:TexService? = TexService.configure(config!!)
+        //(application as TexDriveDemoApplication).tripRecorder = service?.getTripRecorder();
 
+        val service = (application as TexDriveDemoApplication).service
+        tripRecorder = (application as TexDriveDemoApplication).tripRecorder
 
         play.setOnClickListener { play.visibility = View.GONE; stop.visibility = View.VISIBLE; startService(); }
         stop.setOnClickListener { stop.visibility = View.GONE; play.visibility = View.VISIBLE; stopService() }
@@ -80,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                 println(score) }
         }
 
-        tripRecorder?.endedTripListener()?.subscribe {
+        (application as TexDriveDemoApplication).tripRecorder?.endedTripListener()?.subscribe {
             print(it)
         }
 
@@ -103,11 +105,42 @@ class MainActivity : AppCompatActivity() {
         })
 
 
+        val autoModeHandler = service?.automodeHandler()
+        autoModeHandler?.state?.subscribe {
+            if(it == AutomodeHandler.State.DRIVING){
+                runOnUiThread {
+                   // startService()
+                    play.visibility = View.GONE
+                    stop.visibility = View.VISIBLE
+                }
+
+            }else{
+                runOnUiThread {
+                   // stopService()
+                    play.visibility = View.VISIBLE
+                    stop.visibility = View.GONE
+                }
+            }
+
+        }
+        autoModeHandler?.messages?.subscribe {
+            runOnUiThread {
+                Toast.makeText(applicationContext,it.txt, Toast.LENGTH_SHORT).show()
+            }
+            log(applicationContext, it.txt)
+        }
+        /*if (!tripRecorder?.isRecording()!!) {
+
+            Toast.makeText(applicationContext,"ACTIVATING.....", Toast.LENGTH_SHORT).show()
+            autoModeHandler?.activateAutomode(applicationContext)
+        }*/
+
+
 
         //==========================================================================================
-     /*      val activityTracker = ActivityTracker(this);
+     /*     val activityTracker = ActivityTracker(this);
 
-       val automode = AutoMode(this)
+       val automode = AutoMode()
 
           automode.statePublisher().subscribe{state ->
               when (state){
@@ -134,11 +167,13 @@ class MainActivity : AppCompatActivity() {
               }
           }
 
-         automode.setCurrentState(activityTracker)*/
+         automode.setCurrentState(activityTracker)
         //automode.setCurrentState(activityTracker)
-        //activityTracker.scan(automode)
+        //activityTracker.scan(automode)*/
 
         //==========================================================================================
+
+
 
     }
 
@@ -234,11 +269,23 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setState(state: AutoModeState.State) {
-        when (state) {
-            AutoModeState.State.SCANNING_SPEED -> scanningSpeedState()
-            AutoModeState.State.IN_VEHICLE -> inVehicleState()
-            AutoModeState.State.TRACKING_ACTIVITY -> activityTrackingState()
+    fun log(context : Context?, data  : String){
+        try {
+            val rootPath = context?.getExternalFilesDir("AUTOMODE")
+            val root = File(rootPath?.toURI())
+            if (!root.exists()) {
+                root.mkdirs()
+            }
+            val f = File(rootPath?.path + "/log.txt")
+            if (!f.exists()) {
+                f.createNewFile()
+            }
+            val out = FileOutputStream(f, true)
+            out.write(data.toByteArray())
+            out.flush()
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

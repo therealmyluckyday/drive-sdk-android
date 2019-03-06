@@ -9,9 +9,10 @@ import axa.tex.drive.sdk.automode.internal.service.AutomodeService
 import io.reactivex.subjects.PublishSubject
 
 
- class AutomodeHandler : KoinComponentCallbacks{
+ class AutomodeHandler{
      val state: PublishSubject<State> = PublishSubject.create()
      val messages : PublishSubject<Message> = PublishSubject.create()
+     var running = false
 
      internal constructor()
 

@@ -1,4 +1,4 @@
-package integration.tex.com.automode.internal.tracker.model
+package axa.tex.drive.sdk.automode.internal.tracker.model
 
 enum class Where{
     IN_VEHICLE,
