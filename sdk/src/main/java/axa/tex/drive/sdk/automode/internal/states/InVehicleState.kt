@@ -16,7 +16,7 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
     private val filterer: SpeedFilter by inject()
     private var disabled = false
 
-    constructor(automode: Automode) {
+     constructor(automode: Automode) {
         this.automode = automode
         automodeHandler.messages.onNext(Message(Date().toString()+":Really in vehicle"))
     }

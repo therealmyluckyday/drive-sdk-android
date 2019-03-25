@@ -47,6 +47,7 @@ internal class Collector : KoinComponentCallbacks{
 
 
     fun startCollecting() {
+
         if (trackers != null) {
             for (tracker in trackers) {
                 if (tracker.isEnabled()) {
@@ -65,7 +66,15 @@ internal class Collector : KoinComponentCallbacks{
     private fun collect(tracker: Tracker) {
         tracker.enableTracking();
         fixData = tracker.provideFixProducer() as Observable<List<Fix>>
-        fixData?.subscribeOn(io.reactivex.schedulers.Schedulers.computation())?.subscribe { fixes ->
+
+        fixData?.subscribeOn( Schedulers.single())?.subscribe {fixes->
+            fixProcessor.addFixes(fixes)
+            if (fixes.size == 1 && fixes[0] is LocationFix) {
+                locations.onNext(fixes[0] as LocationFix)
+            }
+        }
+
+       /* fixData?.subscribeOn(io.reactivex.schedulers.Schedulers.computation())?.subscribe { fixes ->
 
             Thread {
                 fixProcessor.addFixes(fixes)
@@ -85,7 +94,7 @@ internal class Collector : KoinComponentCallbacks{
                   Thread { fixProcessor.addFixes(context, fix as List<Fix>) }.start()
                   //Thread { FixProcessor.addFixes(context,fix as List<Fix>) }.start()
               }*/
-        }
+        }*/
     }
 
     fun stopCollecting() {
@@ -95,8 +104,9 @@ internal class Collector : KoinComponentCallbacks{
                 tracker.disableTracking()
             }
         }
-        val tripManager : TripManager by inject()
-        tripManager.removeTripId(context)
+        recording = false
+        //val tripManager : TripManager by inject()
+        //tripManager.removeTripId(context)
     }
 
     fun numberOfTrackers(): Int {

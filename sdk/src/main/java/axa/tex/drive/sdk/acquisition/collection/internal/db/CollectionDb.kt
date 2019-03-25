@@ -14,6 +14,8 @@ const val LAST_PACKET: String = "last-packet"
 
 const val NUMBER_PACKETS: String = "number-packets"
 
+
+
 internal class CollectionDb {
 
     private var context: Context?

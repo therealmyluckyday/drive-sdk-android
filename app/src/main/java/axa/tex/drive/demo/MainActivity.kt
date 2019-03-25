@@ -21,12 +21,12 @@ import axa.tex.drive.sdk.acquisition.TripRecorder
 
 
 
-import axa.tex.drive.sdk.core.Platform
-import axa.tex.drive.sdk.core.TexConfig
-import axa.tex.drive.sdk.core.TexService
+
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
+
+import kotlinx.android.synthetic.main.activity_main.view.*
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         tripRecorder = (application as TexDriveDemoApplication).tripRecorder
 
         play.setOnClickListener { play.visibility = View.GONE; stop.visibility = View.VISIBLE; startService(); }
-        stop.setOnClickListener { stop.visibility = View.GONE; play.visibility = View.VISIBLE; stopService() }
+        stop.setOnClickListener {speedView.speedTo(0f); speedView.isWithTremble = false;  speedView.stop(); stop.visibility = View.GONE; play.visibility = View.VISIBLE; stopService()}
 
         if (tripRecorder?.isRecording()!!) {
             play.visibility = View.GONE;
@@ -88,10 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         //scoreRetriever?.retrieveScore(tripId = "ECDAF109-513A-4D0E-88AF-8F69724B86A1")
 
-        score.setOnClickListener {
-            val intent = Intent(this, Trips::class.java)
-            startActivity(intent)
-        }
+
 
         WorkManager.getInstance().getStatusesForUniqueWork("B9FBFF8B-D60C-4DA5-B37D-2B054E64612E").observe(this,Observer { stats ->
             run {
@@ -104,6 +101,12 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+
+        trips.setOnLongClickListener {
+            val intent = Intent(this, Trips::class.java)
+            startActivity(intent)
+            true
+        }
 
         val autoModeHandler = service?.automodeHandler()
         autoModeHandler?.state?.subscribe {
@@ -119,16 +122,24 @@ class MainActivity : AppCompatActivity() {
                    // stopService()
                     play.visibility = View.VISIBLE
                     stop.visibility = View.GONE
+                    speedView.speedTo(0f)
+                    speedView.stop()
+                    speedView.isWithTremble = false
                 }
             }
 
         }
-        autoModeHandler?.messages?.subscribe {
+       /* autoModeHandler?.messages?.subscribe {
             runOnUiThread {
-                Toast.makeText(applicationContext,it.txt, Toast.LENGTH_SHORT).show()
+               // Toast.makeText(applicationContext,it.txt, Toast.LENGTH_SHORT).show()
             }
-            log(applicationContext, it.txt)
+            //log(applicationContext, it.txt)
+        }*/
+
+        autoModeHandler?.speedListener?.locationInput?.subscribe{
+            speedView.speedTo(it.speed*3.6f, 50)
         }
+
         /*if (!tripRecorder?.isRecording()!!) {
 
             Toast.makeText(applicationContext,"ACTIVATING.....", Toast.LENGTH_SHORT).show()
@@ -254,38 +265,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun scanningSpeedState() {
-        speed_scanning.setCompoundDrawablesWithIntrinsicBounds(R.drawable.blue, 0, 0, 0)
-        in_vehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.green, 0, 0, 0)
-    }
-
-    private fun inVehicleState() {
-        speed_scanning.setCompoundDrawablesWithIntrinsicBounds(R.drawable.gray, 0, 0, 0)
-        in_vehicle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.blue, 0, 0, 0)
-    }
-
-    private fun activityTrackingState() {
-        activity_tracking.setCompoundDrawablesWithIntrinsicBounds(R.drawable.blue, 0, 0, 0)
-    }
 
 
-    fun log(context : Context?, data  : String){
-        try {
-            val rootPath = context?.getExternalFilesDir("AUTOMODE")
-            val root = File(rootPath?.toURI())
-            if (!root.exists()) {
-                root.mkdirs()
-            }
-            val f = File(rootPath?.path + "/log.txt")
-            if (!f.exists()) {
-                f.createNewFile()
-            }
-            val out = FileOutputStream(f, true)
-            out.write(data.toByteArray())
-            out.flush()
-            out.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+
 }

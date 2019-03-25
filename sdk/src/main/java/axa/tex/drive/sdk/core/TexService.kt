@@ -6,6 +6,7 @@ import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LogMessage
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import axa.tex.drive.sdk.automode.AutomodeHandler
+import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
@@ -13,7 +14,7 @@ class TexService : KoinComponentCallbacks{
 
     companion object : KoinComponentCallbacks {
 
-        private var instance: TexService? = null
+        internal var instance: TexService? = null
         private var recorder: TripRecorder? = null
         private var config: TexConfig? = null
 
@@ -50,5 +51,15 @@ class TexService : KoinComponentCallbacks{
        // config?.context?.let { TexConfig.loadAutoModeModule(it) }
         val automodeHandler : AutomodeHandler by inject()
         return automodeHandler
+    }
+
+    internal fun automodeTracker(): AutoModeTracker {
+        // config?.context?.let { TexConfig.loadAutoModeModule(it) }
+        val autoModeTracker : AutoModeTracker by inject()
+        return autoModeTracker
+    }
+
+    internal fun getService() : TexService? {
+       return instance
     }
 }

@@ -1,6 +1,7 @@
 package axa.tex.drive.sdk.automode.internal.tracker
 
 
+import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
@@ -19,7 +20,7 @@ class SpeedFilter {
 
 
 
-    internal val locationInput: PublishSubject<TexSpeed> = PublishSubject.create()
+    val locationInput: PublishSubject<TexSpeed> = PublishSubject.create()
     internal val locationOutputWithAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
     internal val locationOutputWhatEverTheAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
     internal val locationOutputUnderStartSpeed: PublishSubject<TexSpeed> = PublishSubject.create()
@@ -30,6 +31,9 @@ class SpeedFilter {
     internal val activityOutput: PublishSubject<TexActivity> = PublishSubject.create()
 
     internal val gpsStream: PublishSubject<TexLocation> = PublishSubject.create()
+
+    internal var collectionEnabled = false
+
 
 
      constructor(requiredSpeedForMovement : Float = SPEED_MOVEMENT_THRESHOLD,
@@ -54,6 +58,7 @@ class SpeedFilter {
             if(it.speed >= requiredSpeedForMovement && it.accuracy < speedAccuracyLimit){
                 locationOutputWithAccuracy.onNext(it);
             }
+
         }
 
          activityInput.subscribe {

@@ -70,7 +70,7 @@ internal class AutomodeService : Service() {
         }
 
         val automodeHandler: AutomodeHandler by inject()
-        automodeHandler.running = false
+        automodeHandler.running = true
 
         return START_STICKY
     }
@@ -96,4 +96,5 @@ internal class AutomodeService : Service() {
             automode.next()
         }
     }
+
 }

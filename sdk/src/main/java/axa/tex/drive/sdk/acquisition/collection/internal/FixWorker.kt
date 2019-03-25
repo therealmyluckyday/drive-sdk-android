@@ -20,11 +20,15 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 import androidx.work.WorkStatus
+import axa.tex.drive.sdk.automode.AutomodeHandler
+import axa.tex.drive.sdk.automode.internal.tracker.model.Message
+import java.util.*
 import java.util.concurrent.ExecutionException
 
 
 internal class FixWorker() : Worker(), KoinComponentCallbacks{
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+    private val automodeHandler: AutomodeHandler by inject()
 
 
     companion object {
@@ -153,13 +157,21 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
             } else {
                 LOGGER.info("SENDING : SUCCEEDED CODE = ${urlConnection.responseCode}")
                 val trip = collectorDb.getPendingTrip(id)
+
                 if(trip != null) {
+                    automodeHandler.messages.onNext(Message("${Date()} Packet sent successfully and trip id = ${trip.tripId}"))
                     collectorDb.deletePendingTrip(id)
                     if (trip.containsStop) {
+
+                        automodeHandler.messages.onNext(Message("Packet sent successfully and trip id = ${trip.tripId} stop = true"))
                         val collector: Collector by inject()
                         collector.currentTripId = null
-                        trip.tripId?.let { scoreRetriever.getAvailableScoreListener().onNext(it) }
-                        trip.tripId?.let { collectorDb.deleteTripNumberPackets(it) }
+                        val tId = trip.tripId
+                        if(tId != null) {
+                           scoreRetriever.getAvailableScoreListener().onNext(tId)
+                            collectorDb.deleteTripNumberPackets(tId)
+                          //  trip.tripId?.let { collectorDb.deleteTripNumberPackets(it) }
+                        }
                     }
                 }
                 return true

@@ -20,6 +20,8 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     private var automode: Automode
     private val filterer: SpeedFilter by inject()
     private var disabled = false
+    private  var lastMvtTime : Long
+    private  var lastGpsTime : Long
 
     private var notMoving: Boolean = true
     private var noGPS: Boolean = true
@@ -35,39 +37,49 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     constructor(automode: Automode) {
         this.automode = automode
         automodeHandler.messages.onNext(Message(Date().toString()+":Now driving..."))
-        automodeHandler.state.onNext(AutomodeHandler.State.DRIVING)
-
+        //automodeHandler.state.onNext(AutomodeHandler.State.DRIVING)
+            lastMvtTime = System.currentTimeMillis()
+            lastGpsTime = System.currentTimeMillis()
         watchGPS()
     }
 
     override fun next() {
-
+        automodeHandler.state.onNext(AutomodeHandler.State.DRIVING)
         //val filterer = automode.activityTracker.filter()
-
-        disposables.add(filterer.locationOutputUnderMovementSpeedWhatEverTheAccuracy.subscribe {
+        lastMvtTime = System.currentTimeMillis()
+        lastGpsTime = System.currentTimeMillis()
+        /*disposables.add(filterer.locationOutputUnderMovementSpeedWhatEverTheAccuracy.subscribe {
             automodeHandler.messages.onNext(Message(Date().toString()+":Speed equals to  ${it.speed} : May be the the vehicle is not moving"))
             notMoving = true
             if (speedWatcher == null) {
                 watchSpeed()
             }
-        })
+        })*/
 
         disposables.add(filterer.locationOutputOverOrEqualsToMovementSpeedWhatEverTheAccuracy.subscribe {
             notMoving = false
-            automodeHandler.messages.onNext(Message(Date().toString()+":Speed equals to  ${it.speed} : We restart moving"))
+           // automodeHandler.messages.onNext(Message(Date().toString()+":Speed equals to  ${it.speed} : We restart moving"))
+            lastMvtTime = System.currentTimeMillis()
             /*if (speedWatcher != null) {
                 speedWatcher?.cancel()
                 speedWatcher = null
             }*/
-            watchSpeed()
+            if(speedWatcher == null){
+                watchSpeed()
+            }
+
         })
 
 
         disposables.add(filterer.gpsStream.subscribe {
-            noGPS = false
+            lastGpsTime = System.currentTimeMillis()
+            //noGPS = false
            // gpsWatcher?.cancel()
           //  gpsWatcher = null
-            watchGPS()
+            if(gpsWatcher == null){
+                watchGPS()
+            }
+
         })
 
 
@@ -80,37 +92,81 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
 
     }
 
+
     private fun watchSpeed() {
-        if(speedWatcher == null){
-        speedWatcher = Timer("Timer for speed").schedule(automode.acceptableStopDuration,automode.acceptableStopDuration) {
-            if (notMoving) {
-                stopAllTimers()
-                automodeHandler.messages.onNext(Message(Date().toString()+": Speed = 0, We need to stop. from speedWatcher"))
+        //if(speedWatcher == null){
+        speedWatcher = Timer("Timer for speed").schedule(1000*60, automode.acceptableStopDuration) {
+
+           if((System.currentTimeMillis() - lastMvtTime) >= automode.acceptableStopDuration){
+               /* automodeHandler.messages.onNext(Message(Date().toString()+": Speed = 0, We need to stop. from speedWatcher"))
                 automodeHandler.state.onNext(AutomodeHandler.State.IDLE)
-                automode.setCurrentState(IdleState(automode))
+
+                if(!automode.states.containsKey(AutomodeHandler.State.IDLE)){
+                    automode.setCurrentState(IdleState(automode))
+                }else{
+                    val idleState = automode.states[AutomodeHandler.State.IDLE]
+                    idleState?.let { automode.setCurrentState(it) }
+                }
+
+                //automode.setCurrentState(IdleState(automode))
                 automode.activityTracker.stopSpeedScanning()
                 automode.getCurrentState().disable(false)
                 automode.next()
                 dispose()
+                stopAllTimers()*/
+               stop("Speed = 0, We need to stop. from speedWatcher")
             }
-            notMoving = true
-        }
+
+            //}
 
 
         }
 
     }
 
+
+
+    /*private fun watchSpeed() {
+       //if(speedWatcher == null){
+        speedWatcher = Timer("Timer for speed").schedule(automode.acceptableStopDuration,automode.acceptableStopDuration) {
+            if (notMoving) {
+
+                automodeHandler.messages.onNext(Message(Date().toString()+": Speed = 0, We need to stop. from speedWatcher"))
+                automodeHandler.state.onNext(AutomodeHandler.State.IDLE)
+
+                if(!automode.states.containsKey(AutomodeHandler.State.IDLE)){
+                    automode.setCurrentState(IdleState(automode))
+                }else{
+                    val idleState = automode.states[AutomodeHandler.State.IDLE]
+                    idleState?.let { automode.setCurrentState(it) }
+                }
+
+                //automode.setCurrentState(IdleState(automode))
+                automode.activityTracker.stopSpeedScanning()
+                automode.getCurrentState().disable(false)
+                automode.next()
+                dispose()
+                stopAllTimers()
+            }
+            notMoving = true
+        //}
+
+
+        }
+
+    }*/
+
     private fun watchGPS() {
 
-        if (gpsWatcher == null){
+        //if (gpsWatcher == null){
             gpsWatcher = Timer("Timer for gps").schedule(automode.timeToWaitForGps, automode.timeToWaitForGps) {
-                if (noGPS) {
-                    cancel()
-                    stopAllTimers()
+                //if (noGPS) {
+                if((System.currentTimeMillis() - lastGpsTime) >= automode.timeToWaitForGps){
+                   // cancel()
+
                     //automode.setCurrentState(IdleState(automode))
 
-                    if(!automode.states.containsKey(AutomodeHandler.State.IDLE)){
+                   /* if(!automode.states.containsKey(AutomodeHandler.State.IDLE)){
                         automode.setCurrentState(IdleState(automode))
                     }else{
                         val idleState = automode.states[AutomodeHandler.State.IDLE]
@@ -125,11 +181,42 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
                     automode.next()
 
                     dispose()
+                    stopAllTimers()*/
+
+                    stop("No gps:Stop driving. from watchGPS")
+
                 }
-                noGPS = true
+                //noGPS = true
             }
+    //}
+
     }
 
+    private fun stop(message : String){
+            //automode.setCurrentState(IdleState(automode))
+
+            if(!automode.states.containsKey(AutomodeHandler.State.IDLE)){
+                automode.setCurrentState(IdleState(automode))
+            }else{
+                val idleState = automode.states[AutomodeHandler.State.IDLE]
+                idleState?.let { automode.setCurrentState(it) }
+            }
+            automodeHandler.messages.onNext(Message(Date().toString()+": $message"))
+            automodeHandler.state.onNext(AutomodeHandler.State.IDLE)
+            automode.getCurrentState().disable(false)
+
+
+
+            automode.activityTracker.stopSpeedScanning()
+
+            //Wait for thirty seconds before going back to scan state. This allows not clear the current trip id while the
+            // the stop not already sent.
+            Thread.sleep(1000*30)
+
+            automode.next()
+
+            dispose()
+            stopAllTimers()
     }
 
     /*private fun watchGPS() {
@@ -157,6 +244,9 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
             speedWatcher?.cancel()
         } catch (e: Exception) {
         }
+        disposables.clear()
+        gpsWatcher = null
+        speedWatcher = null
     }
 
     private fun dispose(){

@@ -42,9 +42,9 @@ class TexConfig {
 
     internal companion object {
 
-        private var locationTrackerEnabled: Boolean = false
-        private var motionTrackerEnabled: Boolean = false
-        private var batteryTrackerEnabled: Boolean = false
+        private var locationTrackerEnabled: Boolean = true
+        private var motionTrackerEnabled: Boolean = true
+        private var batteryTrackerEnabled: Boolean = true
         internal var user: TexUser? = null
         internal var appName: String? = null
         internal var clientId: String? = null
@@ -66,7 +66,7 @@ class TexConfig {
                 single { ScoreRetriever() }
                 single { CollectionDb(context) }
                 single { FixProcessor(context) }
-                single(LocationTracker::class.simpleName!!) { LocationTracker(LocationSensor(context, locationTrackerEnabled)) as Tracker }
+                single(LocationTracker::class.simpleName!!) { LocationTracker(LocationSensor(get(),get(),context, locationTrackerEnabled)) as Tracker }
                 single(BatteryTracker::class.simpleName!!) { BatteryTracker(BatterySensor(context, batteryTrackerEnabled)) as Tracker }
                 single(MotionTracker::class.simpleName!!) { MotionTracker(MotionSensor(context, motionTrackerEnabled)) as Tracker }
 

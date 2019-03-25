@@ -78,9 +78,9 @@ internal class CollectorService : Service() {
             }
         }
 
-        val config = collectorDb.getConfig()
+        //val config = collectorDb.getConfig()
 
-        TexConfig.init(applicationContext, config)
+       // TexConfig.init(applicationContext, config)
         val collector: Collector by inject()
         this.collector = collector
         collector.startCollecting()
@@ -142,7 +142,7 @@ internal class CollectorService : Service() {
             stopForeground(true)
         }
         //running = false
-        collector?.recording = true
+        collector?.recording = false
     }
 
 }

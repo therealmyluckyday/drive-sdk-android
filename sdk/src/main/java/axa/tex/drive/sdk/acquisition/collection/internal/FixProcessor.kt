@@ -83,7 +83,7 @@ internal class FixProcessor : KoinComponentCallbacks {
                 val appName = config?.appName
 
                 val clientId: String? = config?.clientId
-
+//beautyful
                 val theFixes = mutableListOf<Fix>();
                 theFixes.addAll(buffer)
                 if (clientId != null && appName != null && !appName.isEmpty() && !clientId.isEmpty()) {

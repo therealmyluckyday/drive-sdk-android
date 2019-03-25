@@ -15,8 +15,8 @@ class Scores : AppCompatActivity() {
 
 
         val tripId = intent.getStringExtra("trip")
-
-        val scoreRetriever: ScoreRetriever = ScoreRetriever()
+        val service = (application as TexDriveDemoApplication).service
+        val scoreRetriever: ScoreRetriever = service?.scoreRetriever()!!
 
         scoreRetriever.getScoreListener().subscribe {
             this.runOnUiThread {
@@ -29,13 +29,20 @@ class Scores : AppCompatActivity() {
 
                     smoothness.visibility = View.VISIBLE
                     smoothness.text = "${it.scoreDil?.smoothness}"
+                    println("SCORES ${it.scoreDil?.acceleration}")
+                }else{
+
+                    error.text = it.response
+                    error.visibility = android.view.View.VISIBLE
+
+
                 }
-                println("SCORES ${it.scoreDil?.acceleration}")
+
             }
         }
 
         //Thread { scoreRetriever.retrieveScore("4260e592-008b-4fcf-877d-fe8d3923b5f5") }.start()
-        Thread { scoreRetriever.retrieveScore("65747F5D-8F8B-495E-BFA7-1E12B70997C7") }.start()
+        Thread { scoreRetriever.retrieveScore(tripId) }.start()
 
     }
 }

@@ -14,11 +14,14 @@ import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
+import axa.tex.drive.sdk.automode.AutomodeHandler
+import axa.tex.drive.sdk.automode.internal.tracker.model.Message
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
+import java.util.*
 
 
 internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
@@ -28,6 +31,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private var fixProcessor: FixProcessor? = null
     private var collector: Collector
     private var myCustomNotification : Notification? = null
+    private val automodeHandler: AutomodeHandler by inject()
 
 
 
@@ -78,8 +82,10 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
 
     override fun startTracking(startTime: Long) : TripId?{
+        automodeHandler.messages.onNext(Message("${Date()} TripRecorder : Start tracking."))
         requestForLocationPermission()
         val tripManager : TripManager by inject()
+        tripManager.removeTripId(context)
         val serviceIntent = Intent(context, CollectorService::class.java)
         if(myCustomNotification != null) {
             serviceIntent.putExtra("notif", myCustomNotification)

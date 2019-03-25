@@ -2,10 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="axa.tex.drive.demo">
 
-    <!--uses-permission android:name="android.permission.INTERNET" />
+    <!--
+    uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /-->
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /
+    -->
     <application
         android:name=".TexDriveDemoApplication"
         android:allowBackup="true"
@@ -30,7 +31,9 @@
             android:value="f8f93617ece5adaba2dcd591cb5e013816d59c21" />
 
         <activity android:name=".Scores" />
-        <activity android:name=".Trips"></activity>
+        <activity android:name=".Trips" />
+        <activity android:name=".ScroreError" />
+        <activity android:name=".ScoreError"></activity>
     </application>
 
 </manifest>

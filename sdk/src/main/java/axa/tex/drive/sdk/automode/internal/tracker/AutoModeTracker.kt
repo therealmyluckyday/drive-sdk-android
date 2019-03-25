@@ -32,7 +32,7 @@ private const val ACTIVITY_DETECTION_INTERVAL = (10 * 1000).toLong()
 internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinComponentCallbacks{
 
     private val locationManager: LocationManager
-    private  val speedFilter: SpeedFilter by inject()
+    internal  val speedFilter: SpeedFilter by inject()
 
     private lateinit var activityRecognitionClient: ActivityRecognitionClient
     private lateinit var pendingIntent: PendingIntent
@@ -54,7 +54,7 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
     override fun onLocationChanged(location: Location) {
         val texSpeed = TexSpeed(location.speed, location.accuracy)
         speedFilter.locationInput.onNext(texSpeed)
-        val texLocation = TexLocation(location.latitude.toFloat(),location.longitude.toFloat(),location.accuracy,location.speed,location.bearing)
+        val texLocation = TexLocation(location.latitude.toFloat(),location.longitude.toFloat(),location.accuracy,location.speed,location.bearing, location.altitude.toFloat(),location.time)
         speedFilter.gpsStream.onNext(texLocation)
     }
 

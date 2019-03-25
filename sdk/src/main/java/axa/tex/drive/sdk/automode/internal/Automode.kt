@@ -11,7 +11,7 @@ private const val ACCEPTABLE_STOPPED_DURATION = 1000 * 60 * 3L
 internal class Automode : KoinComponentCallbacks{
     internal var activityTracker: TexActivityTracker
     internal val autoModeHandler : AutomodeHandler by inject()
-    private  lateinit var currentState : AutomodeState
+    private  var currentState : AutomodeState
     internal var timeToWaitForGps = TIME_TO_WAIT_FOR_GPS
     internal var acceptableStopDuration = ACCEPTABLE_STOPPED_DURATION
 
@@ -33,7 +33,7 @@ internal class Automode : KoinComponentCallbacks{
 
     }
 
-    internal fun next(){
+        internal fun next(){
         currentState.next()
     }
     internal fun disable(disabled : Boolean){

@@ -71,7 +71,7 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
         val config = collectorDb.getConfig()
         val responseString = StringBuffer("")
         val locale = null
-        val serverUrl = PlatformToHostConverter(Platform.PRODUCTION).getHost()
+        val serverUrl = PlatformToHostConverter(Platform.PREPROD).getHost()
         val url: URL
         val theLocal = getLocaleId(locale)
         if (!finalScore) {
