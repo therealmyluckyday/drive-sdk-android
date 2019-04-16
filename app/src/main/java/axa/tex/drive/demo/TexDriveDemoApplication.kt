@@ -40,7 +40,7 @@ class TexDriveDemoApplication : Application() {
         super.onCreate()
         // Fabric.with(this, Crashlytics())
 
-        //notifyStart()
+        notifyStart("Tex drive next is running", 0)
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -62,7 +62,7 @@ class TexDriveDemoApplication : Application() {
                         "Start trip : ${myTripId!!.value}"
                     }else{
                         ""
-                    })
+                    }, 7)
                     saveTripForScore(myTripId!!.value)
                     log(applicationContext, "=====================================================================\n")
                     log(applicationContext, "New trip at ${Date().toString()}\n")
@@ -76,7 +76,7 @@ class TexDriveDemoApplication : Application() {
                         "End of trip : ${myTripId!!.value}"
                     }else{
                         ""
-                    })
+                    }, 8)
 
                     stopTheService()
                     log(applicationContext, "Enf of trip at ${Date().toString()}\n")
@@ -197,7 +197,7 @@ class TexDriveDemoApplication : Application() {
 
 
     @SuppressLint("NewApi")
-    private fun notifyStart(message : String){
+    private fun notifyStart(message : String, notifId : Int){
         val nm = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val currentApiVersion = android.os.Build.VERSION.SDK_INT
         val notification : Notification
@@ -234,7 +234,7 @@ class TexDriveDemoApplication : Application() {
             }
 
 
-            nm.notify(7, n)
+            nm.notify(notifId, n)
         }
     }
 }
