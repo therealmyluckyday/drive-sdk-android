@@ -2,6 +2,7 @@ package axa.tex.drive.sdk.core.logger
 
 import io.reactivex.subjects.PublishSubject
 
+
 class Logger {
 
     internal val logger = LogImpl()

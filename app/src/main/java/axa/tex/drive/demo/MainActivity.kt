@@ -14,7 +14,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.widget.Toast
 import androidx.work.WorkManager
 import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
@@ -26,9 +25,6 @@ import axa.tex.drive.sdk.automode.AutomodeHandler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
-import kotlinx.android.synthetic.main.activity_main.view.*
-import java.io.File
-import java.io.FileOutputStream
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -220,7 +216,7 @@ class MainActivity : AppCompatActivity() {
             tripRecorder?.setCustomNotification(notification)
 
         try {
-            val tripId =  tripRecorder?.startTracking(Date().time);
+            val tripId =  tripRecorder?.startTrip(Date().time);
             println(tripId)
         }catch (e: PermissionException){
             e.printStackTrace()
@@ -231,7 +227,7 @@ class MainActivity : AppCompatActivity() {
     private fun stopService() {
         Thread{
             try {
-                tripRecorder?.stopTracking(Date().time)
+                tripRecorder?.stopTrip(Date().time)
             }catch (e: PermissionException){
                 e.printStackTrace()
             }

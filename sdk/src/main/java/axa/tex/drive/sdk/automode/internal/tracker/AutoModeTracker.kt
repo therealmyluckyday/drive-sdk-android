@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnSuccessListener
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
 import axa.tex.drive.sdk.automode.internal.tracker.model.Where
+import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 
@@ -32,7 +33,8 @@ private const val ACTIVITY_DETECTION_INTERVAL = (10 * 1000).toLong()
 internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinComponentCallbacks{
 
     private val locationManager: LocationManager
-    internal  val speedFilter: SpeedFilter by inject()
+    internal val speedFilter: SpeedFilter by inject()
+    internal val locations: PublishSubject<Location> = PublishSubject.create()
 
     private lateinit var activityRecognitionClient: ActivityRecognitionClient
     private lateinit var pendingIntent: PendingIntent
@@ -56,6 +58,9 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
         speedFilter.locationInput.onNext(texSpeed)
         val texLocation = TexLocation(location.latitude.toFloat(),location.longitude.toFloat(),location.accuracy,location.speed,location.bearing, location.altitude.toFloat(),location.time)
         speedFilter.gpsStream.onNext(texLocation)
+        speedFilter.locations.onNext(location)
+        locations.onNext(location)
+
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}

@@ -11,14 +11,12 @@ import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
 import java.util.*
-import axa.tex.drive.demo.R.mipmap.ic_launcher
 import android.graphics.BitmapFactory
 import android.content.Intent
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import axa.tex.drive.sdk.acquisition.model.TripId
-import axa.tex.drive.sdk.core.internal.Constants
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.FileOutputStream
@@ -162,7 +160,7 @@ class TexDriveDemoApplication : Application() {
           tripRecorder?.setCustomNotification(notification)*/
 
         try {
-           return  tripRecorder?.startTracking(Date().time)
+           return  tripRecorder?.startTrip(Date().time)
 
 
         } catch (e: PermissionException) {
@@ -174,7 +172,7 @@ class TexDriveDemoApplication : Application() {
     private fun stopTheService() {
         Thread {
             try {
-                tripRecorder?.stopTracking(Date().time)
+                tripRecorder?.stopTrip(Date().time)
             } catch (e: PermissionException) {
                 e.printStackTrace()
             }

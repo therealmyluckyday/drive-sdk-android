@@ -18,12 +18,12 @@ interface TripRecorder {
     /**
      * Initiates tracking
      */
-    fun startTracking(startTime: Long) : TripId?
+    fun startTrip(startTime: Long) : TripId?
 
     /**
      * Stops the tracking
      */
-    fun stopTracking(endTime: Long)
+    fun stopTrip(endTime: Long)
 
     /**
      * Says if we are currently recording
@@ -41,4 +41,6 @@ interface TripRecorder {
 
 
     fun endedTripListener() : PublishSubject<String?>
+
+    fun tripProgress() : PublishSubject<TripProgress>
 }

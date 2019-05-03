@@ -52,7 +52,7 @@ class TextInstrumentedTest : KoinTest {
     @Test
     fun testIsRecording() {
         Assert.assertTrue(tripRecorder?.isRecording() == true)
-        tripRecorder?.stopTracking();
+        tripRecorder?.stopTrip();
         Thread.sleep(1000)
         Assert.assertTrue(tripRecorder?.isRecording() == false)
         tripRecorder?.track();

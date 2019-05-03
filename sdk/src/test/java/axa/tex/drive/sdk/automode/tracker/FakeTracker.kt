@@ -91,7 +91,7 @@ abstract class FakeTracker : TexActivityTracker, KoinComponentCallbacks {
         for (speed in speeds){
             if(!stopScanning) {
                 filterer.locationInput.onNext(speed)
-                val texLocation = TexLocation(0f, 0f, speed.accuracy, speed.speed, 0f)
+                val texLocation = TexLocation(0f, 0f, speed.accuracy, speed.speed, 0f, 10f, 15151551515)
                 filterer.gpsStream.onNext(texLocation)
             }
         }

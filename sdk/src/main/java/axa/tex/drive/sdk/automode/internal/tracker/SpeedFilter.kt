@@ -1,6 +1,7 @@
 package axa.tex.drive.sdk.automode.internal.tracker
 
 
+import android.location.Location
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
@@ -31,6 +32,8 @@ class SpeedFilter {
     internal val activityOutput: PublishSubject<TexActivity> = PublishSubject.create()
 
     internal val gpsStream: PublishSubject<TexLocation> = PublishSubject.create()
+
+    internal val locations: PublishSubject<Location> = PublishSubject.create()
 
     internal var collectionEnabled = false
 
