@@ -44,7 +44,8 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     }
 
     override fun next() {
-        automodeHandler.state.onNext(AutomodeHandler.State.DRIVING)
+      
+        automodeHandler.state.onNext(true)
         //val filterer = automode.activityTracker.filter()
         lastMvtTime = System.currentTimeMillis()
         lastGpsTime = System.currentTimeMillis()
@@ -202,7 +203,8 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
                 idleState?.let { automode.setCurrentState(it) }
             }
             automodeHandler.messages.onNext(Message(Date().toString()+": $message"))
-            automodeHandler.state.onNext(AutomodeHandler.State.IDLE)
+            //automodeHandler.state.onNext(AutomodeHandler.State.IDLE)
+            automodeHandler.state.onNext(false)
             automode.getCurrentState().disable(false)
 
 

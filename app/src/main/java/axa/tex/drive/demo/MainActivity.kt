@@ -105,8 +105,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         val autoModeHandler = service?.automodeHandler()
-        autoModeHandler?.state?.subscribe {
-            if(it == AutomodeHandler.State.DRIVING){
+        autoModeHandler?.state?.subscribe {driving ->
+            if(driving){
                 runOnUiThread {
                    // startService()
                     play.visibility = View.GONE
@@ -125,12 +125,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-       /* autoModeHandler?.messages?.subscribe {
-            runOnUiThread {
-               // Toast.makeText(applicationContext,it.txt, Toast.LENGTH_SHORT).show()
-            }
-            //log(applicationContext, it.txt)
-        }*/
 
         autoModeHandler?.speedListener?.locationInput?.subscribe{
             speedView.speedTo(it.speed*3.6f, 50)

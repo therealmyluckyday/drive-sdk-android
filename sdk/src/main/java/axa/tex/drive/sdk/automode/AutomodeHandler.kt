@@ -12,14 +12,14 @@ import org.koin.android.ext.android.inject
 
 
 class AutomodeHandler : KoinComponentCallbacks{
-     val state: PublishSubject<State> = PublishSubject.create()
+     val state: PublishSubject<Boolean> = PublishSubject.create()
      val messages : PublishSubject<Message> = PublishSubject.create()
      var running = false
      val speedListener : SpeedFilter by inject()
 
      internal constructor()
 
-    enum class State {
+    internal enum class State {
         IDLE,
         TRACKING_ACTIVITY,
         SCANNING_SPEED,

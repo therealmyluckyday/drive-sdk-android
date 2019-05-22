@@ -67,9 +67,9 @@ repositories {
     mavenCentral()
 }
 
-//def artifactId = 'drive.sdk'
-//def groupId = 'axa.tex'
-/*publishing {
+def artifactId = 'drive.sdk'
+def groupId = 'axa.tex'
+publishing {
     publications {
         library(MavenPublication) {
             setGroupId(groupId)
@@ -91,11 +91,11 @@ repositories {
 
     }
 }
-*/
 
 
 
-def libraryGroupId = 'axa.tex.drive'
+
+/*def libraryGroupId = 'axa.tex.drive'
 def libraryArtifactId = "${archivesBaseName}".toLowerCase()
 def libraryVersion = getVersionName()
 
@@ -125,7 +125,7 @@ publishing {
             }
         }
     }
-}
+}*/
 
 
 artifactory {

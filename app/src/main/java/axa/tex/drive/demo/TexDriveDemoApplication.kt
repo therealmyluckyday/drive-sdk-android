@@ -50,8 +50,8 @@ class TexDriveDemoApplication : Application() {
 
 
         val autoModeHandler = service?.automodeHandler()
-        autoModeHandler?.state?.subscribe {
-            if (it == AutomodeHandler.State.DRIVING) {
+        autoModeHandler?.state?.subscribe {driving ->
+            if (driving) {
                 if (!tripRecorder?.isRecording()!!) {
 
                     myTripId = startTheService()
