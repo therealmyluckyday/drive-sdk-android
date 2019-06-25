@@ -116,7 +116,7 @@ class AutomaticModeTest : KoinTest {
        // val signal = CountDownLatch(1)
         automode.autoModeHandler.state.subscribe {
             //signal.countDown()
-            Assert.assertTrue(it == AutomodeHandler.State.IDLE)
+            Assert.assertTrue(!it)
         }
         //signal.await()
         StandAloneContext.stopKoin()
