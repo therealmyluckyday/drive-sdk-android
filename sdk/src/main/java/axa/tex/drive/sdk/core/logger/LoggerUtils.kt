@@ -1,7 +1,6 @@
 package axa.tex.drive.sdk.core.logger
 
 import android.os.Environment
-import android.os.Message
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -10,11 +9,11 @@ import java.io.IOException
 internal class LoggerUtils {
 
     companion object {
-          fun logInFile(folder : String, fileName: String, content: String) {
+        fun logInFile(folder: String, fileName: String, content: String) {
 
             var fileWriter: FileWriter? = null
             val logFile = getLogFile(folder, fileName)
-            if(!logFile.exists()){
+            if (!logFile.exists()) {
                 logFile.createNewFile()
             }
             try {
@@ -46,12 +45,12 @@ internal class LoggerUtils {
         private fun getLogFile(folderName: String, fileName: String): File {
 
             val storage = Environment.getExternalStorageDirectory().getAbsolutePath()
-            val folder = File(storage,folderName)
+            val folder = File(storage, folderName)
             if (!folder.exists()) {
                 folder.mkdirs()
             }
 
-            return  File(folder, fileName)
+            return File(folder, fileName)
 
         }
     }

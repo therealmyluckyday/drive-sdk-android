@@ -6,8 +6,6 @@ import org.junit.Test
 class MeanTest {
 
 
-
-
     @Test
     fun testMeanInitialization() {
         val acceleration: Double = (2).toDouble()
@@ -18,15 +16,13 @@ class MeanTest {
         var weight = 23
 
 
+        val mean = Mean(acceleration, braking, expert, smoothness, speed, weight)
 
-
-        val mean = Mean(acceleration,braking,expert,smoothness,speed,weight)
-
-        Assert.assertTrue(mean.acceleration==acceleration)
-        Assert.assertTrue(mean.braking==braking)
-        Assert.assertTrue(mean.expert==expert)
-        Assert.assertTrue(mean.smoothness==smoothness)
-        Assert.assertTrue(mean.speed==speed)
-        Assert.assertTrue(mean.weight==weight)
+        Assert.assertTrue(mean.acceleration == acceleration)
+        Assert.assertTrue(mean.braking == braking)
+        Assert.assertTrue(mean.expert == expert)
+        Assert.assertTrue(mean.smoothness == smoothness)
+        Assert.assertTrue(mean.speed == speed)
+        Assert.assertTrue(mean.weight == weight)
     }
 }

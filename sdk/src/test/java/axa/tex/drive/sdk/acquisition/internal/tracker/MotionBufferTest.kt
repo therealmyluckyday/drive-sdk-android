@@ -1,40 +1,35 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
-import android.hardware.Sensor
-import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.Motion
 import axa.tex.drive.sdk.acquisition.model.MotionFix
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import java.util.*
 
 class MotionBufferTest {
 
-    private val buffer = LinkedList<Fix>()
-    private val TYPE_LINEAR_ACCELERATION : Int = 0
-    private val TYPE_ACCELEROMETER  :Int = 1
-    private val TYPE_GRAVITY :Int = 2
-    private val TYPE_GYROSCOPE : Int = 3
-    private val TYPE_MAGNETIC_FIELD : Int =  4
+    private val TYPE_LINEAR_ACCELERATION: Int = 0
+    private val TYPE_ACCELEROMETER: Int = 1
+    private val TYPE_GRAVITY: Int = 2
+    private val TYPE_GYROSCOPE: Int = 3
+    private val TYPE_MAGNETIC_FIELD: Int = 4
 
-    private var olderMotionAge : Int = DEFAULT_OLDER_MOTION_AGE
-    private var motionAgeAfterAcceleration : Int = DEFAULT_MOTION_AGE_AFTER_ACCELERATION
+    private var motionAgeAfterAcceleration: Long = DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION
 
     fun IntRange.random() =
-            Random().nextInt((endInclusive + 1) - start) +  start
+            Random().nextInt((endInclusive + 1) - start) + start
 
     @Test
-    fun testAddFix(){
+    fun testAddFix() {
         val beginTime = Date().time
         var timestamp = beginTime
 
-        val motion = Motion(0.5f,1f,1.1f, beginTime);
+        val motion = Motion(0.5f, 1f, 1.1f, beginTime);
         var sensorType = (0 until 4).random()
 
         var i = 0
         val buffer = MotionBuffer()
-        while(i < 3000) {
+        while (i < 3000) {
             val fix = when (sensorType) {
                 TYPE_LINEAR_ACCELERATION -> MotionFix(acceleration = motion, timestamp = timestamp)
                 TYPE_ACCELEROMETER -> MotionFix(rawAcceleration = motion, timestamp = timestamp)
@@ -55,16 +50,16 @@ class MotionBufferTest {
 
 
     @Test
-    fun testFlush(){
+    fun testFlush() {
         val beginTime = Date().time
         var timestamp = beginTime
 
-        val motion = Motion(0.5f,1f,1.1f, beginTime);
+        val motion = Motion(0.5f, 1f, 1.1f, beginTime);
         var sensorType = (0 until 4).random()
 
         var i = 0
         val buffer = MotionBuffer()
-        while(i < 3000) {
+        while (i < 3000) {
             val fix = when (sensorType) {
                 TYPE_LINEAR_ACCELERATION -> MotionFix(acceleration = motion, timestamp = timestamp)
                 TYPE_ACCELEROMETER -> MotionFix(rawAcceleration = motion, timestamp = timestamp)
@@ -77,7 +72,6 @@ class MotionBufferTest {
 
             timestamp = Date().time
             i++
-
         }
         val newBuf = buffer.flush()
         Assert.assertTrue(newBuf.last().timestamp() - newBuf.first().timestamp() <= motionAgeAfterAcceleration)

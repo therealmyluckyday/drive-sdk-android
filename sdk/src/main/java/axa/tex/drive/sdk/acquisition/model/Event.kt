@@ -5,14 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 
 
 @JsonRootName(value = "")
-data class Event (val event: List<String>,
-                  val timestamp: Long):Fix(timestamp){
+data class Event(val event: List<String>,
+                 val timestamp: Long) : Fix(timestamp) {
 
     override fun toJson(): String {
         return try {
             val mapper = ObjectMapper();
-             mapper.writeValueAsString(this);
-        }catch (e : Exception){
+            mapper.writeValueAsString(this);
+        } catch (e: Exception) {
             e.printStackTrace()
             "{}";
         }

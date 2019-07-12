@@ -1,14 +1,12 @@
 package axa.tex.drive.sdk.core.internal.util
 
 import axa.tex.drive.sdk.core.Platform
-import axa.tex.drive.sdk.core.Platform.PRODUCTION
-import axa.tex.drive.sdk.core.Platform.PREPROD
-import axa.tex.drive.sdk.core.Platform.TESTING
+import axa.tex.drive.sdk.core.Platform.*
 
 
 internal class PlatformToHostConverter(platform: Platform) {
 
-   private var host: String = ""
+    private var host: String = ""
 
 
     init {
@@ -23,7 +21,7 @@ internal class PlatformToHostConverter(platform: Platform) {
         }
     }
 
-    fun getHost() : String?{
+    fun getHost(): String? {
         return host;
     }
 

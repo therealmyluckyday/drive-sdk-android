@@ -6,7 +6,7 @@ import org.junit.Test
 class WeatherCategoriesTest {
 
     @Test
-    fun testWeatherCategoriesInitialization(){
+    fun testWeatherCategoriesInitialization() {
         var cloudy: Int = 2
         var foggy: Int = 3
         var heavy_ice: Int = 5
@@ -20,7 +20,7 @@ class WeatherCategoriesTest {
         var unknown: Int = 31
 
 
-       val weatherCategory =  WeatherCategories(cloudy, foggy, heavy_ice, heavy_rain, heavy_snow, light_ice, normal, rainy, snowy, thundery, unknown)
+        val weatherCategory = WeatherCategories(cloudy, foggy, heavy_ice, heavy_rain, heavy_snow, light_ice, normal, rainy, snowy, thundery, unknown)
         Assert.assertTrue(weatherCategory.cloudy == cloudy)
         Assert.assertTrue(weatherCategory.foggy == foggy)
         Assert.assertTrue(weatherCategory.heavy_ice == heavy_ice)
@@ -33,7 +33,6 @@ class WeatherCategoriesTest {
         Assert.assertTrue(weatherCategory.thundery == thundery)
         Assert.assertTrue(weatherCategory.unknown == unknown)
     }
-
 
 
 }

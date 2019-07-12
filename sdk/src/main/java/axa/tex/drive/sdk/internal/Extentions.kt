@@ -1,17 +1,28 @@
 package axa.tex.drive.sdk.internal.extension
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
+import java.io.ByteArrayOutputStream
+import java.util.zip.GZIPOutputStream
 
 
-fun Any.toJson() : String{
-    return try {
-        val mapper = ObjectMapper();
-        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
-        mapper.writeValueAsString(this);
-    }catch (e : Exception){
-        e.printStackTrace()
-        "{}";
+internal fun String.capitalize(): String {
+    if (this == null || this.isEmpty()) {
+        return ""
+    }
+    val first = this[0]
+    return if (Character.isUpperCase(first)) {
+        this
+    } else {
+        Character.toUpperCase(first) + this.substring(1)
     }
 }
 
+
+internal fun String.compress(): ByteArray {
+    val os = ByteArrayOutputStream(this.length)
+    val gos = GZIPOutputStream(os)
+    gos.write(this.toByteArray())
+    gos.close()
+    val compressed = os.toByteArray()
+    os.close()
+    return compressed
+}

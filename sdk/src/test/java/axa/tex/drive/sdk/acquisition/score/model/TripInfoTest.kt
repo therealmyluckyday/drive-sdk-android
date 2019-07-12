@@ -6,14 +6,14 @@ import org.junit.Test
 class TripInfoTest {
 
     @Test
-    fun testTripInfoTestInitialization(){
+    fun testTripInfoTestInitialization() {
         var battery: Int = 2
         var daylight_ratio: Int = 3
         var duration: Int = 5
         var length: Double = (9).toDouble()
         val road_categories: RoadCategories = RoadCategories()
         val temperature: Int = 7
-        val weather_categories =  WeatherCategories()
+        val weather_categories = WeatherCategories()
 
         val tripInfo = TripInfo(battery, daylight_ratio, duration, length, road_categories, temperature, weather_categories)
         Assert.assertTrue(tripInfo.battery == battery)

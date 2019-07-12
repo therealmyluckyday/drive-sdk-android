@@ -1,3 +1,3 @@
 package axa.tex.drive.sdk.acquisition.model
 
-data class TexUser(val userId : String,  val authToken : String)
+data class TexUser(val userId: String, val authToken: String)

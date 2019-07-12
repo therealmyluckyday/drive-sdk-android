@@ -1,6 +1,7 @@
 package axa.tex.drive.sdk.core
 
-import android.util.Log
+
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import java.io.BufferedInputStream
 import java.io.InputStream
 import java.security.KeyStore
@@ -14,9 +15,10 @@ import java.util.*
 import javax.net.ssl.*
 
 class CertificateAuthority {
+
     companion object {
 
-
+        internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
         private class UnifiedTrustManager @Throws(KeyStoreException::class)
         constructor(localKeyStore: KeyStore) : X509TrustManager {
             private var defaultTrustManager: X509TrustManager? = null
@@ -27,7 +29,7 @@ class CertificateAuthority {
                     this.defaultTrustManager = createTrustManager(null)
                     this.localTrustManager = createTrustManager(localKeyStore)
                 } catch (e: NoSuchAlgorithmException) {
-                    Log.w("Error", e)
+                    LOGGER.warn("Error ${e.message}", "constructor")
                 }
 
             }
@@ -101,7 +103,7 @@ class CertificateAuthority {
                 return context.socketFactory
 
             } catch (e: Exception) {
-                Log.w("Error", e)
+                LOGGER.error("Error ${e.message}", "createSSLSocketFactory")
                 return null
             }
 
@@ -116,12 +118,11 @@ class CertificateAuthority {
                 }
 
             } catch (e: Exception) {
-                Log.w("Error", e)
+                LOGGER.error("Error ${e.message}", "createSSLSocketFactory")
             }
 
         }
     }
-
 
 
 }

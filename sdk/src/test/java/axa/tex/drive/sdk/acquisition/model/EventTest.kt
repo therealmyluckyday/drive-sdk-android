@@ -16,7 +16,7 @@ class EventTest {
     }
 
     @Test
-    fun testEventOutput(){
+    fun testEventOutput() {
         val time = 1543938100057
         val end = Event(listOf("stop"), time);
         val json = end.toJson()

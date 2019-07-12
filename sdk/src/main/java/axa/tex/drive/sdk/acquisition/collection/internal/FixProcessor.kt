@@ -1,94 +1,165 @@
 package axa.tex.drive.sdk.acquisition.collection.internal
 
+
 import android.content.Context
 import androidx.work.*
-import axa.tex.drive.sdk.acquisition.model.FixPacket
+import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
+import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.FixWorkerCron
+import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.FixWorkerWithQueue
+import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.PersistentQueue
 import axa.tex.drive.sdk.acquisition.model.Event
 import axa.tex.drive.sdk.acquisition.model.Fix
-import java.util.*
-import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
+import axa.tex.drive.sdk.acquisition.model.FixPacket
 import axa.tex.drive.sdk.acquisition.model.PendingTrip
-import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.internal.Constants
-import axa.tex.drive.sdk.core.internal.utils.*
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
+import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
+import axa.tex.drive.sdk.core.internal.utils.TripManager
+import axa.tex.drive.sdk.core.internal.utils.Utils
+import axa.tex.drive.sdk.core.logger.LoggerFactory
+import org.koin.android.ext.android.inject
+import java.util.*
+
+private const val DEFAULT_PACKET_SIZE = 50
+
+internal class FixProcessor : KoinComponentCallbacks {
+
+    private var context: Context
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+    private var tripStart: Boolean = false
+
+    private val tripManager : TripManager by inject()
 
 
-internal object FixProcessor {
-    private const val DEFAULT_PACKET_SIZE = 5
+    constructor(context: Context) {
+        this.context = context
+    }
+
+
     private val buffer = mutableListOf<Fix>()
-    private var packetSize : Int = DEFAULT_PACKET_SIZE;
-    private var tripEnded  = false;
+    private var packetSize: Int = DEFAULT_PACKET_SIZE;
+    private var tripEnded = false;
 
 
-    fun setPacketSize(packetSize : Int){
+    fun setPacketSize(packetSize: Int) {
         this.packetSize = packetSize
     }
 
-    public fun startTrip(context : Context){
-        val start = Event(listOf("start"), Date().time);
+
+
+    fun startTrip(startTime: Long) {
+        val start = Event(listOf("start"), startTime);
         tripEnded = false
-        addFixes(context,listOf(start))
+        tripStart = true
+        addFixes(listOf(start))
     }
 
-    public fun endTrip(context : Context){
-        val end = Event(listOf("stop"), Date().time);
+    fun endTrip(endTime: Long) {
+        val end = Event(listOf("stop"), endTime);
         tripEnded = true
-        addFixes(context,listOf(end))
+        addFixes(listOf(end))
 
     }
 
 
+    @Synchronized
+    fun addFixes(/*context : Context,*/fixes: List<Fix>) {
 
-    @Synchronized fun addFixes(context : Context,fixes : List<Fix>) {
-
-        val model = Utils.getDeviceName()
-        val os: String = Utils.getOSVersion()
-        val timezone:String = Utils.getFormattedTZ()
-        val uid: String = Utils.getUid(context)
+        val model = DeviceInfo.getDeviceName()
+        val os: String = DeviceInfo.getOSVersion()
+        val timezone: String = Utils.getFormattedTZ()
+        val uid: String = DeviceInfo.getUid(context)
         val version: String = Constants.JSON_SCHEMA_VERSION
-        val tripId = Utils.tripId(context)
+        val tripId = tripManager.tripId(context)
 
-        for (fix in fixes){
+        for (fix in fixes) {
             buffer.add(fix)
-            if(buffer.size >= packetSize || tripEnded){
-                val config  = CollectionDb.getConfig(context)
+            if (buffer.size >= packetSize || tripEnded || tripStart) {
+                tripStart = false
+                LOGGER.info("SENDING : NEW PACKET DETECTED")
+                val collectorDb: CollectionDb by inject()
+
+                val config = collectorDb.getConfig()
                 val appName = config?.appName
-                val clientId = config?.clientId
-               // val end = Event(listOf("end"), Date().time);
-                //buffer.add(end)
-               // tripEnded = false
+
+                val clientId: String? = config?.clientId
+//beautyful
                 val theFixes = mutableListOf<Fix>();
                 theFixes.addAll(buffer)
-
-                val packet = appName?.let {
-                    clientId?.let { id ->
-                        FixPacket(theFixes, model ,os,timezone,uid,version, tripId, it,
-                                id)
+                if (clientId != null && appName != null && !appName.isEmpty() && !clientId.isEmpty()) {
+                    val packet = FixPacket(theFixes, model, os, timezone, uid, version, tripId?.value, appName,
+                            clientId)
+                    LOGGER.info("SENDING : CONVERTING TO JSON")
+                    val json = packet?.toJson()
+                    if(Constants.EMPTY_PACKET == json){
+                        buffer.clear()
+                        return
                     }
+
+                    LOGGER.info("SENDING : $json")
+                    val id = UUID.randomUUID().toString()
+/////////////////////////////////////////////////////////////////////////////////////////////
+                    val nbPackets = collectorDb.getNumberPackets(tripId?.value!!)
+                    collectorDb.setNumberPackets(tripId.value, nbPackets+1)
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+                    LOGGER.info("SENDING : SETTING DATA")
+                    val data: Data = Data.Builder().putString(Constants.ID_KEY, id).
+                            putString(Constants.DATA_KEY, json).
+                            putString(Constants.APP_NAME_KEY, appName).
+                            putString(Constants.CLIENT_ID_KEY, clientId).
+                            putInt(Constants.WORK_TAG_KEY,nbPackets).
+                            putString(Constants.TRIP_ID_KEY, tripId?.value).build()
+                    LOGGER.info("SENDING : DATA SET")
+                    LOGGER.info("PACKET DATA FOR WORKER MANAGER", data.toString())
+                    buffer.clear()
+
+                    val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build()
+
+
+
+                    val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorker::class.java).setInputData(data).addTag((nbPackets-1).toString()).setConstraints(constraints)
+                            .build()
+
+
+                    ////////////////////////////////////////////////////
+                   /* val persistentQueue : PersistentQueue by inject()
+                    if(!persistentQueue.tripExists(tripId!!.value)) {
+                        val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(data).setConstraints(constraints)
+                                .build()
+
+                        collectorDb.setPacketNumber(tripId.value, 1)
+                        collectorDb.setNumberPackets(tripId.value, 1)
+                        persistentQueue.enqueue(tripId.value, appName ,clientId,json, tripEnded)
+                        WorkManager.getInstance().enqueue(fixUploadWork)
+                    }else{
+
+                        val nbPackets = collectorDb.getNumberPackets(tripId.value)
+                        collectorDb.setNumberPackets(tripId.value, nbPackets+1)
+                        persistentQueue.enqueue(tripId.value, appName ,clientId,json, tripEnded)
+                    }*/
+                    ///////////////////////////////////////////////////
+
+
+                    val pendingTrip = PendingTrip(id, tripId?.value, tripEnded)
+                    tripEnded = false
+                    collectorDb.saveTrip(pendingTrip)
+
+                    LOGGER.info("SENDING : ENQUEUING")
+                  //  val workContinuation = tripId?.value?.let { WorkManager.getInstance().beginUniqueWork(it,ExistingWorkPolicy.APPEND,fixUploadWork) }
+                    //workContinuation?.enqueue()
+
+                   // LOGGER.info("SENDING : ENQUEUED")
+                    WorkManager.getInstance().enqueue(fixUploadWork)
                 }
-
-                /*val packet = FixPacket(theFixes, model ,os,timezone,uid,version, tripId,"youdrive_france_prospect",
-                        "00001111")*/
-                val json = packet?.toJson()
-
-                val id = UUID.randomUUID().toString()
-               // val data : Data = Data.Builder().putAll(buffer.associateBy ( {it.timestamp().toString()}, {it.toJson()} )).build()
-                val data : Data = Data.Builder().putString(id,json).build()
-               // val data : Data = Data.Builder().putAll(buffer.associateBy ( {/*it.timestamp().toString()*/id}, {json} )).build()
-                buffer.clear()
-
-                val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-                        .build()
-
-                val fixUploadWork : OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorker::class.java).
-                        setInputData(data).setConstraints(constraints)
-                        .build()
-
-
-                val pendingTrip = PendingTrip(id, tripId, tripEnded)
-                CollectionDb.saveTrip(context,pendingTrip)
-                WorkManager.getInstance().enqueue(fixUploadWork)
             }
         }
+    }
+
+    fun processInOrder(fixes : List<Fix>){
+
     }
 }

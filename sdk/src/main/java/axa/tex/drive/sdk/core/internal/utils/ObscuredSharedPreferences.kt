@@ -4,15 +4,14 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.provider.Settings
 import android.util.Base64
-import android.util.Log
+import axa.tex.drive.sdk.core.logger.LoggerFactory
+
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
-
-
 
 
 /**
@@ -40,6 +39,8 @@ class ObscuredSharedPreferences
  * @param delegate - SharedPreferences object from the system
  */
 (protected var context: Context, protected var delegate: SharedPreferences) : SharedPreferences {
+
+    internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     init {
         //updated thanks to help from bkhall on github
@@ -118,6 +119,7 @@ class ObscuredSharedPreferences
         try {
             v = delegate.getString(key, null)
         } catch (e: ClassCastException) {
+            e.printStackTrace()
             return delegate.getBoolean(key, defValue)
         }
 
@@ -127,7 +129,7 @@ class ObscuredSharedPreferences
         if (!checkBooleanString(parsed)) {
             //could not decrypt the Boolean.  Maybe the wrong key was used.
             decryptionErrorFlag = true
-            Log.e(this.javaClass.name, "Warning, could not decrypt the value.  Possible incorrect key used.")
+            LOGGER.error("${this.javaClass.name}, Warning, could not decrypt the value.  Possible incorrect key used.")
         }
         return if (v != null) java.lang.Boolean.parseBoolean(parsed) else defValue
     }
@@ -146,15 +148,17 @@ class ObscuredSharedPreferences
         try {
             v = delegate.getString(key, null)
         } catch (e: ClassCastException) {
+            e.printStackTrace()
             return delegate.getFloat(key, defValue)
         }
 
         try {
             return java.lang.Float.parseFloat(decrypt(v)!!)
         } catch (e: NumberFormatException) {
-            //could not decrypt the number.  Maybe we are using the wrong key?
+            e.printStackTrace()//could not decrypt the number.  Maybe we are using the wrong key?
             decryptionErrorFlag = true
-            Log.e(this.javaClass.name, "Warning, could not decrypt the value.  Possible incorrect key.  " + e.message)
+            LOGGER.error("${this.javaClass.name}, Warning, could not decrypt the value.  Possible incorrect key. ${e.message}")
+
         }
 
         return defValue
@@ -165,15 +169,17 @@ class ObscuredSharedPreferences
         try {
             v = delegate.getString(key, null)
         } catch (e: ClassCastException) {
+            e.printStackTrace()
             return delegate.getInt(key, defValue)
         }
 
         try {
             return Integer.parseInt(decrypt(v)!!)
         } catch (e: NumberFormatException) {
+            e.printStackTrace()
             //could not decrypt the number.  Maybe we are using the wrong key?
             decryptionErrorFlag = true
-            Log.e(this.javaClass.name, "Warning, could not decrypt the value.  Possible incorrect key.  " + e.message)
+            LOGGER.error("${this.javaClass.name}, Warning, could not decrypt the value.  Possible incorrect key. ${e.message}")
         }
 
         return defValue
@@ -184,6 +190,7 @@ class ObscuredSharedPreferences
         try {
             v = delegate.getString(key, null)
         } catch (e: ClassCastException) {
+            e.printStackTrace()
             return delegate.getLong(key, defValue)
         }
 
@@ -191,8 +198,9 @@ class ObscuredSharedPreferences
             return java.lang.Long.parseLong(decrypt(v)!!)
         } catch (e: NumberFormatException) {
             //could not decrypt the number.  Maybe we are using the wrong key?
+            e.printStackTrace()
             decryptionErrorFlag = true
-            Log.e(this.javaClass.name, "Warning, could not decrypt the value.  Possible incorrect key.  " + e.message)
+            LOGGER.error("${this.javaClass.name}, Warning, could not decrypt the value.  Possible incorrect key. ${e.message}")
         }
 
         return defValue
@@ -246,7 +254,7 @@ class ObscuredSharedPreferences
             pbeCipher.init(Cipher.DECRYPT_MODE, key, PBEParameterSpec(SALT!!, 20))
             return String(pbeCipher.doFinal(bytes), Charset.forName(UTF8))
         } catch (e: Exception) {
-            Log.e(this.javaClass.name, "Warning, could not decrypt the value.  It may be stored in plaintext.  " + e.message)
+            LOGGER.error("${this.javaClass.name}, Warning, could not decrypt the value.  It may be stored in plaintext.   ${e.message}")
             return value
         }
 

@@ -1,6 +1,5 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
-import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeMotionSensor
 import org.junit.Assert
 import org.junit.Test
@@ -10,25 +9,25 @@ class MotionTrackerTest {
     @Test
     fun motionTrackerCorrectlyEnabled() {
 
-        val fakeMotionSensor = FakeMotionSensor()
-        val motionTracker = MotionTracker(fakeMotionSensor = fakeMotionSensor)
+        val motionSensor = FakeMotionSensor()
+        val motionTracker = MotionTracker(FakeMotionSensor())
         motionTracker.enableTracking()
-        Assert.assertTrue(fakeMotionSensor.trackingEnabled);
-        Assert.assertFalse(fakeMotionSensor.trackingDisable);
+        Assert.assertTrue(motionTracker.isEnabled());
+        Assert.assertFalse(!motionTracker.isEnabled());
     }
 
     @Test
     fun motionTrackerCorrectlyDisabled() {
 
-        val fakeMotionSensor = FakeMotionSensor()
-        val motionTracker = MotionTracker(fakeMotionSensor = fakeMotionSensor)
+
+        val motionTracker = MotionTracker(FakeMotionSensor())
         motionTracker.enableTracking()
-        Assert.assertTrue(fakeMotionSensor.trackingEnabled);
-        Assert.assertFalse(fakeMotionSensor.trackingDisable);
+        Assert.assertTrue(motionTracker.isEnabled());
+        Assert.assertFalse(!motionTracker.isEnabled());
 
         motionTracker.disableTracking()
 
-        Assert.assertFalse(fakeMotionSensor.trackingEnabled);
-        Assert.assertTrue(fakeMotionSensor.trackingDisable);
+        Assert.assertFalse(motionTracker.isEnabled());
+        Assert.assertTrue(!motionTracker.isEnabled());
     }
 }

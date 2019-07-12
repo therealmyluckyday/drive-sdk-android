@@ -1,25 +1,29 @@
 package axa.tex.drive.sdk.acquisition
 
-import axa.tex.drive.sdk.acquisition.model.Fix
+import android.app.Notification
+import axa.tex.drive.sdk.acquisition.model.LocationFix
+import axa.tex.drive.sdk.acquisition.model.TripId
+import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 
-interface TripRecorder{
+interface TripRecorder {
 
     /**
      * TripID of the currently recorded trip.
      * @return the trip id
      */
-    fun getCurrentTripId(): String
+    fun getCurrentTripId(): TripId?
 
     /**
      * Initiates tracking
      */
-    fun track()
+    fun startTrip(startTime: Long) : TripId?
 
     /**
      * Stops the tracking
      */
-    fun stopTracking()
+    fun stopTrip(endTime: Long)
 
     /**
      * Says if we are currently recording
@@ -30,8 +34,13 @@ interface TripRecorder{
     /**
      * @return An observable on which we can register to get location fixes.
      */
-    fun locationObservable(): Observable<Fix>
+    fun locationObservable(): Observable<LocationFix>
 
 
+    fun setCustomNotification(notification: Notification?)
 
+
+    fun endedTripListener() : PublishSubject<String?>
+
+    fun tripProgress() : PublishSubject<TripProgress>
 }
