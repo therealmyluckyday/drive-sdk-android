@@ -102,14 +102,14 @@ class MainActivity : AppCompatActivity() {
         autoModeHandler?.state?.subscribe {driving ->
             if(driving){
                 runOnUiThread {
-                   // startService()
+                   startService()
                     play.visibility = View.GONE
                     stop.visibility = View.VISIBLE
                 }
 
             }else{
                 runOnUiThread {
-                   // stopService()
+                   stopService()
                     play.visibility = View.VISIBLE
                     stop.visibility = View.GONE
                     speedView.speedTo(0f)
