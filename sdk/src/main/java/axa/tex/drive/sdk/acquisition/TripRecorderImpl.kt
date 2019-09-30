@@ -105,6 +105,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     override fun startTrip(startTime: Long) : TripId?{
         start = startTime
 
+        logger.info("${Date()} TripRecorder : Start tracking.", function = "fun startTrip(startTime: Long) : TripId?")
         requestForLocationPermission()
         val tripManager : TripManager by inject()
         tripManager.removeTripId(context)

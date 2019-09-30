@@ -15,10 +15,11 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
     private val automodeHandler: AutomodeHandler by inject()
     private val filterer: SpeedFilter by inject()
     private var disabled = false
+    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
 
      constructor(automode: Automode) {
         this.automode = automode
-        automodeHandler.messages.onNext(Message(Date().toString()+":Really in vehicle"))
+         logger.info("Really in vehicle")
     }
 
     override fun next() {
@@ -27,7 +28,7 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
         var locationSubscription: Disposable? = null
         locationSubscription = filterer.locationOutputWithAccuracy.subscribe {
             if (!disabled) {
-                automodeHandler.messages.onNext(Message(Date().toString() + ":Speed of ${it.speed} reached with ${it.accuracy} of accuracy"))
+                logger.info(Date().toString() + ":Speed of ${it.speed} reached with ${it.accuracy} of accuracy", function = "fun next()")
                 locationSubscription?.dispose()
 
                 if (!automode.states.containsKey(AutomodeHandler.State.DRIVING)) {

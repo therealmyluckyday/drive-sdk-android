@@ -15,6 +15,7 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
     private val automodeHandler: AutomodeHandler by inject()
     private val filterer: SpeedFilter by inject()
 
+    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
     private var automode: Automode
     private var disabled = false
 
@@ -22,7 +23,7 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
         this.automode = automode
 
         //log(automode.autoModeTracker.context, "Tracking state")
-        automodeHandler.messages.onNext(Message(Date().toString()+":Tracking state"))
+        logger.info(Date().toString()+":Tracking state")
     }
 
     override fun next() {
@@ -34,10 +35,10 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
             activitySubscription?.dispose()
             tracker.stopActivityScanning()
             var subscription: Disposable? = null
-            automodeHandler.messages.onNext(Message(Date().toString() + " : In vehicle according to Activity Recognition Client"))
+            logger.info(Date().toString() + " : In vehicle according to Activity Recognition Client", function = "fun next()")
             subscription = filterer.locationOutputWhatEverTheAccuracy.subscribe {
 
-                automodeHandler.messages.onNext(Message(Date().toString() + ":Speed of ${it.speed} reached"))
+                logger.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun next()")
                 subscription?.dispose()
 
                 if (!automode.states.containsKey(AutomodeHandler.State.IN_VEHICLE)) {

@@ -11,7 +11,8 @@ internal class LogImpl : Log {
     internal var file: String? = null
 
     override fun print(description: String, type: LogType, function: String) {
-        val logDetail = LogMessage(description, type, file, function)
+        val className = if (file != null) file!!.splitToSequence(".").last() else "Unknown"
+        val logDetail = LogMessage(description, type, className, function)
         logSubject.onNext(logDetail)
     }
 

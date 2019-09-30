@@ -14,6 +14,7 @@ private const val TRIP_ID = "TRIP_ID"
 
 class TripManager : KoinComponentCallbacks{
 
+    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
     private val automodeHandler: AutomodeHandler by inject()
    // companion object {
         internal fun tripId(context: Context): TripId? {
@@ -27,7 +28,8 @@ class TripManager : KoinComponentCallbacks{
 
             } else {
                 val uuid = TripId(UUID.randomUUID().toString().toUpperCase(Locale.US))
-                automodeHandler.messages.onNext(Message("${Date()} Generating new trip : ${uuid.value}"))
+                logger.info("${Date()} Generating new trip : ${uuid.value}", function = "fun tripId(context: Context): TripId?")
+
                 prefs.edit().putString(TRIP_ID, uuid.toJson()).apply()
                 return uuid
             }
@@ -36,7 +38,7 @@ class TripManager : KoinComponentCallbacks{
         internal fun removeTripId(context: Context) {
             val prefs = context.getSharedPreferences(TRIP_ID, Context.MODE_PRIVATE)
             if (prefs.contains(TRIP_ID)) {
-                automodeHandler.messages.onNext(Message("${Date()} Removing trip id"))
+                logger.info("${Date()} Removing trip id", function = "fun tripId(context: Context): TripId?")
                 prefs.edit().clear().apply()
             }
         }

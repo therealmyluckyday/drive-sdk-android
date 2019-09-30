@@ -29,7 +29,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
 
     constructor(automode: Automode) {
         this.automode = automode
-        automodeHandler.messages.onNext(Message(Date().toString()+":Now driving..."))
+        logger.info("${Date()} DrivingState : ${Date().toString()} Now driving...")
             lastMvtTime = System.currentTimeMillis()
             lastGpsTime = System.currentTimeMillis()
         watchGPS()

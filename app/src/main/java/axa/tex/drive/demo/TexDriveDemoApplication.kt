@@ -48,6 +48,12 @@ class TexDriveDemoApplication : Application() {
 
 
         val autoModeHandler = service?.automodeHandler()
+
+        service?.logStream()?.subscribeOn(Schedulers.io())?.subscribe({ it ->
+            log(applicationContext, "[" + java.util.Calendar.getInstance() + "][" + it.file + "][" + it.function + "]" + it.description + "\n")
+        })
+
+
         autoModeHandler?.state?.subscribe {driving ->
             if (driving) {
                 if (!tripRecorder?.isRecording()!!) {
@@ -93,9 +99,6 @@ class TexDriveDemoApplication : Application() {
            // Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
         }
 
-        autoModeHandler?.messages?.subscribeOn(Schedulers.io()).subscribe {
-            log(applicationContext, "${it.txt}+\n")
-        }
 
     }
 

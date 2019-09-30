@@ -150,7 +150,7 @@ internal class LocationSensor : TexSensor, LocationListener , KoinComponentCallb
                             it.altitude.toDouble(),
                             it.time)
                     fixProducer.onNext(listOf(locationFix))
-                    automode.autoModeHandler.messages.onNext(Message("${Date().toString()} Got new location fix "))
+                    LOGGER.info("${Date().toString()} Got new location fix ", "private fun enableTracking(track: Boolean)")
                 }
             }
             //============================================================================================================================
