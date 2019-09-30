@@ -18,17 +18,17 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-internal class FixWorkerCron() : Worker(), KoinComponentCallbacks{
+internal class FixWorkerCron() : Worker(), KoinComponentCallbacks {
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     var fixUploadWork: OneTimeWorkRequest? = null
     private var done = false
-   private  lateinit var collectorDb: CollectionDb
-   private  lateinit  var persistentQueue : PersistentQueue
+    private lateinit var collectorDb: CollectionDb
+    private lateinit var persistentQueue: PersistentQueue
 
     override fun doWork(): WorkerResult {
-    val collectorDb :  CollectionDb by inject()
+        val collectorDb: CollectionDb by inject()
         this.collectorDb = collectorDb
-    persistentQueue = PersistentQueue(applicationContext)
+        persistentQueue = PersistentQueue(applicationContext)
         val inputData: Data = inputData
 
         val result = sendFixes(inputData)
@@ -46,7 +46,6 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks{
     private fun sendFixes(inputData: Data): Boolean {
 
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
-       // val data = inputData.keyValueMap
         val appName = inputData.getString(Constants.APP_NAME_KEY, "")
         val clientId = inputData.getString(Constants.CLIENT_ID_KEY, "")
         val id = inputData.getString(Constants.ID_KEY, "")
@@ -56,32 +55,32 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks{
 
         var packetNumber = collectorDb.getPacketNumber(tripId)
 
-        var packet = persistentQueue.pop(tripId,appName, clientId,packetNumber.toString(), false)
-        if(packet == null){
-            packet = persistentQueue.pop(tripId,appName, clientId,packetNumber.toString(), true)
+        var packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString(), false)
+        if (packet == null) {
+            packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString(), true)
         }
         var res = false
-        if(packet != null){
+        if (packet != null) {
             done = packet.end
             res = sendData(id, packet.data!!, appName, clientId)
-            if(res){
+            if (res) {
                 persistentQueue.delete(packet)
-                if(!done){
-                collectorDb.setPacketNumber(tripId, packetNumber+1)
-                packetNumber = collectorDb.getPacketNumber(tripId)
-                packet = persistentQueue.pop(tripId,appName, clientId,packetNumber.toString(), false)
-                if(packet == null){
-                    packet = persistentQueue.pop(tripId,appName, clientId,packetNumber.toString(), true)
-                }
+                if (!done) {
+                    collectorDb.setPacketNumber(tripId, packetNumber + 1)
+                    packetNumber = collectorDb.getPacketNumber(tripId)
+                    packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString(), false)
+                    if (packet == null) {
+                        packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString(), true)
+                    }
 
-                if(packet != null) {
-                    val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build()
-                    val fixUploadWork = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(inputData).setConstraints(constraints)
-                            .build()
-                    WorkManager.getInstance().enqueue(fixUploadWork)
-                }
-                }else if(!done){
+                    if (packet != null) {
+                        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+                                .build()
+                        val fixUploadWork = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(inputData).setConstraints(constraints)
+                                .build()
+                        WorkManager.getInstance().enqueue(fixUploadWork)
+                    }
+                } else if (!done) {
                     Thread.sleep(3000)
                     val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
                             .build()
@@ -91,7 +90,7 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks{
                 }
 
             }
-        }else if(!done){
+        } else if (!done) {
             Thread.sleep(3000)
             val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
                     .build()
@@ -109,10 +108,9 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks{
     private fun sendData(id: String, data: String, appName: String, clientId: String): Boolean {
 
         try {
-           // val collectorDb: CollectionDb by inject()
-           val config = collectorDb.getConfig()
-            var platform : Platform = Platform.PREPROD
-            if(config != null){
+            val config = collectorDb.getConfig()
+            var platform: Platform = Platform.PREPROD
+            if (config != null) {
                 platform = config.endPoint!!
             }
 
@@ -123,7 +121,6 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks{
             val url = URL(platformToHostConverter.getHost() + "/data")
 
             val uid = DeviceInfo.getUid(applicationContext);
-            //val appName = config?.appName
 
 
             val urlConnection: HttpURLConnection
@@ -134,9 +131,6 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks{
             urlConnection.setRequestProperty("Content-Encoding", "gzip")
             if (uid != null) {
                 urlConnection.addRequestProperty("X-UserId", uid)
-                /*if (authToken != null) {
-                    urlConnection.addRequestProperty("X-AuthToken", authToken)
-                }*/
             }
             urlConnection.addRequestProperty("X-AppKey", appName)
             urlConnection.connect()
@@ -159,7 +153,7 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks{
             } else {
                 LOGGER.info("SENDING : SUCCEEDED CODE = ${urlConnection.responseCode}")
                 val trip = collectorDb.getPendingTrip(id)
-                if(trip != null) {
+                if (trip != null) {
                     collectorDb.deletePendingTrip(id)
                     if (trip.containsStop) {
                         val collector: Collector by inject()

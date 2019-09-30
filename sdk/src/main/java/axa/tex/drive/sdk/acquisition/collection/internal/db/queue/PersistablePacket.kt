@@ -1,17 +1,17 @@
 package axa.tex.drive.sdk.acquisition.collection.internal.db.queue
 
-class PersistablePacket : Comparable<PersistablePacket>{
+class PersistablePacket : Comparable<PersistablePacket> {
 
-    var tripId : String? = null
-    var appName : String? = null
-    var clientId : String? = null
-    var data : String? = null
-    var packetNumber : Int = 0
-    var end : Boolean = false
+    var tripId: String? = null
+    var appName: String? = null
+    var clientId: String? = null
+    var data: String? = null
+    var packetNumber: Int = 0
+    var end: Boolean = false
 
     constructor()
 
-    constructor(tripId : String,appName : String, clientId : String, data : String, packetNumber: Int, end:Boolean){
+    constructor(tripId: String, appName: String, clientId: String, data: String, packetNumber: Int, end: Boolean) {
         this.tripId = tripId
         this.appName = appName
         this.clientId = clientId

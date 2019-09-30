@@ -5,29 +5,28 @@ import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import org.koin.android.ext.android.inject
 import java.io.*
-import java.nio.file.Files.isDirectory
 
 
+private const val SEP: String = "$"
 
- private const val SEP : String  = "$"
+class PersistentQueue : KoinComponentCallbacks {
 
-class PersistentQueue : KoinComponentCallbacks{
-
-    var  context : Context
+    var context: Context
     private var collectorDb: CollectionDb? = null
 
-    constructor(context: Context){
+    constructor(context: Context) {
         this.context = context
 
         val collectorDb: CollectionDb by inject()
         this.collectorDb = collectorDb
     }
 
-    private fun buildFileName(appName : String, clientId : String) : String{
+    private fun buildFileName(appName: String, clientId: String): String {
         return "$appName$SEP$clientId"
     }
 
-    @Synchronized internal fun enqueue(tripId : String, appName : String, clientId : String, data : String, endOftTrip: Boolean){
+    @Synchronized
+    internal fun enqueue(tripId: String, appName: String, clientId: String, data: String, endOftTrip: Boolean) {
 
         try {
             val rootPath = context.filesDir
@@ -36,11 +35,8 @@ class PersistentQueue : KoinComponentCallbacks{
             if (!root.exists()) {
                 root.mkdirs()
             }
-
-            //val packetNumber = collectorDb?.getPacketNumber(tripId)
             val number = collectorDb?.getNumberPackets(tripId)
-           //val number = root.list().size+1
-            val f = File(rootPath + "$tripId$SEP${buildFileName(appName,clientId)}$SEP$number$SEP$endOftTrip")
+            val f = File(rootPath + "$tripId$SEP${buildFileName(appName, clientId)}$SEP$number$SEP$endOftTrip")
             if (f.exists()) {
                 f.delete()
             }
@@ -77,7 +73,7 @@ class PersistentQueue : KoinComponentCallbacks{
         return ""
     }
 
-    internal fun pop(tripId : String, appName : String, clientId: String, packetNumber : String, endOftTrip: Boolean):PersistablePacket?{
+    internal fun pop(tripId: String, appName: String, clientId: String, packetNumber: String, endOftTrip: Boolean): PersistablePacket? {
         try {
             val rootPath = context.filesDir
                     .absolutePath + "/TEX/$tripId/"
@@ -86,12 +82,12 @@ class PersistentQueue : KoinComponentCallbacks{
             val data = readFromFileInputStream(fin)
             fin.close()
             return PersistablePacket(tripId, appName, clientId, data, packetNumber.toInt(), endOftTrip)
-        }catch (e : Exception){
+        } catch (e: Exception) {
             return null
         }
     }
 
-    internal fun deleteTrip(tripId : String) : Boolean{
+    internal fun deleteTrip(tripId: String): Boolean {
         val rootPath = context.filesDir
                 .absolutePath + "/TEX/$tripId/"
         val dir = File(rootPath)
@@ -106,41 +102,22 @@ class PersistentQueue : KoinComponentCallbacks{
         fileOrDirectory.delete()
     }
 
-    /*fun listTrips() : List<PersistablePacket>{
-        val persistablePackets = mutableListOf<PersistablePacket>()
-        val rootPath = context.filesDir
-                .absolutePath + "/TEX/"
-        val root = File(rootPath)
-        val files = root.list()
-        for(file in files){
-            var tab = file.split(SEP)
-            if(tab.size >= 3){
-                val tripId = tab[0]
-                val appName = tab[1]
-                val clientId = tab[2]
-                val packet = pop(tripId, appName, clientId)
-                persistablePackets.add(packet)
-            }
-        }
-        return persistablePackets
-    }*/
-
-    private fun listTrips(tripId: String) : List<PersistablePacket>{
+    private fun listTrips(tripId: String): List<PersistablePacket> {
         val persistablePackets = mutableListOf<PersistablePacket>()
         val rootPath = context.filesDir
                 .absolutePath + "/TEX/$tripId"
         val root = File(rootPath)
         val files = root.list()
-        for(file in files){
+        for (file in files) {
             var tab = file.split(SEP)
-            if(tab.size >= 3){
+            if (tab.size >= 3) {
                 val tripId = tab[0]
                 val appName = tab[1]
                 val clientId = tab[2]
                 val packetNumber = tab[3]
                 val endOftTrip = tab[4].toBoolean()
                 val packet = pop(tripId, appName, clientId, packetNumber, endOftTrip)
-                if(packet != null) {
+                if (packet != null) {
                     persistablePackets.add(packet)
                 }
             }
@@ -148,25 +125,23 @@ class PersistentQueue : KoinComponentCallbacks{
         return persistablePackets
     }
 
-    internal fun tripExists(tripId: String): Boolean{
+    internal fun tripExists(tripId: String): Boolean {
         val rootPath = context.filesDir
                 .absolutePath + "/TEX/$tripId"
         val root = File(rootPath)
         return root.exists()
     }
 
-    internal fun next(tripId : String) : PersistablePacket?{
-
+    internal fun next(tripId: String): PersistablePacket? {
         val packets = listTrips(tripId)
-        if(packets != null && packets.isNotEmpty()){
+        if (packets != null && packets.isNotEmpty()) {
             return packets.sorted().first()
         }
         return null
     }
 
 
-    internal fun delete(packet: PersistablePacket){
-
+    internal fun delete(packet: PersistablePacket) {
         try {
             val rootPath = context.filesDir
                     .absolutePath + "/TEX/${packet.tripId}/"
@@ -175,19 +150,19 @@ class PersistentQueue : KoinComponentCallbacks{
                 root.mkdirs()
             }
             val number = packet.packetNumber
-            val appName : String = packet.appName!!
-            val clientId : String = packet.clientId!!
-            val f = File(rootPath + "${packet.tripId}$SEP${buildFileName(appName,clientId)}$SEP$number$SEP${packet.end}")
+            val appName: String = packet.appName!!
+            val clientId: String = packet.clientId!!
+            val f = File(rootPath + "${packet.tripId}$SEP${buildFileName(appName, clientId)}$SEP$number$SEP${packet.end}")
             if (f.exists()) {
                 f.delete()
             }
 
-        }catch (e : Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
-        }
+    }
 
-    fun numberOfPendingPacket(tripId: String) : Int{
+    fun numberOfPendingPacket(tripId: String): Int {
         try {
             val rootPath = context.filesDir
                     .absolutePath + "/TEX/$tripId/"
@@ -195,14 +170,10 @@ class PersistentQueue : KoinComponentCallbacks{
             if (!root.exists()) {
                 root.mkdirs()
             }
-           return root.list().size
-        }catch (e : Exception){
+            return root.list().size
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         return 0
     }
-
-
-
-
-    }
+}

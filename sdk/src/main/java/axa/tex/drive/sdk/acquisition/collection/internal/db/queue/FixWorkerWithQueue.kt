@@ -1,9 +1,9 @@
 package axa.tex.drive.sdk.acquisition.collection.internal.db.queue
 
 
-import androidx.work.*
+import androidx.work.Data
+import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.TripRecorder
-import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.collection.internal.Collector
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
@@ -20,9 +20,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
-internal class FixWorkerWithQueue() : Worker(), KoinComponentCallbacks{
+internal class FixWorkerWithQueue() : Worker(), KoinComponentCallbacks {
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
-    val persistentQueue : PersistentQueue by inject()
+    val persistentQueue: PersistentQueue by inject()
     val tripRecoder: TripRecorder by inject()
 
     companion object {
@@ -48,96 +48,49 @@ internal class FixWorkerWithQueue() : Worker(), KoinComponentCallbacks{
 
     private fun sendFixes(inputData: Data): Boolean {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
-       // val data = inputData.keyValueMap
         val appName = inputData.getString(Constants.APP_NAME_KEY, "")
         val clientId = inputData.getString(Constants.CLIENT_ID_KEY, "")
         val id = inputData.getString(Constants.ID_KEY, "")
-        //val data = inputData.getString(Constants.DATA_KEY, "")
-
         val tripId = inputData.getString("tripId", "")
-        //val persistentQueue = PersistentQueue(applicationContext)
-
         var packet = persistentQueue.next(tripId)
 
         LOGGER.info("COLLECTOR_WORKER SIZE :", inputData.keyValueMap.size.toString())
-        /*for ((id, value) in data) {
-            LOGGER.info(FIX_SENDER_TAG, value as String)
-            return sendData(id, value as String, appName, clientId)
-        }*/
-        //return sendData(id, data, appName, clientId)
-        if(packet!= null) {
+        if (packet != null) {
             var stop = false
-            while(!stop) {
+            while (!stop) {
                 if (packet != null) {
                     val res = sendData(id, tripId, packet?.data!!, appName, clientId)
                     if (res) {
                         persistentQueue.delete(packet)
                         val rest = persistentQueue.numberOfPendingPacket(tripId)
-                       // tripRecoder.packetListener().onNext(rest)
                     }
-                        /*if(rest > 0) {
-                    val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)A
-                            .build()
-                    val data: Data = Data.Builder().putString(Constants.ID_KEY, id).putString(Constants.APP_NAME_KEY, appName).putString(Constants.CLIENT_ID_KEY, clientId).putString("tripId", tripId).build()
-                    val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorkerWithQueue::class.java).setInputData(data).setConstraints(constraints)
-                            .build()
-                    WorkManager.getInstance().enqueue(fixUploadWork)
-                }*/
-
                     if (packet != null) {
                         stop = packet.end
                     }
-                    }
-
-
+                }
 
                 packet = persistentQueue.next(tripId)
             }
             try {
                 persistentQueue.deleteTrip(tripId)
-            }catch (e : Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
 
             return true
-            /*if(stop && packet != null){
-                val res = sendData(id, tripId, packet?.data!!, appName, clientId)
-                if (res) {
-                    persistentQueue.delete(packet)
-                    val rest = persistentQueue.numberOfPendingPacket(tripId)
-                    tripRecoder.packetListener().onNext(rest)
-                }
-                return res
-            }*/
-
-           // return res
-            //return false
-
-        }else{
-            return false
         }
         return false
     }
 
 
     @Throws(IOException::class)
-    private fun sendData(id: String, tripId : String, data: String, appName: String, clientId: String): Boolean {
-        //tripRecoder.packetListener().onNext(persistentQueue.numberOfPendingPacket(tripId))
-
+    private fun sendData(id: String, tripId: String, data: String, appName: String, clientId: String): Boolean {
         try {
             val collectorDb: CollectionDb by inject()
-           // val config = collectorDb.getConfig()
-
-
             val scoreRetriever: ScoreRetriever by inject()
-
             val platformToHostConverter = PlatformToHostConverter(Platform.PREPROD);
             val url = URL(platformToHostConverter.getHost() + "/data")
-
             val uid = DeviceInfo.getUid(applicationContext);
-            //val appName = config?.appName
-
-
             val urlConnection: HttpURLConnection
             urlConnection = url.openConnection() as HttpURLConnection
             urlConnection.doOutput = true
@@ -146,16 +99,13 @@ internal class FixWorkerWithQueue() : Worker(), KoinComponentCallbacks{
             urlConnection.setRequestProperty("Content-Encoding", "gzip")
             if (uid != null) {
                 urlConnection.addRequestProperty("X-UserId", uid)
-                /*if (authToken != null) {
-                    urlConnection.addRequestProperty("X-AuthToken", authToken)
-                }*/
             }
             urlConnection.addRequestProperty("X-AppKey", appName)
             try {
                 urlConnection.connect()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 return false
-            }catch (t : Throwable){
+            } catch (t: Throwable) {
                 return false
             }
 
@@ -179,7 +129,7 @@ internal class FixWorkerWithQueue() : Worker(), KoinComponentCallbacks{
 
                 LOGGER.info("SENDING : SUCCEEDED CODE = ${urlConnection.responseCode}")
                 val trip = collectorDb.getPendingTrip(id)
-                if(trip != null) {
+                if (trip != null) {
                     collectorDb.deletePendingTrip(id)
                     if (trip.containsStop) {
                         val collector: Collector by inject()
