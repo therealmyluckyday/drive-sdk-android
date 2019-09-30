@@ -63,7 +63,7 @@ internal class FixProcessor : KoinComponentCallbacks {
 
 
     @Synchronized
-    fun addFixes(/*context : Context,*/fixes: List<Fix>) {
+    fun addFixes(fixes: List<Fix>) {
 
         val model = DeviceInfo.getDeviceName()
         val os: String = DeviceInfo.getOSVersion()

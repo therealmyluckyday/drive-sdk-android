@@ -1,10 +1,10 @@
 package axa.tex.drive.sdk.automode.internal.states
 
-import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.automode.internal.tracker.model.Message
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
+import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.disposables.Disposable
 import org.koin.android.ext.android.inject
 import java.util.*

@@ -1,14 +1,14 @@
 package axa.tex.drive.sdk.acquisition
 
-import android.Manifest
 import android.app.Notification
-import android.content.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
-import android.support.v4.app.ActivityCompat
 import axa.tex.drive.sdk.acquisition.collection.internal.Collector
 import axa.tex.drive.sdk.acquisition.collection.internal.CollectorService
 import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
@@ -16,17 +16,14 @@ import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
-import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
-import axa.tex.drive.sdk.automode.internal.tracker.model.Message
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.utils.TripManager
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
@@ -36,15 +33,13 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private var collector: Collector
     private var myCustomNotification : Notification? = null
     private val automodeHandler: AutomodeHandler by inject()
-
     private var mCurrentLocation : Location? = null
     private var mCurrentDistance: Double = 0.toDouble()
     private var mCurrentSpeed: Int = 0
-    private  var start : Long  = 0
-    private  var disposable : Disposable
-
+    private var start : Long  = 0
+    private var disposable : Disposable
     private val tripProgress = PublishSubject.create<TripProgress>()
-
+    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
 
     override fun setCustomNotification(customNotification: Notification?) {
         myCustomNotification = customNotification
@@ -82,17 +77,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             val progress = TripProgress(getCurrentTripId()!!,it,mCurrentSpeed,mCurrentDistance,duration)
             tripProgress.onNext(progress)
         }
-
-     /*   autoModeTracker.locations.subscribe {
-            var deltaDistance = 0.0
-            if (mCurrentLocation != null) { // this is not the first point GPS received
-                deltaDistance = (mCurrentLocation!!.distanceTo(it) / 1000).toDouble() // Km
-            }else{
-                mCurrentLocation = it
-            }
-            mCurrentDistance += deltaDistance
-            mCurrentSpeed = (it.speed * 3.6).toInt() // km/h
-        }*/
     }
 
     @Throws(PermissionException::class)
@@ -120,7 +104,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
     override fun startTrip(startTime: Long) : TripId?{
         start = startTime
-        automodeHandler.messages.onNext(Message("${Date()} TripRecorder : Start tracking."))
+
         requestForLocationPermission()
         val tripManager : TripManager by inject()
         tripManager.removeTripId(context)
@@ -134,7 +118,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             context.startService(serviceIntent)
         }
 
-        //FixProcessor.startTrip(context)
         fixProcessor?.startTrip(startTime)
 
         return tripManager.tripId(context)
@@ -142,7 +125,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
     override fun stopTrip(endTime: Long) {
         requestForLocationPermission()
-        //FixProcessor.endTrip(context)
         fixProcessor?.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
         context.bindService(serviceIntent, object : ServiceConnection {
@@ -155,12 +137,11 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
             override fun onServiceDisconnected(componentName: ComponentName) {
             }
-        }, /*Context.BIND_AUTO_CREATE*/0);
+        }, 0);
         disposable.dispose()
     }
 
     override fun isRecording(): Boolean {
-        //return CollectorService.isRunning()
         return collector.recording
     }
 

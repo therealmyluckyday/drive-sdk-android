@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.automode.internal.tracker.model.Message
 import axa.tex.drive.sdk.automode.internal.service.AutomodeService
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import io.reactivex.subjects.PublishSubject
@@ -13,7 +12,6 @@ import org.koin.android.ext.android.inject
 
 class AutomodeHandler : KoinComponentCallbacks{
      val state: PublishSubject<Boolean> = PublishSubject.create()
-     val messages : PublishSubject<Message> = PublishSubject.create()
      var running = false
      val speedListener : SpeedFilter by inject()
 

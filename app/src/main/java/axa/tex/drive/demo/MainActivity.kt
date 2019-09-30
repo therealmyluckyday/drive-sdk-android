@@ -17,18 +17,12 @@ import android.view.View
 import androidx.work.WorkManager
 import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
-
-
-
-
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-
     private var tripRecorder: TripRecorder? = null
     //private var config: TexConfig? = null
 

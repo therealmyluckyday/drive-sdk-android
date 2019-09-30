@@ -24,34 +24,25 @@ class MotionBuffer {
     internal var motionPeriodAfterAcceleration: Long = DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION
 
     @Synchronized fun addFix(fix: MotionFix?) {
-        //synchronized(buffer) {
             if (fix != null) {
                 buffer.add(fix)
-           // }
-            // val currentDate = System.currentTimeMillis()
             while (buffer.size > 0 && ((buffer.last().timestamp() - buffer.first().timestamp()) > olderMotionAge)) {
-                //buffer.removeFirst()
                 buffer.removeAt(0)
             }
         }
 
         cleanBuffer()
 
-        logger.info("NUMBER OF MOTIONS : ${buffer.size}")
     }
 
 
     @Synchronized fun flush(): List<Fix> {
-        //synchronized(buffer) {
-            //val currentDate = System.currentTimeMillis()
             while (buffer.size > 0 && ((buffer.last().timestamp() - buffer.first().timestamp()) > olderMotionAge)) {
-                //buffer.removeFirst()
                 buffer.removeAt(0)
             }
 
             while (buffer.size > 0 && ((buffer.first().timestamp() - buffer.last().timestamp()) > motionPeriodAfterAcceleration)) {
                 val last = buffer.size-1
-                //buffer.removeLast()
                 if(last > 0) {
                     buffer.removeAt(last)
                 }

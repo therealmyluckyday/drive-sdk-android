@@ -1,22 +1,21 @@
 package axa.tex.drive.sdk.automode.internal.states
 
 
-import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.automode.internal.tracker.model.Message
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
-import java.util.*
 
 internal class IdleState : AutomodeState, KoinComponentCallbacks{
 
     private var automode: Automode
     private var disabled = false
+    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
+
     constructor(automode: Automode){
         this.automode = automode
-        //log(automode.activityTracker.context,"Idle state")
         val automodeHandler : AutomodeHandler by inject()
-        automodeHandler.messages.onNext(Message(Date().toString()+":Idle state"))
     }
 
     override fun next() {

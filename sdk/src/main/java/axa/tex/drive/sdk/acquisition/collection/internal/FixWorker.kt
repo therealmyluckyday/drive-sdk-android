@@ -7,6 +7,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
+import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
@@ -18,11 +19,6 @@ import org.koin.android.ext.android.inject
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-
-import androidx.work.WorkStatus
-import axa.tex.drive.sdk.automode.AutomodeHandler
-import axa.tex.drive.sdk.automode.internal.tracker.model.Message
-import java.util.*
 import java.util.concurrent.ExecutionException
 
 

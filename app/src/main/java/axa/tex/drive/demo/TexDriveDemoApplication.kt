@@ -3,36 +3,34 @@ package axa.tex.drive.demo
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
-import android.widget.Toast
-import axa.tex.drive.sdk.acquisition.PermissionException
-import axa.tex.drive.sdk.acquisition.TripRecorder
-import axa.tex.drive.sdk.automode.AutomodeHandler
-import axa.tex.drive.sdk.core.Platform
-import axa.tex.drive.sdk.core.TexConfig
-import axa.tex.drive.sdk.core.TexService
-import java.util.*
-import android.graphics.BitmapFactory
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
+import android.widget.Toast
+import axa.tex.drive.sdk.acquisition.PermissionException
+import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.TripId
+import axa.tex.drive.sdk.core.Platform
+import axa.tex.drive.sdk.core.TexConfig
+import axa.tex.drive.sdk.core.TexService
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 
 
 class TexDriveDemoApplication : Application() {
 
+    private val ID = 1234
+    private var config: TexConfig? = null
+    private var myTripId : TripId? = null
     internal  val CHANNEL_ID = "tex-channel-id"
     internal  val CHANNEL_NAME = "Notification"
-    private val ID = 1234
-
     var tripRecorder: TripRecorder? = null
-    private var config: TexConfig? = null
     var service: TexService? = null
     lateinit var notificationManager: NotificationManager
-    private var myTripId : TripId? = null
 
     override fun onCreate() {
         super.onCreate()

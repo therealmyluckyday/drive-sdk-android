@@ -7,21 +7,15 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.automode.internal.Automode
+import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
+import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-
-import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
-import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
-import axa.tex.drive.sdk.automode.internal.tracker.model.Message
-
-import axa.tex.drive.sdk.core.TexConfig
-import axa.tex.drive.sdk.core.TexService
-import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import java.util.*
 
 
