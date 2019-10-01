@@ -12,7 +12,6 @@ import android.os.IBinder
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import axa.tex.drive.sdk.R
-import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.core.TexConfig
@@ -26,7 +25,6 @@ private const val NOTIFICATION_ID = 7071
 
 internal class CollectorService : Service() {
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
-
     private val binder = LocalBinder()
     private var collector: Collector? = null;
 
@@ -56,12 +54,11 @@ internal class CollectorService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        //val collectorDb = CollectionDb(applicationContext)
         val collectorDb: CollectionDb by inject()
 
 
         try {
-            if(collectorDb == null) {
+            if (collectorDb == null) {
                 try {
                     StandAloneContext.stopKoin()
                     TexConfig.setupKoin(applicationContext)
@@ -69,7 +66,7 @@ internal class CollectorService : Service() {
                     e.printStackTrace()
                 }
             }
-        }catch (e : IllegalStateException){
+        } catch (e: IllegalStateException) {
             try {
                 StandAloneContext.stopKoin()
                 TexConfig.setupKoin(applicationContext)
@@ -77,10 +74,6 @@ internal class CollectorService : Service() {
                 e.printStackTrace()
             }
         }
-
-        //val config = collectorDb.getConfig()
-
-        //TexConfig.init(applicationContext, config)
         val collector: Collector by inject()
         this.collector = collector
         collector.startCollecting()
@@ -103,33 +96,26 @@ internal class CollectorService : Service() {
             this.startForeground(NOTIFICATION_ID, notification)
         }
 
-        /*running = true
-        if (tripId == null) {
-            tripId = Utils.tripId(applicationContext)//UUID.randomUUID().toString().toUpperCase(Locale.US)
-        }*/
-
-
-
         try {
             scoreRetriever.getAvailableScoreListener().subscribe { tripId ->
                 scoreRetriever.getScoreListener().subscribe { scoreResult ->
-                    if(scoreResult.scoreDil == null){
+                    if (scoreResult.scoreDil == null) {
                         LOGGER.info("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "onStartCommand")
-                    }else{
+                    } else {
                         LOGGER.info("The retrieved score : ${scoreResult.scoreDil.toJson()}", "onStartCommand")
                     }
 
                 }
                 Thread {
                     Thread.sleep(10000)
-                    tripId?.let { scoreRetriever.retrieveScore(it) } }.start()
+                    tripId?.let { scoreRetriever.retrieveScore(it) }
+                }.start()
             }
         } catch (e: Exception) {
             e.printStackTrace()
         } catch (err: Error) {
             err.printStackTrace()
         }
-
 
         return START_STICKY
     }
@@ -141,8 +127,6 @@ internal class CollectorService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             stopForeground(true)
         }
-        //running = false
         collector?.recording = false
     }
-
 }

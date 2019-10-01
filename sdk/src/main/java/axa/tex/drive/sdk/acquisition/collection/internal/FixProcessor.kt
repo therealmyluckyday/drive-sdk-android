@@ -4,9 +4,6 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 import android.content.Context
 import androidx.work.*
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.FixWorkerCron
-import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.FixWorkerWithQueue
-import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.PersistentQueue
 import axa.tex.drive.sdk.acquisition.model.Event
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.FixPacket
@@ -24,27 +21,22 @@ private const val DEFAULT_PACKET_SIZE = 50
 
 internal class FixProcessor : KoinComponentCallbacks {
 
+    private val buffer = mutableListOf<Fix>()
+    private var packetSize: Int = DEFAULT_PACKET_SIZE
+    private var tripEnded = false
     private var context: Context
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private var tripStart: Boolean = false
-
-    private val tripManager : TripManager by inject()
+    private val tripManager: TripManager by inject()
 
 
     constructor(context: Context) {
         this.context = context
     }
 
-
-    private val buffer = mutableListOf<Fix>()
-    private var packetSize: Int = DEFAULT_PACKET_SIZE;
-    private var tripEnded = false;
-
-
     fun setPacketSize(packetSize: Int) {
         this.packetSize = packetSize
     }
-
 
 
     fun startTrip(startTime: Long) {
@@ -76,14 +68,13 @@ internal class FixProcessor : KoinComponentCallbacks {
             buffer.add(fix)
             if (buffer.size >= packetSize || tripEnded || tripStart) {
                 tripStart = false
-                LOGGER.info("SENDING : NEW PACKET DETECTED", function= "fun addFixes(fixes: List<Fix>)")
+                LOGGER.info("SENDING : NEW PACKET DETECTED", function = "fun addFixes(fixes: List<Fix>)")
                 val collectorDb: CollectionDb by inject()
 
                 val config = collectorDb.getConfig()
                 val appName = config?.appName
 
                 val clientId: String? = config?.clientId
-//beautyful
                 val theFixes = mutableListOf<Fix>();
                 theFixes.addAll(buffer)
                 if (clientId != null && appName != null && !appName.isEmpty() && !clientId.isEmpty()) {
@@ -91,27 +82,20 @@ internal class FixProcessor : KoinComponentCallbacks {
                             clientId)
                     LOGGER.info("SENDING : CONVERTING TO JSON", function = "fun addFixes(fixes: List<Fix>")
                     val json = packet?.toJson()
-                    if(Constants.EMPTY_PACKET == json){
+                    if (Constants.EMPTY_PACKET == json) {
                         buffer.clear()
                         return
                     }
 
                     LOGGER.info("SENDING : $json", function = "fun addFixes(fixes: List<Fix>")
                     val id = UUID.randomUUID().toString()
-/////////////////////////////////////////////////////////////////////////////////////////////
                     val nbPackets = collectorDb.getNumberPackets(tripId?.value!!)
-                    collectorDb.setNumberPackets(tripId.value, nbPackets+1)
+                    collectorDb.setNumberPackets(tripId.value, nbPackets + 1)
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////
 
                     LOGGER.info("SENDING : SETTING DATA", function = "fun addFixes(fixes: List<Fix>")
-                    val data: Data = Data.Builder().putString(Constants.ID_KEY, id).
-                            putString(Constants.DATA_KEY, json).
-                            putString(Constants.APP_NAME_KEY, appName).
-                            putString(Constants.CLIENT_ID_KEY, clientId).
-                            putInt(Constants.WORK_TAG_KEY,nbPackets).
-                            putString(Constants.TRIP_ID_KEY, tripId?.value).build()
+                    val data: Data = Data.Builder().putString(Constants.ID_KEY, id).putString(Constants.DATA_KEY, json).putString(Constants.APP_NAME_KEY, appName).putString(Constants.CLIENT_ID_KEY, clientId).putInt(Constants.WORK_TAG_KEY, nbPackets).putString(Constants.TRIP_ID_KEY, tripId?.value).build()
                     LOGGER.info("SENDING : DATA SET", function = "fun addFixes(fixes: List<Fix>")
                     LOGGER.info("PACKET DATA FOR WORKER MANAGER ${data.toString()}", function = "fun addFixes(fixes: List<Fix>")
                     buffer.clear()
@@ -120,46 +104,21 @@ internal class FixProcessor : KoinComponentCallbacks {
                             .build()
 
 
-
-                    val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorker::class.java).setInputData(data).addTag((nbPackets-1).toString()).setConstraints(constraints)
+                    val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorker::class.java).setInputData(data).addTag((nbPackets - 1).toString()).setConstraints(constraints)
                             .build()
-
-
-                    ////////////////////////////////////////////////////
-                   /* val persistentQueue : PersistentQueue by inject()
-                    if(!persistentQueue.tripExists(tripId!!.value)) {
-                        val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(data).setConstraints(constraints)
-                                .build()
-
-                        collectorDb.setPacketNumber(tripId.value, 1)
-                        collectorDb.setNumberPackets(tripId.value, 1)
-                        persistentQueue.enqueue(tripId.value, appName ,clientId,json, tripEnded)
-                        WorkManager.getInstance().enqueue(fixUploadWork)
-                    }else{
-
-                        val nbPackets = collectorDb.getNumberPackets(tripId.value)
-                        collectorDb.setNumberPackets(tripId.value, nbPackets+1)
-                        persistentQueue.enqueue(tripId.value, appName ,clientId,json, tripEnded)
-                    }*/
-                    ///////////////////////////////////////////////////
-
 
                     val pendingTrip = PendingTrip(id, tripId?.value, tripEnded)
                     tripEnded = false
                     collectorDb.saveTrip(pendingTrip)
 
                     LOGGER.info("SENDING : ENQUEUING", function = "fun addFixes(fixes: List<Fix>")
-                  //  val workContinuation = tripId?.value?.let { WorkManager.getInstance().beginUniqueWork(it,ExistingWorkPolicy.APPEND,fixUploadWork) }
-                    //workContinuation?.enqueue()
-
-                   // LOGGER.info("SENDING : ENQUEUED")
                     WorkManager.getInstance().enqueue(fixUploadWork)
                 }
             }
         }
     }
 
-    fun processInOrder(fixes : List<Fix>){
+    fun processInOrder(fixes: List<Fix>) {
 
     }
 }

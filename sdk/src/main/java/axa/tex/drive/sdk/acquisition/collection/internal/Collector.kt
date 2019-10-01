@@ -7,16 +7,14 @@ import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
-
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 
-internal class Collector : KoinComponentCallbacks{
+internal class Collector : KoinComponentCallbacks {
 
     private val trackers: MutableList<Tracker>?
     val logger = LoggerFactory().getLogger(this::class.java.name)
@@ -31,12 +29,7 @@ internal class Collector : KoinComponentCallbacks{
 
     var fixData: Observable<List<Fix>>? = null
 
-    // internal companion object {
     val locations: PublishSubject<LocationFix> = PublishSubject.create()
-    /* fun locationObservable(): Observable<LocationFix> {
-         return locations
-     }*/
-    //}
 
     constructor(context: Context, trackers: MutableList<Tracker>?) {
         this.trackers = trackers
@@ -67,34 +60,12 @@ internal class Collector : KoinComponentCallbacks{
         tracker.enableTracking();
         fixData = tracker.provideFixProducer() as Observable<List<Fix>>
 
-        fixData?.subscribeOn( Schedulers.single())?.subscribe {fixes->
+        fixData?.subscribeOn(Schedulers.single())?.subscribe { fixes ->
             fixProcessor.addFixes(fixes)
             if (fixes.size == 1 && fixes[0] is LocationFix) {
                 locations.onNext(fixes[0] as LocationFix)
             }
         }
-
-       /* fixData?.subscribeOn(io.reactivex.schedulers.Schedulers.computation())?.subscribe { fixes ->
-
-            Thread {
-                fixProcessor.addFixes(fixes)
-                if (fixes.size == 1 && fixes[0] is LocationFix) {
-                    locations.onNext(fixes[0] as LocationFix)
-                }
-            }.start()
-            /*  if (fix is Fix) {
-                  if (fix is LocationFix) {
-                      locations.onNext(fix)
-                  }
-                  //Thread { FixProcessor.addFixes(context,listOf(fix)) }.start()
-                  Thread { fixProcessor.addFixes(context, listOf(fix)) }.start()
-              }
-
-              else {
-                  Thread { fixProcessor.addFixes(context, fix as List<Fix>) }.start()
-                  //Thread { FixProcessor.addFixes(context,fix as List<Fix>) }.start()
-              }*/
-        }*/
     }
 
     fun stopCollecting() {
@@ -105,8 +76,6 @@ internal class Collector : KoinComponentCallbacks{
             }
         }
         recording = false
-        //val tripManager : TripManager by inject()
-        //tripManager.removeTripId(context)
     }
 
     fun numberOfTrackers(): Int {

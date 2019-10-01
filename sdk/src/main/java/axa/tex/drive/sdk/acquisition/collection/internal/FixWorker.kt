@@ -22,7 +22,7 @@ import java.net.URL
 import java.util.concurrent.ExecutionException
 
 
-internal class FixWorker() : Worker(), KoinComponentCallbacks{
+internal class FixWorker() : Worker(), KoinComponentCallbacks {
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val automodeHandler: AutomodeHandler by inject()
 
@@ -36,11 +36,6 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
 
         val inputData: Data = inputData
         val tag = inputData.getInt(Constants.WORK_TAG_KEY, -1)
-       /*if(isRunning(tag.toString())){
-           LOGGER.info("Waiting for precedent packet to be sent...", "override fun doWork(): WorkerResult")
-          return  WorkerResult.RETRY
-       }*/
-
         val result = sendFixes(inputData)
 
         return if (result) {
@@ -78,16 +73,11 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
 
     private fun sendFixes(inputData: Data): Boolean {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
-       // val data = inputData.keyValueMap
         val appName = inputData.getString(Constants.APP_NAME_KEY, "")
         val clientId = inputData.getString(Constants.CLIENT_ID_KEY, "")
         val id = inputData.getString(Constants.ID_KEY, "")
         val data = inputData.getString(Constants.DATA_KEY, "")
         LOGGER.info("COLLECTOR_WORKER SIZE :$inputData.keyValueMap.size.toString()", "private fun sendFixes(inputData : Data) : Boolean")
-        /*for ((id, value) in data) {
-            LOGGER.info(FIX_SENDER_TAG, value as String)
-            return sendData(id, value as String, appName, clientId)
-        }*/
         return sendData(id, data, appName, clientId)
     }
 
@@ -97,9 +87,9 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
 
         try {
             val collectorDb: CollectionDb by inject()
-           val config = collectorDb.getConfig()
-            var platform : Platform = Platform.PRODUCTION
-            if(config != null){
+            val config = collectorDb.getConfig()
+            var platform: Platform = Platform.PRODUCTION
+            if (config != null) {
                 platform = config.endPoint!!
             }
 
@@ -113,9 +103,6 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
             LOGGER.info("SENDING DATA = ${data}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
 
             val uid = DeviceInfo.getUid(applicationContext);
-            //val appName = config?.appName
-
-
             val urlConnection: HttpURLConnection
             urlConnection = url.openConnection() as HttpURLConnection
             urlConnection.doOutput = true
@@ -124,52 +111,47 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks{
             urlConnection.setRequestProperty("Content-Encoding", "gzip")
             if (uid != null) {
                 urlConnection.addRequestProperty("X-UserId", uid)
-                /*if (authToken != null) {
-                    urlConnection.addRequestProperty("X-AuthToken", authToken)
-                }*/
             }
             urlConnection.addRequestProperty("X-AppKey", appName)
             urlConnection.connect()
             LOGGER.info("SENDING : SENDING DATA", "Fixworkfun sendData(id: String, data: String, appName: String, clientId: String): Booleaner doWork()")
             urlConnection.outputStream.write(data.compress())
             urlConnection.outputStream.close()
-            LOGGER.info("UPLOADING DATA/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean" )
+            LOGGER.info("UPLOADING DATA/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
             if (urlConnection.responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
-                LOGGER.error("SENDING : FAILED CODE = ${urlConnection.responseCode}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean" )
+                LOGGER.error("SENDING : FAILED CODE = ${urlConnection.responseCode}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
                 return when (urlConnection.responseCode) {
                     HttpURLConnection.HTTP_BAD_REQUEST -> {
-                        LOGGER.error("UPLOADING DATA ERROR/ RESPONSE CODE $urlConnection.responseCode","fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+                        LOGGER.error("UPLOADING DATA ERROR/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
                         // throw IOException()
                         true
                     }
-                    HttpURLConnection.HTTP_INTERNAL_ERROR ->{
+                    HttpURLConnection.HTTP_INTERNAL_ERROR -> {
                         LOGGER.error("UPLOADING DATA ERROR/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
 
                         false
                     }
                     else -> {
-                        //throw IOException()
-                        LOGGER.error("Exception","fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+                        LOGGER.error("Exception", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
                         true
                     }
                 }
             } else {
-                LOGGER.info("SENDING : SUCCEEDED CODE = ${urlConnection.responseCode}","fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+                LOGGER.info("SENDING : SUCCEEDED CODE = ${urlConnection.responseCode}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
                 val trip = collectorDb.getPendingTrip(id)
 
-                if(trip != null) {
-                    LOGGER.info("Packet sent successfully and trip id = ${trip.tripId} ","fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+                if (trip != null) {
+                    LOGGER.info("Packet sent successfully and trip id = ${trip.tripId} ", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
                     collectorDb.deletePendingTrip(id)
                     if (trip.containsStop) {
 
-                        LOGGER.info("Packet sent successfully and trip id = ${trip.tripId} stop = true",  "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+                        LOGGER.info("Packet sent successfully and trip id = ${trip.tripId} stop = true", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
                         val collector: Collector by inject()
                         collector.currentTripId = null
                         val tId = trip.tripId
-                        if(tId != null) {
-                           scoreRetriever.getAvailableScoreListener().onNext(tId)
+                        if (tId != null) {
+                            scoreRetriever.getAvailableScoreListener().onNext(tId)
                             collectorDb.deleteTripNumberPackets(tId)
-                          //  trip.tripId?.let { collectorDb.deleteTripNumberPackets(it) }
                         }
                     }
                 }

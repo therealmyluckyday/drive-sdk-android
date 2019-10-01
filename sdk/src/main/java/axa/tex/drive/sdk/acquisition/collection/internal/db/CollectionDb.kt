@@ -15,7 +15,6 @@ const val LAST_PACKET: String = "last-packet"
 const val NUMBER_PACKETS: String = "number-packets"
 
 
-
 internal class CollectionDb {
 
     private var context: Context?
@@ -37,7 +36,7 @@ internal class CollectionDb {
 
         val json = prefs?.getString(id, "")
         val mapper = ObjectMapper()
-        if(json == null || json.isEmpty()){
+        if (json == null || json.isEmpty()) {
             return null
         }
         val node = mapper.readTree(json);
@@ -96,7 +95,7 @@ internal class CollectionDb {
     }
 
     @Synchronized
-    internal fun setPacketNumber(trip : String, packetNumber : Int){
+    internal fun setPacketNumber(trip: String, packetNumber: Int) {
         val prefs =
                 context?.getSharedPreferences(LAST_PACKET, Context.MODE_PRIVATE)
         prefs?.edit()?.putInt(trip, packetNumber)?.apply()
@@ -104,7 +103,7 @@ internal class CollectionDb {
     }
 
     @Synchronized
-    internal fun getPacketNumber(trip : String) : Int{
+    internal fun getPacketNumber(trip: String): Int {
         val prefs =
                 context?.getSharedPreferences(LAST_PACKET, Context.MODE_PRIVATE)
         return prefs?.getInt(trip, -1)!!
@@ -112,7 +111,7 @@ internal class CollectionDb {
 
 
     @Synchronized
-    internal fun setNumberPackets(trip : String, packetNumber : Int){
+    internal fun setNumberPackets(trip: String, packetNumber: Int) {
         val prefs =
                 context?.getSharedPreferences(NUMBER_PACKETS, Context.MODE_PRIVATE)
         prefs?.edit()?.putInt(trip, packetNumber)?.apply()
@@ -120,14 +119,14 @@ internal class CollectionDb {
     }
 
     @Synchronized
-    internal fun getNumberPackets(trip : String) : Int{
+    internal fun getNumberPackets(trip: String): Int {
         val prefs =
                 context?.getSharedPreferences(NUMBER_PACKETS, Context.MODE_PRIVATE)
         return prefs?.getInt(trip, -1)!!
     }
 
     @Synchronized
-    internal fun deleteTripNumberPackets(trip : String){
+    internal fun deleteTripNumberPackets(trip: String) {
         val prefs =
                 context?.getSharedPreferences(NUMBER_PACKETS, Context.MODE_PRIVATE)
         prefs?.edit()?.clear()?.apply()
