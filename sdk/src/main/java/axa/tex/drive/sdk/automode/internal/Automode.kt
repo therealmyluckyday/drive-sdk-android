@@ -20,14 +20,14 @@ internal class Automode : KoinComponentCallbacks{
     internal constructor(activityTracker: TexActivityTracker){
         this.activityTracker = activityTracker
         this.currentState = IdleState(this)
-        if(!states.containsKey(currentState.sate())){
-            states[currentState.sate()] = currentState
+        if(!states.containsKey(currentState.state())){
+            states[currentState.state()] = currentState
         }
     }
 
     internal fun setCurrentState(currentState : AutomodeState){
-        if(!states.containsKey(currentState.sate())){
-            states[currentState.sate()] = currentState
+        if(!states.containsKey(currentState.state())){
+            states[currentState.state()] = currentState
         }
         this.currentState = currentState
 

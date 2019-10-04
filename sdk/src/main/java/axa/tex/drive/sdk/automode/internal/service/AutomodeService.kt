@@ -14,9 +14,9 @@ import android.support.v4.app.NotificationCompat
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.automode.AutomodeHandler
-import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.states.DrivingState
+import axa.tex.drive.sdk.core.TexConfig
 import org.koin.android.ext.android.inject
 
 
@@ -77,22 +77,20 @@ internal class AutomodeService : Service() {
 
 
     fun stopCollectorService() {
-
         stopSelf()
-
-
     }
 
-    private fun activateAutomode(){
+    private fun activateAutomode() {
         try {
             TexConfig.setupKoin(applicationContext)
-        }catch (e : Exception){}
+        } catch (e: Exception) {
+        }
 
         val automode: Automode by inject()
         val tripRecorder: TripRecorder by inject()
-        if(tripRecorder.isRecording()){
+        if (tripRecorder.isRecording()) {
             automode.setCurrentState(DrivingState(automode))
-        }else{
+        } else {
             automode.next()
         }
     }

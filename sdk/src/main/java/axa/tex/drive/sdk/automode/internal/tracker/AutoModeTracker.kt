@@ -11,16 +11,16 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.widget.Toast
-import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
+import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
+import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
+import axa.tex.drive.sdk.automode.internal.tracker.model.Where
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
-import axa.tex.drive.sdk.automode.internal.tracker.model.Where
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
@@ -30,7 +30,7 @@ private const val PENDING_INTENT_REQUEST_CODE = 484
 private const val ACTIVITY_DETECTION_INTERVAL = (10 * 1000).toLong()
 
 @SuppressLint("MissingPermission")
-internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinComponentCallbacks{
+internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinComponentCallbacks {
 
     private val locationManager: LocationManager
     internal val speedFilter: SpeedFilter by inject()
@@ -39,24 +39,18 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
     private lateinit var activityRecognitionClient: ActivityRecognitionClient
     private lateinit var pendingIntent: PendingIntent
     private lateinit var activityReceiver: BroadcastReceiver
-    private var context : Context
-
-
+    private var context: Context
 
 
     constructor(context: Context) {
         this.context = context
         this.locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-
-        //speedFilter = SpeedFilter()
-
     }
 
     override fun onLocationChanged(location: Location) {
         val texSpeed = TexSpeed(location.speed, location.accuracy)
         speedFilter.locationInput.onNext(texSpeed)
-        val texLocation = TexLocation(location.latitude.toFloat(),location.longitude.toFloat(),location.accuracy,location.speed,location.bearing, location.altitude.toFloat(),location.time)
+        val texLocation = TexLocation(location.latitude.toFloat(), location.longitude.toFloat(), location.accuracy, location.speed, location.bearing, location.altitude.toFloat(), location.time)
         speedFilter.gpsStream.onNext(texLocation)
         speedFilter.locations.onNext(location)
         locations.onNext(location)
@@ -80,7 +74,7 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
         locationManager.removeUpdates(this)
     }
 
-    override fun checkWhereAmI(){
+    override fun checkWhereAmI() {
 
         activityRecognitionClient = ActivityRecognitionClient(context)
         val activityIntent = Intent(ACTIVITY_INTENT_ACTION)
@@ -110,8 +104,7 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
 
     }
 
-    override fun stopActivityScanning(){
+    override fun stopActivityScanning() {
         activityRecognitionClient.removeActivityUpdates(pendingIntent)
     }
-
 }

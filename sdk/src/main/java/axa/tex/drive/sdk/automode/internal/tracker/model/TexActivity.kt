@@ -1,9 +1,9 @@
 package axa.tex.drive.sdk.automode.internal.tracker.model
 
-enum class Where{
+enum class Where {
     IN_VEHICLE,
     ON_FOOT,
     WALKING
 }
 
-data class TexActivity(val where: Where, val confidence : Int)
+data class TexActivity(val where: Where, val confidence: Int)

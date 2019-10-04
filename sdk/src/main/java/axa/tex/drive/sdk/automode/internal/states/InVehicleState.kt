@@ -17,14 +17,12 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
     private var disabled = false
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
 
-     constructor(automode: Automode) {
+    constructor(automode: Automode) {
         this.automode = automode
-         logger.info("Really in vehicle")
+        logger.info("Really in vehicle")
     }
 
     override fun next() {
-        //val filterer = automode.activityTracker.filter()
-        //val tracker = automode.activityTracker
         var locationSubscription: Disposable? = null
         locationSubscription = filterer.locationOutputWithAccuracy.subscribe {
             if (!disabled) {
@@ -38,16 +36,14 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
                     drivingState?.let { automode.setCurrentState(it) }
                 }
 
-                //automode.setCurrentState(DrivingState(automode))
                 this@InVehicleState.disable(true)
                 automode.getCurrentState().disable(false)
                 automode.next()
             }
         }
-        //tracker.activelyScanSpeed()
     }
 
-    override fun sate(): AutomodeHandler.State {
+    override fun state(): AutomodeHandler.State {
         return AutomodeHandler.State.IN_VEHICLE
     }
 
