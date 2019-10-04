@@ -77,7 +77,7 @@ internal class MotionSensor : TexSensor, SensorEventListener {
     private fun enableTracking(track: Boolean) {
         val mSensorThread = HandlerThread("sensor_thread")
         mSensorThread.start();
-        val mHandler =  Handler(mSensorThread.looper);
+        val mHandler = Handler(mSensorThread.looper);
         if (track) {
             for (i in 0 until sensors!!.size()) {
                 sensorManager?.registerListener(this, sensors!!.valueAt(i), /*stressedCaptureRate*/SensorManager.SENSOR_DELAY_UI, mHandler)
@@ -122,69 +122,7 @@ internal class MotionSensor : TexSensor, SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        //processSensorEvent(event)
-         Thread{processSensorEvent(event)}.start()
-
-        /*val currentTimestamp = System.currentTimeMillis()
-        val sensorType = event?.sensor?.type
-        // We have to maintain an array of the sensor accuracies as declared in onAccuracyChanged instead of checking
-        // event.accuracy because SensorEvent objects do not report correct accuracies on some devices (e.g. Samsung Galaxy S4)
-        val accuracy = sensorType?.let { accuracies?.get(it, SensorManager.SENSOR_STATUS_UNRELIABLE) }
-        if (accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) return
-        // Check if sensor values are not NaN or infinite
-        if (event != null) {
-            for (value in event.values) {
-                if (java.lang.Float.isNaN(value) || java.lang.Float.isInfinite(value)) {
-                    LOGGER.warn("Skipping sensor value NaN or infinite", "override fun onSensorChanged(event: SensorEvent?)")
-                    return
-                }
-            }
-        }
-
-
-        event?.timestamp = currentTimestamp // Warning: this line convert timestamp from ns to ms
-        if (sensorType == Sensor.TYPE_ACCELEROMETER) { // check if there is and event
-            if (normL2(event.values) >= accelerationThreshold * GRAVITY_FORCE) {
-                if (!isOverAccelerationThreshold) {
-
-                    LOGGER.info("Acceleration event detected", "override fun onSensorChanged(event: SensorEvent?)")
-
-                    accelerationEventTimestamp = Date().time
-
-                    Thread {
-                        val buf = motionBuffer.flush()
-                        LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "override fun onSensorChanged(event: SensorEvent?)")
-
-                        fixProducer.onNext(buf)
-                        motionBuffer.acquireMotionAfterAcceleration()
-
-                        Timer("After acceleration event", false).schedule(motionBuffer.motionPeriodAfterAcceleration) {
-                            fixProducer.onNext(motionBuffer.flushMotionsAfterAcceleration())
-                        }
-
-                    }.start()
-
-
-                    isOverAccelerationThreshold = true
-                }
-            } else {
-                if (isOverAccelerationThreshold) {
-                    isOverAccelerationThreshold = false
-                }
-            }
-        } else {
-
-
-
-            Thread {
-                val motionFix = event?.let { motionFix(it, event.timestamp) }
-                if(motionBuffer.afterAcceleration){
-                    motionBuffer.addMotionAfter(motionFix)
-                }else {
-                    motionBuffer.addFix(motionFix)
-                }
-            }.start()
-        }*/
+        Thread { processSensorEvent(event) }.start()
     }
 
     private fun normL2(values: FloatArray): Double {
@@ -195,7 +133,7 @@ internal class MotionSensor : TexSensor, SensorEventListener {
         return Math.sqrt(value.toDouble())
     }
 
-    private fun processSensorEvent(event: SensorEvent?){
+    private fun processSensorEvent(event: SensorEvent?) {
         val currentTimestamp = System.currentTimeMillis()
         val sensorType = event?.sensor?.type
         // We have to maintain an array of the sensor accuracies as declared in onAccuracyChanged instead of checking
@@ -224,23 +162,17 @@ internal class MotionSensor : TexSensor, SensorEventListener {
 
                     accelerationEventTimestamp = Date().time
 
+                    motionBuffer.crashFix = motionFix(event, currentTimestamp)
+                    val buf = motionBuffer.flush()
+                    LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "override fun onSensorChanged(event: SensorEvent?)")
 
-                    //Thread {
-                        motionBuffer.crashFix = motionFix(event, currentTimestamp)
-                        val buf = motionBuffer.flush()
-                        LOGGER.info("Sending motion buffer (buffer size = ${buf.size})", "override fun onSensorChanged(event: SensorEvent?)")
+                    fixProducer.onNext(buf)
+                    motionBuffer.acquireMotionAfterAcceleration()
 
-                        fixProducer.onNext(buf)
-                        motionBuffer.acquireMotionAfterAcceleration()
+                    Timer("After acceleration event", false).schedule(motionBuffer.motionPeriodAfterAcceleration) {
+                        fixProducer.onNext(motionBuffer.flushMotionsAfterAcceleration())
+                    }
 
-                        Timer("After acceleration event", false).schedule(motionBuffer.motionPeriodAfterAcceleration) {
-                            fixProducer.onNext(motionBuffer.flushMotionsAfterAcceleration())
-                        }
-
-                    //}.start()
-
-
-                   // isOverAccelerationThreshold = true
                 }
             } else {
                 if (isOverAccelerationThreshold) {
@@ -248,19 +180,14 @@ internal class MotionSensor : TexSensor, SensorEventListener {
                 }
             }
         } else {
-
-
-
-            //Thread {
-                val motionFix = event?.let { motionFix(it, event.timestamp) }
-                if(motionFix != null) {
-                    if (motionBuffer.afterAcceleration) {
-                        motionBuffer.addMotionAfter(motionFix)
-                    } else {
-                        motionBuffer.addFix(motionFix)
-                    }
+            val motionFix = event?.let { motionFix(it, event.timestamp) }
+            if (motionFix != null) {
+                if (motionBuffer.afterAcceleration) {
+                    motionBuffer.addMotionAfter(motionFix)
+                } else {
+                    motionBuffer.addFix(motionFix)
                 }
-            //}.start()
+            }
         }
     }
 
