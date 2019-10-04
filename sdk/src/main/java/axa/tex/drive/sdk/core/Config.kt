@@ -9,7 +9,7 @@ internal class Config {
     var motionTrackerEnabled: Boolean = false
     var appName: String? = null//Constants.DEFAULT_APP_NAME
     var clientId: String? = null
-    var endPoint : Platform? = Platform.PRODUCTION
+    var endPoint: Platform? = Platform.PRODUCTION
 
     constructor() {
 
@@ -18,7 +18,7 @@ internal class Config {
     constructor(batteryTrackerEnabled: Boolean,
                 locationTrackerEnabled: Boolean,
                 motionTrackerEnabled: Boolean,
-                appName: String?, clientId: String?,endPoint : Platform?) {
+                appName: String?, clientId: String?, endPoint: Platform?) {
         this.batteryTrackerEnabled = batteryTrackerEnabled
         this.locationTrackerEnabled = locationTrackerEnabled
         this.motionTrackerEnabled = motionTrackerEnabled
@@ -30,12 +30,11 @@ internal class Config {
     internal fun toJson(): String {
         return try {
             val mapper = ObjectMapper();
-            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
-            mapper.writeValueAsString(this);
+            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
+            mapper.writeValueAsString(this)
         } catch (e: Exception) {
             e.printStackTrace()
-            "{}";
+            "{}"
         }
-
     }
 }

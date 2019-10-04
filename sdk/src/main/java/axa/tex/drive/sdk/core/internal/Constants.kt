@@ -6,7 +6,6 @@ object Constants {
     internal const val JSON_SCHEMA_VERSION = "2.0"
     internal const val LOG_DIR = "LOGS"
     internal const val DEFAULT_APP_NAME = "youdrive_france_prospect"
-
     internal const val APP_NAME_KEY = "appName"
     internal const val CLIENT_ID_KEY = "clientId"
     internal const val ID_KEY = "id"
@@ -15,6 +14,4 @@ object Constants {
     internal const val WORK_TAG_KEY = "tag"
     internal const val EMPTY_PACKET = "{}"
     internal const val START_DATE_KEY = "startDate"
-
-
 }

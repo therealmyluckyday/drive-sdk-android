@@ -4,9 +4,7 @@ import android.content.ComponentCallbacks
 import android.content.res.Configuration
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 
-interface KoinComponentCallbacks : ComponentCallbacks{
-
-
+interface KoinComponentCallbacks : ComponentCallbacks {
     override fun onLowMemory() {
         val logger = LoggerFactory().getLogger(this::class.java.name).logger
         logger.warn("LOW MEMORY DETECTED", "onLowMemory")
