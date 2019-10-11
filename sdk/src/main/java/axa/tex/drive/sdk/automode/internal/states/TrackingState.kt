@@ -21,7 +21,7 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
 
     constructor(automode: Automode) {
         this.automode = automode
-        logger.info(Date().toString() + ":Tracking state")
+        logger.info( ":Tracking state")
     }
 
     override fun next() {

@@ -124,7 +124,7 @@ class TexConfig {
             }
 
             logger.logger.info("Create koin module", "init")
-            logger.logger.info("Done create koin module", "init")
+            logger.logger.info("Done Œ koin module", "init")
         }
 
 
