@@ -6,27 +6,30 @@ import axa.tex.drive.sdk.core.logger.LoggerFactory
 
 private const val DEFAULT_PACKET_SIZE = 50
 
-class TripChunk {
+class TripChunk(internal val tripId: TripId, internal val tripInfos: TripInfos) {
 
-    // MARK: Property
-    private val tripId: TripId
     private var fixes = mutableListOf<Fix>()
-    private val tripInfos: TripInfos
     private var packetSize: Int = DEFAULT_PACKET_SIZE
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+    private var event: Event? = null
+
+    fun isEnded() : Boolean {
+        return ((this.event != null) && (this.event!!.event.contains("stop")))
+    }
 
     fun append(fix: Fix) {
         fixes.add(fix)
     }
 
     fun canUpload() : Boolean {
-        if fixes.last is MotionFix {
+        if (fixes.last() is MotionFix) {
             return false
         }
-        if let event = self.event, event.eventType == EventType.stop {
+
+        if (this.isEnded()) {
             return true
         }
-        return fixes.count > packetSize
+        return fixes.count() > packetSize
     }
 
     // Private Method
@@ -35,12 +38,10 @@ class TripChunk {
     }
 
     // MARK: Serialize
-    fun serialize() : String {
+    fun toJson() : String {
         val packet = FixPacket(fixes, tripInfos.model, tripInfos.os, tripInfos.timezone, tripInfos.uid, tripInfos.version, tripId?.value, tripInfos.appName,
                 tripInfos.clientId)
         LOGGER.info("CONVERTING TO JSON", function = "fun serialize() : String")
         return packet?.toJson()
     }
-
-
 }
