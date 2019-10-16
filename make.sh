@@ -80,6 +80,7 @@ __build() {
 }
 
 __clean() {
+    echo "--> Cleaning ..."
     test -f "${FILE_NAME}" && echo "---> Deleting ${FILE_NAME} ..." && rm "${FILE_NAME}" || :;
 
     for f in build build-tools licenses platforms platform-tools tools
@@ -114,7 +115,6 @@ do
       break
       ;;
     --clean | -c)
-      echo "--> Cleaning ..."
       __clean
       break
       ;;
