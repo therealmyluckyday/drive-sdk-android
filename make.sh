@@ -89,8 +89,18 @@ __clean() {
     ./gradlew clean
 }
 
-
 # Main
+__usage() {
+  echo "Usage: $0 [ --build ] [ --clean ] [ --env  ] [ --install-sdk ]" 1>&2
+  exit 1
+}
+
+if [[ $# -eq 0 ]]
+then
+  __usage
+  exit 1
+fi
+
 OPTION=$1
 while [[ -n ${OPTION} ]];
 do
