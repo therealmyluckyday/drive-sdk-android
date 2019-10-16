@@ -6,4 +6,10 @@ dist
 .gradle
 .idea
 *.iml
+android-sdk.zip
 local.properties
+build-tools/
+licenses/
+platform-tools/
+platforms/
+tools/
