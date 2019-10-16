@@ -86,7 +86,6 @@ __clean() {
             rm -rf $f
         fi
     done
-    ./gradlew clean
 }
 
 # Main
