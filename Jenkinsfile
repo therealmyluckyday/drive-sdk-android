@@ -18,7 +18,7 @@ pipeline {
     SLACK_USER_TOKEN = credentials('slack_user_token')
     ARTIFACTORY_CREDENTIALS = credentials('axa_artifactory')
     API_LEVEL = "28"
-    HOME = "/var/android/"
+    HOME = "/tmp/android/"
   }
 
   stages {
