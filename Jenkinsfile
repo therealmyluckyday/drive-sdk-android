@@ -37,9 +37,7 @@ pipeline {
 
     stage('build') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'axa_artifactory', usernameVariable: 'ARTIFACTORY_USERNAME', passwordVariable: 'ARTIFACTORY_PASSWORD')]) {
-            sh './make.sh --build'
-        }
+        sh 'ARTIFACTORY_USERNAME=env.ARTIFACTORY_CREDENTIALS_USR ARTIFACTORY_PASSWORD=env.ARTIFACTORY_CREDENTIALS.PSW ./make.sh --build'
       }
     }
 
