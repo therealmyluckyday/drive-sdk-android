@@ -11,6 +11,7 @@ fi
 
 ANDROID_SDK_TOOLS=4333796
 FILE_NAME="android-sdk.zip"
+ANDROID_HOME="${PWD}/android-sdk"
 OS_TYPE=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 __download_install_android_sdk() {
@@ -21,7 +22,7 @@ __download_install_android_sdk() {
     https://dl.google.com/android/repository/sdk-tools-${OS_TYPE}-${ANDROID_SDK_TOOLS}.zip
 
   echo "----> Installing the Android SDK ..."
-  unzip "${UNZIP_OPTIONS}" ${FILE_NAME}
+  unzip -d "${ANDROID_HOME}" "${UNZIP_OPTIONS}" ${FILE_NAME}
 }
 
 __install_android_platform() {
@@ -34,31 +35,34 @@ __install_android_platform() {
     exit 1
   fi
 
-  cd tools
-  echo y | ./bin/sdkmanager "platforms;android-${API_LEVEL}" > /dev/null
-  echo y | ./bin/sdkmanager "platform-tools" > /dev/null
+  cd "${ANDROID_HOME}"
+  echo y | ./tools/bin/sdkmanager "platforms;android-${API_LEVEL}" > /dev/null
+  echo y | ./tools/bin/sdkmanager "platform-tools" > /dev/null
   cd - > /dev/null
 }
 
 __install_android_build() {
   echo "---> Installing the Android Build ..."
 
-  cd tools
-  VERSION=$(./bin/sdkmanager --list 2>/dev/null | \
+  cd "${ANDROID_HOME}"
+  VERSION=$(./tools/bin/sdkmanager --list 2>/dev/null | \
     grep build-tools | \
     grep ${API_LEVEL} | \
     cut -d'|' -f2 | \
     sed -re "s/[[:space:]]//g" | \
     tail -n 1)
   echo "----> Installing the build-tools ${VERSION} .."
-  echo y | ./bin/sdkmanager "build-tools;${VERSION}" > /dev/null
+  echo y | ./tools/bin/sdkmanager "build-tools;${VERSION}" > /dev/null
   cd - > /dev/null
 }
 
 __accept_licenses() {
   echo "---> Accepting the Android licenses ..."
-  cd tools
-  yes | ./bin/sdkmanager --licenses
+
+  cd "${ANDROID_HOME}"
+  set +o pipefail
+  yes | ./tools/bin/sdkmanager --licenses
+  set -o pipefail
   cd - > /dev/null
 }
 
@@ -72,11 +76,11 @@ __check_credentials() {
 
 __build() {
   echo "---> Building ..."
-  ANDROID_HOME="${PWD}/tools" PATH="${PWD}/platform-tools:${PATH}" ./gradlew build
+  PATH="${ANDROID_HOME}/platform-tools:${PATH}" ./gradlew build
 }
 
 __clean() {
-    test -f "${FILE_NAME}" && rm "${FILE_NAME}" || :;
+    test -f "${FILE_NAME}" && echo "---> Deleting ${FILE_NAME} ..." && rm "${FILE_NAME}" || :;
 
     for f in build build-tools licenses platforms platform-tools tools
     do
