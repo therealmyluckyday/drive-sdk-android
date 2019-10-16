@@ -18,7 +18,7 @@ pipeline {
     SLACK_USER_TOKEN = credentials('slack_user_token')
     ARTIFACTORY_CREDENTIALS = credentials('axa_artifactory')
     API_LEVEL = "28"
-    HOME = "/home/android/"
+    HOME = "/var/android/"
   }
 
   stages {
@@ -31,7 +31,7 @@ pipeline {
 
     stage('temporary home') {
       steps {
-        sh 'mkdir -p /home/android'
+        sh 'mkdir -p ${HOME}'
       }
     }
     stage('install-sdk') {
