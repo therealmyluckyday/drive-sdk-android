@@ -11,7 +11,7 @@ fi
 
 ANDROID_SDK_TOOLS=4333796
 FILE_NAME="android-sdk.zip"
-ANDROID_HOME="${PWD}/android-sdk"
+export ANDROID_HOME="${PWD}/android-sdk"
 OS_TYPE=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 __download_install_android_sdk() {
