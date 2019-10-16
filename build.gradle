@@ -26,8 +26,8 @@ allprojects {
         maven {
             url 'https://axadil.jfrog.io/axadil/android-tex'
             credentials {
-                username = artifactory_username
-                password = artifactory_password
+                username = System.getenv("ARTIFACTORY_USERNAME")
+                password = System.getenv("ARTIFACTORY_PASSWORD")
             }
         }
     }
