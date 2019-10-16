@@ -17,6 +17,7 @@ pipeline {
     GITHUB_TOKEN = credentials('jenkins_pipeline')
     SLACK_USER_TOKEN = credentials('slack_user_token')
     API_LEVEL = "28"
+    HOME = "/tmp/"
   }
 
   stages {
