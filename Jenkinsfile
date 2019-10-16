@@ -16,6 +16,7 @@ pipeline {
     GIT_COMMITTER_EMAIL = sh(script: "git show -s --pretty=%ae",, returnStdout: true).trim()
     GITHUB_TOKEN = credentials('jenkins_pipeline')
     SLACK_USER_TOKEN = credentials('slack_user_token')
+    ARTIFACTORY_CREDENTIALS = credentials('axa_artifactory')
     API_LEVEL = "28"
     HOME = "/tmp/"
   }
