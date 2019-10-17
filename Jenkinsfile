@@ -31,47 +31,23 @@ pipeline {
       }
     }
 
-    stage('temporary home') {
-      steps {
-        sh 'mkdir -p ${HOME}'
-      }
-    }
-
-    stage('install-sdk') {
-      steps {
-        sh './make.sh --install-sdk ${API_LEVEL}'
-      }
-    }
-
     stage('assembleDebug') {
       steps {
-        sh './make.sh --assemble-debug'
+        sh './gradlew assembleDebug'
       }
     }
 
     stage('test') {
       steps {
-        sh './make.sh --test'
+        sh './gradlew test'
       }
     }
 
-    stage('lint-app') {
+    stage('lint') {
       steps {
-        sh './make.sh --lint-app'
-      }
-    }
-
-    stage('lint-sdk') {
-      steps {
-        sh './make.sh --lint-sdk'
+        sh './gradlew lintDebug'
+        archiveArtifacts artifacts: '**/build/reports/**'
       }
     }
   }
-
-  post {
-    always {
-      archiveArtifacts artifacts: '**/build/reports/**'
-    }
-  }
-
 }
