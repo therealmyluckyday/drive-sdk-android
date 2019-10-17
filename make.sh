@@ -10,8 +10,9 @@ else
 fi
 
 ANDROID_SDK_TOOLS=4333796
+DOWNLOAD_ANDROID_SDK="android-sdk"
+export ANDROID_HOME="${DOWNLOAD_ANDROID_SDK}"
 FILE_NAME="android-sdk.zip"
-export ANDROID_HOME="${PWD}/android-sdk"
 OS_TYPE=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 __download_install_android_sdk() {
@@ -22,7 +23,7 @@ __download_install_android_sdk() {
     https://dl.google.com/android/repository/sdk-tools-${OS_TYPE}-${ANDROID_SDK_TOOLS}.zip
 
   echo "----> Installing the Android SDK ..."
-  unzip -d "${ANDROID_HOME}" "${UNZIP_OPTIONS}" ${FILE_NAME}
+  unzip -d "${DOWNLOAD_ANDROID_SDK}" "${UNZIP_OPTIONS}" ${FILE_NAME}
 }
 
 __install_android_platform() {
@@ -35,35 +36,29 @@ __install_android_platform() {
     exit 1
   fi
 
-  cd "${ANDROID_HOME}"
-  echo y | ./tools/bin/sdkmanager "platforms;android-${API_LEVEL}" > /dev/null
-  echo y | ./tools/bin/sdkmanager "platform-tools" > /dev/null
-  cd - > /dev/null
+  echo y | ${DOWNLOAD_ANDROID_SDK}/tools/bin/sdkmanager "platforms;android-${API_LEVEL}" > /dev/null
+  echo y | ${DOWNLOAD_ANDROID_SDK}/tools/bin/sdkmanager "platform-tools" > /dev/null
 }
 
 __install_android_build() {
   echo "---> Installing the Android Build ..."
 
-  cd "${ANDROID_HOME}"
-  VERSION=$(./tools/bin/sdkmanager --list 2>/dev/null | \
+  VERSION=$(${DOWNLOAD_ANDROID_SDK}/tools/bin/sdkmanager --list 2>/dev/null | \
     grep build-tools | \
     grep ${API_LEVEL} | \
     cut -d'|' -f2 | \
     sed -re "s/[[:space:]]//g" | \
     tail -n 1)
   echo "----> Installing the build-tools ${VERSION} .."
-  echo y | ./tools/bin/sdkmanager "build-tools;${VERSION}" > /dev/null
-  cd - > /dev/null
+  echo y | ${DOWNLOAD_ANDROID_SDK}/tools/bin/sdkmanager "build-tools;${VERSION}" > /dev/null
 }
 
 __accept_licenses() {
   echo "---> Accepting the Android licenses ..."
 
-  cd "${ANDROID_HOME}"
   set +o pipefail
-  yes | ./tools/bin/sdkmanager --licenses
+  yes | ${DOWNLOAD_ANDROID_SDK}/tools/bin/sdkmanager --licenses
   set -o pipefail
-  cd - > /dev/null
 }
 
 __check_credentials() {
@@ -83,14 +78,11 @@ __clean() {
     echo "--> Cleaning ..."
     test -f "${FILE_NAME}" && echo "---> Deleting ${FILE_NAME} ..." && rm "${FILE_NAME}" || :;
 
-    for f in build build-tools licenses platforms platform-tools tools
-    do
-        if [[ -d $f ]]
-        then
-            echo "---> Deleting $f ..."
-            rm -rf $f
-        fi
-    done
+    if [[ -d ${DOWNLOAD_ANDROID_SDK} ]]
+    then
+        echo "---> Deleting $f ..."
+        rm -rf $f
+    fi
 }
 
 __lint() {
