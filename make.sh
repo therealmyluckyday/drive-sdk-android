@@ -74,9 +74,9 @@ __check_credentials() {
   fi
 }
 
-__build() {
-  echo "---> Building ..."
-  PATH="${ANDROID_HOME}/platform-tools:${PATH}" ./gradlew build
+__assemble_debug() {
+  echo "---> Assembling debug ..."
+  ./gradlew assembleDebug
 }
 
 __clean() {
@@ -99,6 +99,11 @@ __lint() {
   ./gradlew :$DIRECTORY:lint
 }
 
+__test() {
+  echo "--> Testing ..."
+  ./gradlew test
+}
+
 # Main
 __usage() {
   echo "Usage: $0 [ --build ] [ --clean ] [ --env  ] [ --install-sdk ] [ --lint-app  ] [ --lint-sdk  ]" 1>&2
@@ -112,12 +117,13 @@ then
 fi
 
 OPTION=$1
+export PATH="${ANDROID_HOME}/platform-tools:${PATH}"
 while [[ -n ${OPTION} ]];
 do
   case "${OPTION}" in
-    --build)
+    --assemble-debug)
       __check_credentials
-      __build
+      __assemble_debug
       break
       ;;
     --clean | -c)
@@ -144,6 +150,10 @@ do
       ;;
     --lint-sdk)
       __lint sdk
+      break
+      ;;
+    --test)
+      __test
       break
       ;;
     *)
