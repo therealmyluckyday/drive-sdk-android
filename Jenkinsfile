@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'openjdk:8-jdk'
-      args '-v /var/run/docker.sock:/var/run/docker.sock'
+      args '-v /var/run/docker.sock:/var/run/docker.sock -v /tmp/cache/gradle:${WORKSPACE}/.gradle'
     }
   }
 
