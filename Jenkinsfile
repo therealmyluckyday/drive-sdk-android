@@ -21,6 +21,7 @@ pipeline {
     ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS_PSW}"
     API_LEVEL = "28"
     HOME = "${WORKSPACE}/home"
+    ANDROID_HOME = "${WORKSPACE}/android-sdk"
   }
 
   stages {
@@ -28,6 +29,12 @@ pipeline {
       steps {
         sh 'env | sort'
         sh 'mount'
+      }
+    }
+
+    stage('install-sdk') {
+      steps {
+        sh './make.sh --install-sdk ${API_LEVEL}'
       }
     }
 
