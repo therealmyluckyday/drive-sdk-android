@@ -37,7 +37,7 @@ pipeline {
 
     stage('install-sdk') {
       steps {
-        sh 'cd ${HOME} ; ./make.sh --install-sdk ${API_LEVEL}'
+        sh 'HOME=${WORKSPACE}/home ./make.sh --install-sdk ${API_LEVEL}'
       }
     }
 
