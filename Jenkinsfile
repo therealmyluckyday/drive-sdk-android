@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'openjdk:8-jdk'
-      args '-v /var/run/docker.sock:/var/run/docker.sock -v /tmp/cache/.gradle:/tmp/android/.gradle'
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
 
@@ -18,7 +18,7 @@ pipeline {
     SLACK_USER_TOKEN = credentials('slack_user_token')
     ARTIFACTORY_CREDENTIALS = credentials('axa_artifactory')
     API_LEVEL = "28"
-    HOME = "/tmp/android/"
+    HOME = "."
   }
 
   stages {
@@ -29,12 +29,6 @@ pipeline {
       }
     }
 
-    stage('temporary home') {
-      steps {
-        sh 'mkdir -p ${HOME}'
-        sh 'chmod 777 ${HOME}'
-      }
-    }
     stage('install-sdk') {
       steps {
         sh './make.sh --install-sdk ${API_LEVEL}'
