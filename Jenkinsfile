@@ -75,6 +75,8 @@ pipeline {
   post {
     always {
       archiveArtifacts artifacts: '**/build/reports/**'
+
+      cleanWs()
     }
   }
 
