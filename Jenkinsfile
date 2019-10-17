@@ -41,18 +41,15 @@ pipeline {
       }
     }
 
-    stage('lint') {
-      parallel {
-        stage('app') {
-          steps {
-            sh 'HOME=${WORKSPACE}/home ./make.sh --lint-app'
-          }
-        }
-        stage('sdk') {
-          steps {
-            sh 'HOME=${WORKSPACE}/home ./make.sh --lint-sdk'
-          }
-        }
+    stage('lint-app') {
+      steps {
+        sh 'HOME=${WORKSPACE}/home ./make.sh --lint-app'
+      }
+    }
+
+    stage('lint-sdk') {
+      steps {
+        sh 'HOME=${WORKSPACE}/home ./make.sh --lint-sdk'
       }
     }
 
