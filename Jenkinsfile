@@ -31,7 +31,7 @@ pipeline {
 
     stage('install-sdk') {
       steps {
-        sh './make.sh --install-sdk ${API_LEVEL}'
+        sh 'cd ${HOME} ; ./make.sh --install-sdk ${API_LEVEL}'
       }
     }
 
@@ -61,7 +61,7 @@ pipeline {
 
     stage('build') {
       steps {
-        sh 'ARTIFACTORY_USERNAME=env.ARTIFACTORY_CREDENTIALS_USR ARTIFACTORY_PASSWORD=env.ARTIFACTORY_CREDENTIALS.PSW ./make.sh --build'
+        sh 'cd ${HOME} ; ARTIFACTORY_USERNAME=env.ARTIFACTORY_CREDENTIALS_USR ARTIFACTORY_PASSWORD=env.ARTIFACTORY_CREDENTIALS.PSW ./make.sh --build'
       }
     }
 
