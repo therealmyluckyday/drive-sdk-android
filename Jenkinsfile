@@ -62,7 +62,7 @@ pipeline {
 
     stage('build') {
       steps {
-        sh 'cd ${HOME} ; ARTIFACTORY_USERNAME=env.ARTIFACTORY_CREDENTIALS_USR ARTIFACTORY_PASSWORD=env.ARTIFACTORY_CREDENTIALS.PSW ./make.sh --build'
+        sh 'HOME=${WORKSPACE}/home ARTIFACTORY_USERNAME=env.ARTIFACTORY_CREDENTIALS_USR ARTIFACTORY_PASSWORD=env.ARTIFACTORY_CREDENTIALS.PSW ./make.sh --build'
       }
     }
 
