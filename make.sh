@@ -93,9 +93,15 @@ __clean() {
     done
 }
 
+__lint() {
+  DIRECTORY=$1
+  echo "--> Linting ${DIRECTORY}..."
+  ./gradlew :$DIRECTORY:lint
+}
+
 # Main
 __usage() {
-  echo "Usage: $0 [ --build ] [ --clean ] [ --env  ] [ --install-sdk ]" 1>&2
+  echo "Usage: $0 [ --build ] [ --clean ] [ --env  ] [ --install-sdk ] [ --lint-app  ] [ --lint-sdk  ]" 1>&2
   exit 1
 }
 
@@ -130,6 +136,14 @@ do
       __install_android_platform $1
       __install_android_build
       __accept_licenses
+      break
+      ;;
+    --lint-app)
+      __lint app
+      break
+      ;;
+    --lint-sdk)
+      __lint sdk
       break
       ;;
     *)
