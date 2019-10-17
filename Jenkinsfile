@@ -18,7 +18,7 @@ pipeline {
     SLACK_USER_TOKEN = credentials('slack_user_token')
     ARTIFACTORY_CREDENTIALS = credentials('axa_artifactory')
     API_LEVEL = "28"
-    HOME = "${WORKSPACE}"
+    HOME = "${WORKSPACE}/home"
   }
 
   stages {
@@ -26,6 +26,12 @@ pipeline {
       steps {
         sh 'env | sort'
         sh 'mount'
+      }
+    }
+
+    stage('temporary home') {
+      steps {
+        sh 'mkdir -p ${HOME}'
       }
     }
 
