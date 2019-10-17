@@ -42,15 +42,19 @@ pipeline {
     }
 
     stage('lint') {
-      stages {
+      parallel {
         stage('app') {
-          steps {
-            sh 'cd ${HOME} ; ./make.sh --lint-app'
+          stages {
+            steps {
+              sh 'HOME=${WORKSPACE}/home ./make.sh --lint-app'
+            }
           }
         }
         stage('sdk') {
-          steps {
-            sh 'cd ${HOME} ; ./make.sh --lint-sdk'
+          stages {
+            steps {
+              sh 'HOME=${WORKSPACE}/home ./make.sh --lint-sdk'
+            }
           }
         }
       }
