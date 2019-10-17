@@ -37,25 +37,25 @@ pipeline {
 
     stage('install-sdk') {
       steps {
-        sh 'HOME=${WORKSPACE}/home ./make.sh --install-sdk ${API_LEVEL}'
+        sh './make.sh --install-sdk ${API_LEVEL}'
       }
     }
 
     stage('lint-app') {
       steps {
-        sh 'HOME=${WORKSPACE}/home ./make.sh --lint-app'
+        sh './make.sh --lint-app'
       }
     }
 
     stage('lint-sdk') {
       steps {
-        sh 'HOME=${WORKSPACE}/home ./make.sh --lint-sdk'
+        sh './make.sh --lint-sdk'
       }
     }
 
     stage('build') {
       steps {
-        sh 'HOME=${WORKSPACE}/home ARTIFACTORY_USERNAME=env.ARTIFACTORY_CREDENTIALS_USR ARTIFACTORY_PASSWORD=env.ARTIFACTORY_CREDENTIALS.PSW ./make.sh --build'
+        sh 'ARTIFACTORY_USERNAME=env.ARTIFACTORY_CREDENTIALS_USR ARTIFACTORY_PASSWORD=env.ARTIFACTORY_CREDENTIALS.PSW ./make.sh --build'
       }
     }
 
