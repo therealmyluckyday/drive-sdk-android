@@ -41,6 +41,26 @@ pipeline {
       }
     }
 
+    stage('assembleDebug') {
+      environment {
+        ARTIFACTORY_USERNAME = env.ARTIFACTORY_CREDENTIALS_USR
+        ARTIFACTORY_PASSWORD = env.ARTIFACTORY_CREDENTIALS.PSW
+      }
+      steps {
+        sh './make.sh --assemble-debug'
+      }
+    }
+
+    stage('test') {
+      environment {
+        ARTIFACTORY_USERNAME = env.ARTIFACTORY_CREDENTIALS_USR
+        ARTIFACTORY_PASSWORD = env.ARTIFACTORY_CREDENTIALS.PSW
+      }
+      steps {
+        sh './make.sh --test'
+      }
+    }
+
     stage('lint-app') {
       steps {
         sh './make.sh --lint-app'
@@ -52,13 +72,6 @@ pipeline {
         sh './make.sh --lint-sdk'
       }
     }
-
-    stage('build') {
-      steps {
-        sh 'ARTIFACTORY_USERNAME=env.ARTIFACTORY_CREDENTIALS_USR ARTIFACTORY_PASSWORD=env.ARTIFACTORY_CREDENTIALS.PSW ./make.sh --build'
-      }
-    }
-
   }
 
   post {
