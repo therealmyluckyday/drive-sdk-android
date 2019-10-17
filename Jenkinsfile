@@ -44,7 +44,7 @@ pipeline {
     stage('assembleDebug') {
       environment {
         ARTIFACTORY_USERNAME = "${ARTIFACTORY_CREDENTIALS_USR}"
-        ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS.PSW}"
+        ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS_PSW}"
       }
       steps {
         sh './make.sh --assemble-debug'
@@ -54,7 +54,7 @@ pipeline {
     stage('test') {
       environment {
         ARTIFACTORY_USERNAME = "${ARTIFACTORY_CREDENTIALS_USR}"
-        ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS.PSW}"
+        ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS_PSW}"
       }
       steps {
         sh './make.sh --test'
