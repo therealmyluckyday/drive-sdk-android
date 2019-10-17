@@ -50,7 +50,7 @@ pipeline {
         }
         stage('sdk') {
           stages {
-            stage('sdk') {
+            stage('lint') {
               steps {
                 dir('${WORKSPACE}') {
                   sh './make.sh --lint-sdk'
