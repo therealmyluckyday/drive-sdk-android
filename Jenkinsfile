@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'openjdk:8-jdk'
-      args '-v /var/run/docker.sock:/var/run/docker.sock'
+      args '-v /var/run/docker.sock:/var/run/docker.sock -v /tmp/cache/.gradle:/tmp/android/.gradle'
     }
   }
 
@@ -37,6 +37,30 @@ pipeline {
     stage('install-sdk') {
       steps {
         sh './make.sh --install-sdk ${API_LEVEL}'
+      }
+    }
+
+    stage('lint') {
+      parallel {
+        stage('app') {
+          stages {
+            stage('lint') {
+              steps {
+                sh './make.sh --lint-app'
+              }
+            }
+          }
+        }
+        stage('sdk') {
+          stages {
+            stage('sdk') {
+              steps {
+                sh './make.sh --lint-sdk'
+              }
+            }
+          }
+
+        }
       }
     }
 
