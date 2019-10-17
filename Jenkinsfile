@@ -17,6 +17,8 @@ pipeline {
     GITHUB_TOKEN = credentials('jenkins_pipeline')
     SLACK_USER_TOKEN = credentials('slack_user_token')
     ARTIFACTORY_CREDENTIALS = credentials('axa_artifactory')
+    ARTIFACTORY_USERNAME = "${ARTIFACTORY_CREDENTIALS_USR}"
+    ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS_PSW}"
     API_LEVEL = "28"
     HOME = "${WORKSPACE}/home"
   }
@@ -42,20 +44,12 @@ pipeline {
     }
 
     stage('assembleDebug') {
-      environment {
-        ARTIFACTORY_USERNAME = "${ARTIFACTORY_CREDENTIALS_USR}"
-        ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS_PSW}"
-      }
       steps {
         sh './make.sh --assemble-debug'
       }
     }
 
     stage('test') {
-      environment {
-        ARTIFACTORY_USERNAME = "${ARTIFACTORY_CREDENTIALS_USR}"
-        ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS_PSW}"
-      }
       steps {
         sh './make.sh --test'
       }
