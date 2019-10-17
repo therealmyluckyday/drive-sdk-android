@@ -32,6 +32,7 @@ pipeline {
     stage('temporary home') {
       steps {
         sh 'mkdir -p ${HOME}'
+        sh 'chmod 777 ${HOME}'
       }
     }
     stage('install-sdk') {
