@@ -41,7 +41,9 @@ pipeline {
           stages {
             stage('lint') {
               steps {
-                sh './make.sh --lint-app'
+                dir('${WORKSPACE}') {
+                  sh './make.sh --lint-app'
+                }
               }
             }
           }
@@ -50,7 +52,9 @@ pipeline {
           stages {
             stage('sdk') {
               steps {
-                sh './make.sh --lint-sdk'
+                dir('${WORKSPACE}') {
+                  sh './make.sh --lint-sdk'
+                }
               }
             }
           }
