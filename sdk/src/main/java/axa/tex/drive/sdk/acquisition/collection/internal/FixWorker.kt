@@ -2,12 +2,8 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 
 
 import androidx.work.Data
-import androidx.work.State
-import androidx.work.WorkManager
 import androidx.work.Worker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
@@ -19,59 +15,17 @@ import org.koin.android.ext.android.inject
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.ExecutionException
 
 
-internal class FixWorker() : Worker(), KoinComponentCallbacks {
+internal open class FixWorker() : Worker(), KoinComponentCallbacks {
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
-    private val automodeHandler: AutomodeHandler by inject()
-
-
-    companion object {
-        private val FIX_SENDER_TAG: String = "COLLECTOR_" + (FixWorker::class.java.simpleName).toUpperCase();
-    }
-
 
     override fun doWork(): WorkerResult {
-
         val inputData: Data = inputData
-        val tag = inputData.getInt(Constants.WORK_TAG_KEY, -1)
-        val result = sendFixes(inputData)
-
-        return if (result) {
-            LOGGER.info("Data sent successfully", "override fun doWork(): WorkerResult")
-            WorkerResult.SUCCESS
-        } else {
-            LOGGER.info("Data were not successfully sent :  Retrying...", "override fun doWork(): WorkerResult")
-            WorkerResult.RETRY
-        }
+        return sendFixes(inputData)
     }
 
-
-    private fun isRunning(tag: String): Boolean {
-
-        try {
-            val status = WorkManager.getInstance().getStatusesByTag(tag).value
-            if (status != null) {
-                for (workStatus in status) {
-                    if (workStatus.state == State.RUNNING || workStatus.state == State.ENQUEUED) {
-                        return true
-                    }
-                }
-            }
-            return false
-
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-        } catch (e: ExecutionException) {
-            e.printStackTrace()
-        }
-
-        return false
-    }
-
-
-    private fun sendFixes(inputData: Data): Boolean {
+    fun sendFixes(inputData: Data): WorkerResult {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
         val appName = inputData.getString(Constants.APP_NAME_KEY, "")
         val clientId = inputData.getString(Constants.CLIENT_ID_KEY, "")
@@ -83,7 +37,7 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks {
 
 
     @Throws(IOException::class)
-    private fun sendData(id: String, data: String, appName: String, clientId: String): Boolean {
+    private fun sendData(id: String, data: String, appName: String, clientId: String): WorkerResult {
 
         try {
             val collectorDb: CollectionDb by inject()
@@ -94,7 +48,6 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks {
             }
 
 
-            val scoreRetriever: ScoreRetriever by inject()
 
             val platformToHostConverter = PlatformToHostConverter(platform);
             val url = URL(platformToHostConverter.getHost() + "/data")
@@ -124,42 +77,26 @@ internal class FixWorker() : Worker(), KoinComponentCallbacks {
                     HttpURLConnection.HTTP_BAD_REQUEST -> {
                         LOGGER.error("UPLOADING DATA ERROR/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
                         // throw IOException()
-                        true
+                        WorkerResult.FAILURE
                     }
                     HttpURLConnection.HTTP_INTERNAL_ERROR -> {
                         LOGGER.error("UPLOADING DATA ERROR/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
 
-                        false
+                        WorkerResult.RETRY
                     }
                     else -> {
                         LOGGER.error("Exception", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
-                        true
+                        WorkerResult.FAILURE
                     }
                 }
             } else {
                 LOGGER.info("SENDING : SUCCEEDED CODE = ${urlConnection.responseCode}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
-                val trip = collectorDb.getPendingTrip(id)
 
-                if (trip != null) {
-                    LOGGER.info("Packet sent successfully and trip id = ${trip.tripId} ", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
-                    collectorDb.deletePendingTrip(id)
-                    if (trip.containsStop) {
-
-                        LOGGER.info("Packet sent successfully and trip id = ${trip.tripId} stop = true", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
-                        val collector: Collector by inject()
-                        collector.currentTripId = null
-                        val tId = trip.tripId
-                        if (tId != null) {
-                            scoreRetriever.getAvailableScoreListener().onNext(tId)
-                            collectorDb.deleteTripNumberPackets(tId)
-                        }
-                    }
-                }
-                return true
+                return WorkerResult.SUCCESS
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            return false
+            return WorkerResult.FAILURE
         }
     }
 }

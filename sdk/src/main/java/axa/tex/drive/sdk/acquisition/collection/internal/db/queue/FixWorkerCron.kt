@@ -31,19 +31,11 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks {
         persistentQueue = PersistentQueue(applicationContext)
         val inputData: Data = inputData
 
-        val result = sendFixes(inputData)
-
-        return if (result) {
-            LOGGER.info("Data sent successfully", "override fun doWork(): WorkerResult")
-            WorkerResult.SUCCESS
-        } else {
-            LOGGER.info("Data were not successfully sent :  Retrying...", "override fun doWork(): WorkerResult")
-            WorkerResult.RETRY
-        }
+        return sendFixes(inputData)
     }
 
 
-    private fun sendFixes(inputData: Data): Boolean {
+    private fun sendFixes(inputData: Data): WorkerResult {
 
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
         val appName = inputData.getString(Constants.APP_NAME_KEY, "")
@@ -55,52 +47,48 @@ internal class FixWorkerCron() : Worker(), KoinComponentCallbacks {
 
         var packetNumber = collectorDb.getPacketNumber(tripId)
 
-        var packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString(), false)
-        if (packet == null) {
-            packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString(), true)
-        }
-        var res = false
-        if (packet != null) {
-            done = packet.end
-            res = sendData(id, packet.data!!, appName, clientId)
-            if (res) {
-                persistentQueue.delete(packet)
-                if (!done) {
-                    collectorDb.setPacketNumber(tripId, packetNumber + 1)
-                    packetNumber = collectorDb.getPacketNumber(tripId)
-                    packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString(), false)
-                    if (packet == null) {
-                        packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString(), true)
-                    }
+        val packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString())
 
-                    if (packet != null) {
-                        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-                                .build()
-                        val fixUploadWork = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(inputData).setConstraints(constraints)
-                                .build()
-                        WorkManager.getInstance().enqueue(fixUploadWork)
-                    }
-                } else if (!done) {
-                    Thread.sleep(3000)
-                    val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build()
-                    val fixUploadWork = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(inputData).setConstraints(constraints)
-                            .build()
-                    WorkManager.getInstance().enqueue(fixUploadWork)
-                }
-
-            }
-        } else if (!done) {
-            Thread.sleep(3000)
-            val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-            val fixUploadWork = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(inputData).setConstraints(constraints)
-                    .build()
-            WorkManager.getInstance().enqueue(fixUploadWork)
-        }
+        var response = WorkerResult.FAILURE
+//        if (packet != null) {
+//            done = packet.end
+//            if (sendData(id, packet.data!!, appName, clientId)) { //
+//                persistentQueue.delete(packet) //
+//                if (!packet.end) {
+//                    response = WorkerResult.SUCCESS //
+//                    collectorDb.setPacketNumber(tripId, packetNumber + 1)
+//                    packetNumber = collectorDb.getPacketNumber(tripId)
+//                    packet = persistentQueue.pop(tripId, appName, clientId, packetNumber.toString())
+//
+//                    if (packet != null) {
+//                        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+//                                .build()
+//                        val fixUploadWork = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(inputData).setConstraints(constraints)
+//                                .build()
+//                        WorkManager.getInstance().enqueue(fixUploadWork)
+//                    }
+//                } else {
+//                    response = WorkerResult.RETRY
+//                    val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+//                            .build()
+//                    val fixUploadWork = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(inputData).setConstraints(constraints)
+//                            .build()
+//                    WorkManager.getInstance().enqueue(fixUploadWork)
+//                }
+//
+//            }
+//        } else if (!done) {
+//            response = WorkerResult.FAILURE
+//            Thread.sleep(3000)
+//            val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
+//                    .build()
+//            val fixUploadWork = OneTimeWorkRequest.Builder(FixWorkerCron::class.java).setInputData(inputData).setConstraints(constraints)
+//                    .build()
+//            WorkManager.getInstance().enqueue(fixUploadWork)
+//        }
 
 
-        return res
+        return response
     }
 
 

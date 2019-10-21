@@ -51,7 +51,9 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
         val texSpeed = TexSpeed(location.speed, location.accuracy)
         speedFilter.locationInput.onNext(texSpeed)
         val texLocation = TexLocation(location.latitude.toFloat(), location.longitude.toFloat(), location.accuracy, location.speed, location.bearing, location.altitude.toFloat(), location.time)
-        speedFilter.gpsStream.onNext(texLocation)
+        if (texLocation != null) {
+            speedFilter.gpsStream.onNext(texLocation)
+        }
         speedFilter.locations.onNext(location)
         locations.onNext(location)
 

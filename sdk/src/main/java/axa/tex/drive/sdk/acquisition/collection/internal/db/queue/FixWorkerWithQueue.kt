@@ -54,6 +54,7 @@ internal class FixWorkerWithQueue() : Worker(), KoinComponentCallbacks {
         val tripId = inputData.getString("tripId", "")
         var packet = persistentQueue.next(tripId)
 
+        // @Erwan : Mettre dans la BDD un compteur de Fiwworker en corus d'envoit, Fait un FixStopWorker qui sera envoyé que si le compteur de FixWorker pour un trip est à 0
         LOGGER.info("COLLECTOR_WORKER SIZE :", inputData.keyValueMap.size.toString())
         if (packet != null) {
             var stop = false

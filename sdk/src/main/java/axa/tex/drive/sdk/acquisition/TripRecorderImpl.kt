@@ -125,6 +125,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     }
 
     override fun stopTrip(endTime: Long) {
+        logger.info("${Date()} TripRecorder : Stop tracking.", function = "fun stopTrip(startTime: Long) : TripId?")
         requestForLocationPermission()
         fixProcessor?.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)

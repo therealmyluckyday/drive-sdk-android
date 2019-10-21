@@ -26,7 +26,7 @@ class PersistentQueue : KoinComponentCallbacks {
     }
 
     @Synchronized
-    internal fun enqueue(tripId: String, appName: String, clientId: String, data: String, endOftTrip: Boolean) {
+    internal fun enqueue(tripId: String, appName: String, clientId: String, data: String, endOfTrip: Boolean) {
 
         try {
             val rootPath = context.filesDir
@@ -36,7 +36,7 @@ class PersistentQueue : KoinComponentCallbacks {
                 root.mkdirs()
             }
             val number = collectorDb?.getNumberPackets(tripId)
-            val f = File(rootPath + "$tripId$SEP${buildFileName(appName, clientId)}$SEP$number$SEP$endOftTrip")
+            val f = File(rootPath + "$tripId$SEP${buildFileName(appName, clientId)}$SEP$number$SEP$endOfTrip")
             if (f.exists()) {
                 f.delete()
             }
@@ -73,15 +73,26 @@ class PersistentQueue : KoinComponentCallbacks {
         return ""
     }
 
-    internal fun pop(tripId: String, appName: String, clientId: String, packetNumber: String, endOftTrip: Boolean): PersistablePacket? {
+    internal fun pop(tripId: String, appName: String, clientId: String, packetNumber: String): PersistablePacket? {
+        var result :PersistablePacket? = null
+        try {
+            result = this.pop(tripId, appName, clientId, packetNumber, false)
+
+            return result
+        } catch (e: Exception) {
+            return this.pop(tripId, appName, clientId, packetNumber, true)
+        }
+    }
+
+    private fun pop(tripId: String, appName: String, clientId: String, packetNumber: String, endOfTrip: Boolean): PersistablePacket? {
         try {
             val rootPath = context.filesDir
                     .absolutePath + "/TEX/$tripId/"
-            val file = File(rootPath, "$tripId$SEP${buildFileName(appName, clientId)}$SEP$packetNumber$SEP$endOftTrip")
+            val file = File(rootPath, "$tripId$SEP${buildFileName(appName, clientId)}$SEP$packetNumber$SEP$endOfTrip")
             val fin = FileInputStream(file)
             val data = readFromFileInputStream(fin)
             fin.close()
-            return PersistablePacket(tripId, appName, clientId, data, packetNumber.toInt(), endOftTrip)
+            return PersistablePacket(tripId, appName, clientId, data, packetNumber.toInt(), endOfTrip)
         } catch (e: Exception) {
             return null
         }

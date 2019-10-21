@@ -77,11 +77,4 @@ internal class Collector : KoinComponentCallbacks {
         }
         recording = false
     }
-
-    fun numberOfTrackers(): Int {
-        if (trackers != null) {
-            return trackers.size
-        }
-        return 0
-    }
 }
