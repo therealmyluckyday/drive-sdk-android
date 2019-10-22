@@ -96,7 +96,7 @@ internal open class FixWorker() : Worker(), KoinComponentCallbacks {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            return WorkerResult.FAILURE
+            return WorkerResult.RETRY
         }
     }
 }

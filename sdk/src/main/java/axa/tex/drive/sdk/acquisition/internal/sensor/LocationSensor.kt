@@ -100,7 +100,7 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
 
         if (track) {
             //============================================================================================================================
-            autoModeTracker?.speedFilter?.gpsStream?.subscribe {
+            autoModeTracker?.speedFilter?.gpsStream?.subscribe ({
                 if (autoModeTracker?.speedFilter!!.collectionEnabled) {
                     val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),
                             it.longitude.toDouble(),
@@ -114,8 +114,9 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
                         fixProducer.onNext(listOf(locationFix))
                     }
                 }
-            }
-            //============================================================================================================================
+            }, {throwable ->
+                print(throwable)
+            })
             if (Build.VERSION.SDK_INT >= 23) {
                 if (context?.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                         context?.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

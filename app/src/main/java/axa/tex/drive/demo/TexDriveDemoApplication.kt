@@ -54,7 +54,7 @@ class TexDriveDemoApplication : Application() {
         })
 
 
-        autoModeHandler?.state?.subscribe {driving ->
+        autoModeHandler?.state?.subscribe ( {driving ->
             if (driving) {
                 if (!tripRecorder?.isRecording()!!) {
 
@@ -90,7 +90,9 @@ class TexDriveDemoApplication : Application() {
                 }
             }
 
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
         if(!autoModeHandler?.running!!) {
             Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()

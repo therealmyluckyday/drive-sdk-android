@@ -27,7 +27,7 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
     override fun next() {
         val tracker = automode.activityTracker
         var activitySubscription: Disposable? = null
-        activitySubscription = filterer.activityOutput.subscribe {
+        activitySubscription = filterer.activityOutput.subscribe( {
             if (!disabled) {
                 activitySubscription?.dispose()
                 tracker.stopActivityScanning()
@@ -52,7 +52,9 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
                 //scanning speed
                 tracker.activelyScanSpeed()
             }
-        }
+        }, {throwable ->
+            print(throwable)
+        })
         //Scanning activity
         tracker.checkWhereAmI()
     }

@@ -60,7 +60,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
         }
 
 
-        disposable = automodeHandler.speedListener.locations.subscribe {
+        disposable = automodeHandler.speedListener.locations.subscribe( {
             var deltaDistance = 0.0
             if (mCurrentLocation != null) { // this is not the first point GPS received
                 deltaDistance = (mCurrentLocation!!.distanceTo(it) / 1000).toDouble() // Km
@@ -72,7 +72,9 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             val duration = System.currentTimeMillis() - start
             val progress = TripProgress(getCurrentTripId()!!,it,mCurrentSpeed,mCurrentDistance,duration)
             tripProgress.onNext(progress)
-        }
+        }, {throwable ->
+            print(throwable)
+        })
     }
 
     @Throws(PermissionException::class)

@@ -97,7 +97,7 @@ internal class CollectorService : Service() {
         }
 
         try {
-            scoreRetriever.getAvailableScoreListener().subscribe { tripId ->
+            scoreRetriever.getAvailableScoreListener().subscribe ( { tripId ->
                 scoreRetriever.getScoreListener().subscribe { scoreResult ->
                     if (scoreResult.scoreDil == null) {
                         LOGGER.info("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "onStartCommand")
@@ -110,7 +110,9 @@ internal class CollectorService : Service() {
                     Thread.sleep(10000)
                     tripId?.let { scoreRetriever.retrieveScore(it) }
                 }.start()
-            }
+            }, {throwable ->
+                print(throwable)
+            })
         } catch (e: Exception) {
             e.printStackTrace()
         } catch (err: Error) {

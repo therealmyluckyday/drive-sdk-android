@@ -42,22 +42,28 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        service?.logStream()?.subscribeOn(Schedulers.computation())?.subscribe {
+        service?.logStream()?.subscribeOn(Schedulers.computation())?.subscribe ( {
             Thread{
                 println("["+it.file +"]["+ it.function + "]"+ it.description )
             }.start()
 
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
         val scoreRetriever = service?.scoreRetriever()
-        scoreRetriever?.getScoreListener()?.subscribe {
+        scoreRetriever?.getScoreListener()?.subscribe ( {
             it?.let { score ->
                 println(score) }
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
-        (application as TexDriveDemoApplication).tripRecorder?.endedTripListener()?.subscribe {
+        (application as TexDriveDemoApplication).tripRecorder?.endedTripListener()?.subscribe ( {
             print(it)
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
 
         WorkManager.getInstance().getStatusesForUniqueWork("B9FBFF8B-D60C-4DA5-B37D-2B054E64612E").observe(this,Observer { stats ->
@@ -79,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val autoModeHandler = service?.automodeHandler()
-        autoModeHandler?.state?.subscribe {driving ->
+        autoModeHandler?.state?.subscribe( {driving ->
             if(driving){
                 runOnUiThread {
                    startService()
@@ -98,11 +104,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
-        autoModeHandler?.speedListener?.locationInput?.subscribe{
+        autoModeHandler?.speedListener?.locationInput?.subscribe({
             speedView.speedTo(it.speed*3.6f, 50)
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
 
 
