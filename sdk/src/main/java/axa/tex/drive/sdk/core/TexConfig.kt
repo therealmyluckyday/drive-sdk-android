@@ -62,7 +62,7 @@ class TexConfig {
                 single(LocationTracker::class.simpleName!!) { LocationTracker(LocationSensor(get(), get(), context, locationTrackerEnabled)) as Tracker }
                 single(BatteryTracker::class.simpleName!!) { BatteryTracker(BatterySensor(context, batteryTrackerEnabled)) as Tracker }
                 single(MotionTracker::class.simpleName!!) { MotionTracker(MotionSensor(context, motionTrackerEnabled)) as Tracker }
-                single { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context, mutableListOf<Tracker>(get(LocationTracker::class.simpleName!!), get(BatteryTracker::class.simpleName!!), get(MotionTracker::class.simpleName!!))) }
+                single { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context, mutableListOf<Tracker>(get(LocationTracker::class.simpleName!!), get(BatteryTracker::class.simpleName!!))) }
                 single { TripRecorderImpl(context) as TripRecorder }
             })
             try {
