@@ -109,7 +109,7 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
                             it.bearing,
                             it.altitude.toDouble(),
                             it.time)
-                    LOGGER.info("${Date().toString()} Got new location fix ", "private fun enableTracking(track: Boolean)")
+                    LOGGER.info("Got new location fix ", "private fun enableTracking(track: Boolean)")
                     if (locationFix != null) {
                         fixProducer.onNext(listOf(locationFix))
                     }

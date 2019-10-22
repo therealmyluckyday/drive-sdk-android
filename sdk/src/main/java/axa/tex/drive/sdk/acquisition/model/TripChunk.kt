@@ -29,6 +29,8 @@ class TripChunk(internal val tripId: TripId, internal val tripInfos: TripInfos, 
 
     fun canUpload() : Boolean {
         if (fixes.last() is MotionFix) {
+            return false
+        }
         if ( this.toJson() == Constants.EMPTY_PACKET) {
             return false
         }
