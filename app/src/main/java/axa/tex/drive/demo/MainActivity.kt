@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         service?.logStream()?.subscribeOn(Schedulers.computation())?.subscribe {
             Thread{
-                println("["+it.file + it.function + "]"+ it.description )
+                println("["+it.file +"]["+ it.function + "]"+ it.description )
             }.start()
 
         }
