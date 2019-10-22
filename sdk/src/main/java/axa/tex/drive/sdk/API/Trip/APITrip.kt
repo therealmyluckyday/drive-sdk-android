@@ -25,13 +25,13 @@ internal class APITrip : KoinComponentCallbacks {
             val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
                     .build()
 
-            var fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorker::class.java).setInputData(data).addTag((tripChunk.tripId).toString()).setConstraints(constraints)
+            var fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(FixWorker::class.java).setInputData(data).addTag((tripChunk.tripInfos.tripId).toString()).setConstraints(constraints)
                     .build()
             if (tripChunk.isEnded()) {
-                fixUploadWork = OneTimeWorkRequest.Builder(LastFixWorker::class.java).setInputData(data).addTag((tripChunk.tripId).toString()).setConstraints(constraints)
+                fixUploadWork = OneTimeWorkRequest.Builder(LastFixWorker::class.java).setInputData(data).addTag((tripChunk.tripInfos.tripId).toString()).setConstraints(constraints)
                         .build()
             }
-            val pendingTrip = PendingTrip(tripChunk.tripInfos.uid, tripChunk.tripId?.value, tripChunk.isEnded())
+            val pendingTrip = PendingTrip(tripChunk.tripInfos.uid, tripChunk.tripInfos.tripId.value, tripChunk.isEnded())
             collectorDb.saveTrip(pendingTrip)
             LOGGER.info("SENDING : ENQUEUING", function = "fun addFixes(fixes: List<Fix>")
             WorkManager.getInstance().enqueue(fixUploadWork)

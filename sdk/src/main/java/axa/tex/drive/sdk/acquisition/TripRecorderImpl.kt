@@ -17,7 +17,6 @@ import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -46,11 +45,8 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     }
 
     override fun getCurrentTripId(): TripId? {
-        val tripManager : TripManager by inject()
-        return tripManager.tripId(context)
+        return fixProcessor?.currentTripChunk?.tripInfos?.tripId
     }
-
-
 
     constructor(context: Context) {
         this.context = context
@@ -107,8 +103,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
         logger.info("${Date()} TripRecorder : Start tracking.", function = "fun startTrip(startTime: Long) : TripId?")
         requestForLocationPermission()
-        val tripManager : TripManager by inject()
-        tripManager.removeTripId(context)
         val serviceIntent = Intent(context, CollectorService::class.java)
         if(myCustomNotification != null) {
             serviceIntent.putExtra("notif", myCustomNotification)
@@ -119,9 +113,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             context.startService(serviceIntent)
         }
 
-        fixProcessor?.startTrip(startTime)
-
-        return tripManager.tripId(context)
+        return fixProcessor?.startTrip(startTime)
     }
 
     override fun stopTrip(endTime: Long) {
