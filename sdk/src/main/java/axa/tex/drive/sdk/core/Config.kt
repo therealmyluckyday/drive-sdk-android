@@ -1,5 +1,6 @@
 package axa.tex.drive.sdk.core
 
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 
@@ -11,9 +12,9 @@ internal class Config {
     var clientId: String? = null
     var endPoint: Platform? = Platform.PRODUCTION
 
-    constructor() {
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
-    }
+
 
     constructor(batteryTrackerEnabled: Boolean,
                 locationTrackerEnabled: Boolean,
@@ -33,7 +34,7 @@ internal class Config {
             mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
             mapper.writeValueAsString(this)
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.error("Exception : ${e.printStackTrace()}", "toJson")
             "{}"
         }
     }

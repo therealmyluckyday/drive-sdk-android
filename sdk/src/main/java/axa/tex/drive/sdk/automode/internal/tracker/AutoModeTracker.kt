@@ -15,7 +15,9 @@ import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
 import axa.tex.drive.sdk.automode.internal.tracker.model.Where
+import axa.tex.drive.sdk.core.CertificateAuthority.Companion.LOGGER
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
@@ -36,6 +38,7 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
     internal val speedFilter: SpeedFilter by inject()
     internal val locations: PublishSubject<Location> = PublishSubject.create()
 
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private lateinit var activityRecognitionClient: ActivityRecognitionClient
     private lateinit var pendingIntent: PendingIntent
     private lateinit var activityReceiver: BroadcastReceiver
@@ -101,8 +104,11 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
         }
         context.registerReceiver(activityReceiver, IntentFilter(ACTIVITY_INTENT_ACTION))
         val task = activityRecognitionClient.requestActivityUpdates(ACTIVITY_DETECTION_INTERVAL, pendingIntent)
-        task.addOnSuccessListener(OnSuccessListener { print("Connection succeeded!") })
-        task.addOnFailureListener(OnFailureListener { print("Unable to connect!") })
+        task.addOnSuccessListener(OnSuccessListener {
+            LOGGER.info("\"Connection succeeded!", "addOnSuccessListener")
+            })
+        task.addOnFailureListener(OnFailureListener {
+            LOGGER.info("\"Connection Failed!", "addOnFailureListener") })
 
     }
 

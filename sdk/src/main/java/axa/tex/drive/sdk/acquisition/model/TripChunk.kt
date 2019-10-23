@@ -25,7 +25,7 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
 
     fun append(fix: Fix) {
         if (fix is Event) {
-            val eventFound = fix as Event
+            val eventFound = fix
             isLast = eventFound.event.contains("stop")
         }
         fixes.add(fix)
@@ -66,9 +66,6 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
     }
 
     fun data() : Data {
-        LOGGER.info("Size ${this.fixes.count()}", function = "fun data()")
-
-        LOGGER.info("Size ${this.toJson().count()}", function = "fun data()")
         return Data.Builder().putString(Constants.ID_KEY, this.tripInfos.uid).putString(Constants.DATA_KEY, this.toJson()).putString(Constants.APP_NAME_KEY, this.tripInfos.appName).putString(Constants.CLIENT_ID_KEY,
                 this.tripInfos.clientId).putInt(Constants.WORK_TAG_KEY, idPacket).putString(Constants.TRIP_ID_KEY, this.tripInfos.tripId.value).build()
     }

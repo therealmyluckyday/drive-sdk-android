@@ -19,4 +19,9 @@ class TripInfos(val appName: String, val clientId: String) {
     val timezone: String = Utils.getFormattedTZ()
     val uid: String = UUID.randomUUID().toString()
     val version: String = Constants.JSON_SCHEMA_VERSION
+
+    init {
+        require(appName.isNotEmpty())
+        require(clientId.isNotEmpty())
+    }
 }
