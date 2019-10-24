@@ -104,8 +104,8 @@ artifactory {
     publish {
         repository {
             repoKey = 'android-tex'
-            username = artifactory_username
-            password = artifactory_password
+            username = System.getenv("ARTIFACTORY_USERNAME")
+            password = System.getenv("ARTIFACTORY_PASSWORD")
         }
         defaults {
             publications('release')

@@ -3,7 +3,16 @@
 /gen
 build
 dist
+.envrc
 .gradle
 .idea
+.knownPackages
 *.iml
+android-sdk.zip
 local.properties
+android-sdk/
+build-tools/
+licenses/
+platform-tools/
+platforms/
+tools/
