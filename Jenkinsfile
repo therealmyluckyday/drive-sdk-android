@@ -40,7 +40,10 @@ pipeline {
 
     stage('assembleDebug') {
       steps {
-        sh './gradlew assembleDebug'
+         sh './gradlew tasks'
+          withCredentials([file(credentialsId: 'debug.keystore', variable: 'FILE')]) {
+           sh './gradlew -Pkeypass='android' -PstoretPass='android' -PstoreFilePath="${FILE}" assembleDebug --debug'
+         }
       }
     }
 
