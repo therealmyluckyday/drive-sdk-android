@@ -96,7 +96,7 @@ class TexDriveDemoApplication : Application() {
 
         if(!autoModeHandler?.running!!) {
             Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
-            autoModeHandler?.activateAutomode(applicationContext)
+            autoModeHandler.activateAutomode(applicationContext)
         }else{
            // Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
         }

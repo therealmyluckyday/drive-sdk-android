@@ -6,6 +6,7 @@ import android.support.test.runner.AndroidJUnit4
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION
 import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_OLDER_MOTION_AGE
+import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.core.TexConfig
@@ -58,22 +59,13 @@ class TextInstrumentedTest : KoinTest {
         tripRecorder?.track();
     }
 
-
-    private fun testMotionBuffer(fixes: List<Fix>): Boolean {
-        Assert.assertFalse(fixes.isEmpty())
-        Assert.assertTrue((fixes.first().timestamp() - fixes.last().timestamp()) <= DEFAULT_OLDER_MOTION_AGE + DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION)
-        return false;
-    }
-
     @Test
     fun testMotionTracking() {
         val appContext = InstrumentationRegistry.getTargetContext()
         val motionTracker = MotionTracker(appContext, true)
         val fixData = motionTracker.provideFixProducer() as Observable<Any>
         fixData.subscribe { fixes ->
-            Assert.assertFalse((fixes as List<Fix>).isEmpty());
-            Assert.assertTrue((fixes as List<Fix>).first().timestamp() - (fixes as List<Fix>).first().timestamp() <=
-                    DEFAULT_OLDER_MOTION_AGE + DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION)
+            Assert.assertFalse((fixes as List<Fix>).isEmpty())
         }
     }
 }

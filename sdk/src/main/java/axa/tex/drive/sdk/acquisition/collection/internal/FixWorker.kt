@@ -29,15 +29,14 @@ internal open class FixWorker() : Worker(), KoinComponentCallbacks {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
         val appName = inputData.getString(Constants.APP_NAME_KEY, "")
         val clientId = inputData.getString(Constants.CLIENT_ID_KEY, "")
-        val id = inputData.getString(Constants.ID_KEY, "")
         val data = inputData.getString(Constants.DATA_KEY, "")
         LOGGER.info("COLLECTOR_WORKER SIZE :$inputData.keyValueMap.size.toString()", "private fun sendFixes(inputData : Data) : Boolean")
-        return sendData(id, data, appName, clientId)
+        return sendData(data, appName, clientId)
     }
 
 
     @Throws(IOException::class)
-    private fun sendData(id: String, data: String, appName: String, clientId: String): WorkerResult {
+    private fun sendData(data: String, appName: String, clientId: String): WorkerResult {
 
         try {
             val collectorDb: CollectionDb by inject()
@@ -52,8 +51,8 @@ internal open class FixWorker() : Worker(), KoinComponentCallbacks {
             val platformToHostConverter = PlatformToHostConverter(platform);
             val url = URL(platformToHostConverter.getHost() + "/data")
 
-            LOGGER.info("SENDING DATA URL = ${url.toURI()}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
-            LOGGER.info("SENDING DATA = ${data}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+            LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = ${data}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+
 
             val uid = DeviceInfo.getUid(applicationContext);
             val urlConnection: HttpURLConnection

@@ -1,5 +1,6 @@
 package axa.tex.drive.sdk.acquisition.collection.internal
 
+import android.annotation.TargetApi
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -50,53 +51,30 @@ internal class CollectorService : Service() {
         return channelId
     }
 
+    //To avoid executing that block of code on devices older than Android X.0
+    fun isNewerPhone(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+    }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-
-        val collectorDb: CollectionDb by inject()
-
-
-        try {
-            if (collectorDb == null) {
-                try {
-                    StandAloneContext.stopKoin()
-                    TexConfig.setupKoin(applicationContext)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        } catch (e: IllegalStateException) {
-            try {
-                StandAloneContext.stopKoin()
-                TexConfig.setupKoin(applicationContext)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    @TargetApi(26)
+    fun startNotification(intent: Intent?) {
+        val channelId = createNotificationChannel();
+        val notification: Notification
+        if (intent != null && intent.hasExtra("notif")) {
+            notification = intent.getParcelableExtra("notif")
+        } else {
+            val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            notification = notificationBuilder.setOngoing(true)
+                    .setSmallIcon(R.drawable.ic_logo)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .build()
         }
-        val collector: Collector by inject()
-        this.collector = collector
-        collector.startCollecting()
-        collector.recording = true
+        this.startForeground(NOTIFICATION_ID, notification)
+    }
 
-        val scoreRetriever: ScoreRetriever by inject()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = createNotificationChannel();
-            val notification: Notification
-            if (intent != null && intent.hasExtra("notif")) {
-                notification = intent.getParcelableExtra("notif")
-            } else {
-                val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                notification = notificationBuilder.setOngoing(true)
-                        .setSmallIcon(R.drawable.ic_logo)
-                        .setCategory(Notification.CATEGORY_SERVICE)
-                        .build()
-            }
-            this.startForeground(NOTIFICATION_ID, notification)
-        }
-
+    fun subscribeScoreAvailability() {
         try {
+            val scoreRetriever: ScoreRetriever by inject()
             scoreRetriever.getAvailableScoreListener().subscribe ( { tripId ->
                 scoreRetriever.getScoreListener().subscribe { scoreResult ->
                     if (scoreResult.scoreDil == null) {
@@ -111,14 +89,28 @@ internal class CollectorService : Service() {
                     tripId?.let { scoreRetriever.retrieveScore(it) }
                 }.start()
             }, {throwable ->
-                print(throwable)
+                LOGGER.error("The retrieved rx score exception: ${throwable.printStackTrace()}", "onStartCommand")
             })
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.error("The retrieved score exception: ${e.printStackTrace()}", "onStartCommand")
         } catch (err: Error) {
-            err.printStackTrace()
+            LOGGER.error("The retrieved score error: ${err.printStackTrace()}", "onStartCommand")
+        }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        val collector: Collector by inject()
+        this.collector = collector
+        collector.startCollecting()
+        collector.recording = true
+
+        if (isNewerPhone()) {
+            startNotification(intent)
         }
 
+        subscribeScoreAvailability()
+        
         return START_STICKY
     }
 

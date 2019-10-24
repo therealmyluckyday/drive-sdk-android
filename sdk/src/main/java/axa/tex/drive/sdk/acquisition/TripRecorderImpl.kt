@@ -40,8 +40,8 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private val tripProgress = PublishSubject.create<TripProgress>()
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
 
-    override fun setCustomNotification(customNotification: Notification?) {
-        myCustomNotification = customNotification
+    override fun setCustomNotification(notification: Notification?) {
+        myCustomNotification = notification
     }
 
     override fun getCurrentTripId(): TripId? {
@@ -82,11 +82,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
         if (Build.VERSION.SDK_INT >= 23) {
 
-           /* if (context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-               val exception = PermissionException("need permission.WRITE_EXTERNAL_STORAGE")
-                throw exception
-            }*/
-
             if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 val exception = PermissionException("need permission.ACCESS_FINE_LOCATION")
                 throw exception
@@ -119,7 +114,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     }
 
     override fun stopTrip(endTime: Long) {
-        logger.info("${Date()} TripRecorder : Stop tracking.", function = "fun stopTrip(startTime: Long) : TripId?")
+        logger.info("TripRecorder : Stop tracking.", function = "fun stopTrip(startTime: Long) : TripId?")
         requestForLocationPermission()
         fixProcessor?.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
@@ -132,6 +127,8 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             }
 
             override fun onServiceDisconnected(componentName: ComponentName) {
+
+                logger.info(" CollectorService : onServiceDisconnected", function = "onServiceDisconnected")
             }
         }, 0);
         disposable.dispose()

@@ -8,7 +8,6 @@ import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.PersistentQueue
 import axa.tex.drive.sdk.acquisition.internal.sensor.BatterySensor
 import axa.tex.drive.sdk.acquisition.internal.sensor.LocationSensor
 import axa.tex.drive.sdk.acquisition.internal.sensor.MotionSensor
@@ -55,7 +54,6 @@ class TexConfig {
                 single { AutoModeTracker(context) as TexActivityTracker }
                 single { Automode(get()) }
                 single { TripManager() }
-                single { PersistentQueue(context) }
                 single { ScoreRetriever() }
                 single { CollectionDb(context) }
                 single { FixProcessor(context) }

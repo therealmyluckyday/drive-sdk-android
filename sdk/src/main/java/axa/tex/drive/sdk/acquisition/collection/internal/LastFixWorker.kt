@@ -19,7 +19,7 @@ internal class LastFixWorker(): FixWorker() {
         val inputData: Data = inputData
         val tripId = inputData.getString(Constants.TRIP_ID_KEY, "")
         val list = WorkManager.getInstance().getStatusesByTag(tripId).value
-        val tripChunkInQueue = list?.filter { it.state == State.ENQUEUED || it.state == State.RUNNING }
+        val tripChunkInQueue = list?.filter { it.state in setOf(State.ENQUEUED, State.RUNNING) }
         if (tripChunkInQueue != null && tripChunkInQueue.count() > 0) {
             return WorkerResult.RETRY
         }
@@ -30,7 +30,7 @@ internal class LastFixWorker(): FixWorker() {
             val collectorDb: CollectionDb by inject()
             LOGGER.info("Packet sent successfully and trip id = ${tripId} stop = true", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
             val collector: Collector by inject()
-            if (collector.currentTripId != null && collector.currentTripId!!.value == tripId) {
+            if (collector.currentTripId?.value == tripId) {
                 collector.currentTripId = null
             }
 

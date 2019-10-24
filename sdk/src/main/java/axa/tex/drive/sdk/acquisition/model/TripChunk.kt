@@ -13,14 +13,10 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
     private var fixes = mutableListOf<Fix>()
     private var packetSize: Int = DEFAULT_PACKET_SIZE
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
-    private var isLast: Boolean = false
+    internal var isLast: Boolean = false
     fun clear() {
         fixes.clear()
         isLast = false
-    }
-
-    fun isEnded() : Boolean {
-        return isLast
     }
 
     fun append(fix: Fix) {
@@ -43,8 +39,8 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
             return true
         }
 
-        if (this.isEnded()) {
-            LOGGER.info("this.isEnded()"+this.isEnded(), function = "canUpload()")
+        if (this.isLast) {
+            LOGGER.info("this.isLast"+this.isLast, function = "canUpload()")
             return true
         }
         if (fixes.last() is MotionFix) {

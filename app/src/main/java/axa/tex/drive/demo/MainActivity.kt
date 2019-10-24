@@ -172,9 +172,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun requestForLocationPermission() {
-
-
-
         val locationPermission = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION)
 

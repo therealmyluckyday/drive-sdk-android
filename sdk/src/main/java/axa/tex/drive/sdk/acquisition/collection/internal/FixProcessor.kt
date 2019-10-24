@@ -48,9 +48,9 @@ internal class FixProcessor : KoinComponentCallbacks {
 
     fun push() {
         LOGGER.info("push tripchunk ", "push")
-        apiTrip.sendTrip(this!!.currentTripChunk!!)
+        apiTrip.sendTrip(this.currentTripChunk!!)
         this.currentTripChunk?.clear()
-        collectorDb.setNumberPackets(this!!.currentTripChunk!!.tripInfos.tripId.value, this!!.currentTripChunk!!.idPacket)
+        collectorDb.setNumberPackets(this.currentTripChunk!!.tripInfos.tripId.value, this.currentTripChunk!!.idPacket)
     }
 
 
