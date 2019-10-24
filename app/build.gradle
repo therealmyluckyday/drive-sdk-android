@@ -39,11 +39,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    signingConfigs {
-        debug {
-            storeFile file(System.getProperty('user.home') + "/.android/debug.keystore")
-        }
-    }
 }
 
 dependencies {
