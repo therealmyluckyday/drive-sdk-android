@@ -26,7 +26,6 @@ class Trips : AppCompatActivity() {
             if(!trip.isEmpty())
             data.add(trip)
         }
-       // val dataSet: List<String> = listOf<String>("4260e592-008b-4fcf-877d-fe8d3923b5f5")
         viewAdapter = TripAdapter(this, data)
 
         recyclerView = findViewById<RecyclerView>(R.id.trips).apply {

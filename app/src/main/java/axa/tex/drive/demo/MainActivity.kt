@@ -24,28 +24,11 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private var tripRecorder: TripRecorder? = null
-    //private var config: TexConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         requestForLocationPermission();
-
-
-
-
-
-       /* config = TexConfig.Builder(user, applicationContext).enableBatteryTracker().enableLocationTracker()
-                .enableMotionTracker().withAppName("BCI").withClientId("22910000").build(applicationContext);
-        */
-        //config = TexConfig.Builder(user, applicationContext).enableTrackers().withAppName("BCI").withClientId("22910000").platformHost(Platform.PREPROD).build();
-
-       /* config = TexConfig.Builder(applicationContext,"APP-TEST","22910000").
-                enableTrackers().platformHost(Platform.PREPROD).build();*/
-
-
-       // val service:TexService? = TexService.configure(config!!)
-        //(application as TexDriveDemoApplication).tripRecorder = service?.getTripRecorder();
 
         val service = (application as TexDriveDemoApplication).service
         tripRecorder = (application as TexDriveDemoApplication).tripRecorder
@@ -59,25 +42,28 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        service?.logStream()?.subscribeOn(Schedulers.computation())?.subscribe {
+        service?.logStream()?.subscribeOn(Schedulers.computation())?.subscribe ( {
             Thread{
-                println(it)
+                println("["+it.file +"]["+ it.function + "]"+ it.description )
             }.start()
 
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
         val scoreRetriever = service?.scoreRetriever()
-        scoreRetriever?.getScoreListener()?.subscribe {
+        scoreRetriever?.getScoreListener()?.subscribe ( {
             it?.let { score ->
                 println(score) }
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
-        (application as TexDriveDemoApplication).tripRecorder?.endedTripListener()?.subscribe {
+        (application as TexDriveDemoApplication).tripRecorder?.endedTripListener()?.subscribe ( {
             print(it)
-        }
-
-        //scoreRetriever?.retrieveScore(tripId = "ECDAF109-513A-4D0E-88AF-8F69724B86A1")
-
+        }, {throwable ->
+            print(throwable)
+        })
 
 
         WorkManager.getInstance().getStatusesForUniqueWork("B9FBFF8B-D60C-4DA5-B37D-2B054E64612E").observe(this,Observer { stats ->
@@ -99,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val autoModeHandler = service?.automodeHandler()
-        autoModeHandler?.state?.subscribe {driving ->
+        autoModeHandler?.state?.subscribe( {driving ->
             if(driving){
                 runOnUiThread {
                    startService()
@@ -118,55 +104,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
-        autoModeHandler?.speedListener?.locationInput?.subscribe{
+        autoModeHandler?.speedListener?.locationInput?.subscribe({
             speedView.speedTo(it.speed*3.6f, 50)
-        }
+        }, {throwable ->
+            print(throwable)
+        })
 
-        /*if (!tripRecorder?.isRecording()!!) {
-
-            Toast.makeText(applicationContext,"ACTIVATING.....", Toast.LENGTH_SHORT).show()
-            autoModeHandler?.activateAutomode(applicationContext)
-        }*/
-
-
-
-        //==========================================================================================
-     /*     val activityTracker = ActivityTracker(this);
-
-       val automode = AutoMode()
-
-          automode.statePublisher().subscribe{state ->
-              when (state){
-                 AutoModeState.State.DRIVING -> {
-                     runOnUiThread{
-                         play.visibility = View.GONE
-                         stop.visibility = View.VISIBLE
-                         Toast.makeText(this@MainActivity, "Now starting collect", Toast.LENGTH_SHORT).show()
-
-                         startService()
-                     }
-
-                 }
-                  AutoModeState.State.IDLE-> try {
-                      runOnUiThread{
-                          play.visibility = View.VISIBLE
-                          stop.visibility = View.GONE
-                          Toast.makeText(this@MainActivity, "Now stopping collect", Toast.LENGTH_SHORT).show()
-                          stopService()
-                      }
-                  }catch (e: Exception){
-                      e.printStackTrace()
-                  }
-              }
-          }
-
-         automode.setCurrentState(activityTracker)
-        //automode.setCurrentState(activityTracker)
-        //activityTracker.scan(automode)*/
-
-        //==========================================================================================
 
 
 
@@ -225,23 +172,12 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun requestForLocationPermission() {
-
-
-      /*val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)*/
-
         val locationPermission = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION)
 
-        val storageLocation = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         if (Build.VERSION.SDK_INT >= 23) {
 
-            /*if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, storageLocation, 0)
-            }*/
 
             if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, locationPermission, 0)

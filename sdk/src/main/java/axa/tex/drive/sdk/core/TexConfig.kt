@@ -8,7 +8,6 @@ import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.collection.internal.db.queue.PersistentQueue
 import axa.tex.drive.sdk.acquisition.internal.sensor.BatterySensor
 import axa.tex.drive.sdk.acquisition.internal.sensor.LocationSensor
 import axa.tex.drive.sdk.acquisition.internal.sensor.MotionSensor
@@ -55,14 +54,13 @@ class TexConfig {
                 single { AutoModeTracker(context) as TexActivityTracker }
                 single { Automode(get()) }
                 single { TripManager() }
-                single { PersistentQueue(context) }
                 single { ScoreRetriever() }
                 single { CollectionDb(context) }
                 single { FixProcessor(context) }
                 single(LocationTracker::class.simpleName!!) { LocationTracker(LocationSensor(get(), get(), context, locationTrackerEnabled)) as Tracker }
                 single(BatteryTracker::class.simpleName!!) { BatteryTracker(BatterySensor(context, batteryTrackerEnabled)) as Tracker }
                 single(MotionTracker::class.simpleName!!) { MotionTracker(MotionSensor(context, motionTrackerEnabled)) as Tracker }
-                single { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context, mutableListOf<Tracker>(get(LocationTracker::class.simpleName!!), get(BatteryTracker::class.simpleName!!), get(MotionTracker::class.simpleName!!))) }
+                single { axa.tex.drive.sdk.acquisition.collection.internal.Collector(context, mutableListOf<Tracker>(get(LocationTracker::class.simpleName!!), get(BatteryTracker::class.simpleName!!))) }
                 single { TripRecorderImpl(context) as TripRecorder }
             })
             try {
@@ -124,7 +122,6 @@ class TexConfig {
             }
 
             logger.logger.info("Create koin module", "init")
-            logger.logger.info("Done create koin module", "init")
         }
 
 

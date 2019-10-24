@@ -24,7 +24,7 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
 
     override fun next() {
         var locationSubscription: Disposable? = null
-        locationSubscription = filterer.locationOutputWithAccuracy.subscribe {
+        locationSubscription = filterer.locationOutputWithAccuracy.subscribe( {
             if (!disabled) {
                 logger.info(Date().toString() + ":Speed of ${it.speed} reached with ${it.accuracy} of accuracy", function = "fun next()")
                 locationSubscription?.dispose()
@@ -40,7 +40,9 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
                 automode.getCurrentState().disable(false)
                 automode.next()
             }
-        }
+        }, {throwable ->
+            print(throwable)
+        })
     }
 
     override fun state(): AutomodeHandler.State {

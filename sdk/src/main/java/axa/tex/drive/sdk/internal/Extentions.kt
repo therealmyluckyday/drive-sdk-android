@@ -5,7 +5,7 @@ import java.util.zip.GZIPOutputStream
 
 
 internal fun String.capitalize(): String {
-    if (this == null || this.isEmpty()) {
+    if (this.isNullOrEmpty()) {
         return ""
     }
     val first = this[0]

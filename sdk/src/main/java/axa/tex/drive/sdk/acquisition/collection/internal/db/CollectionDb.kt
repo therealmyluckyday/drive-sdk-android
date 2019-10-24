@@ -106,7 +106,7 @@ internal class CollectionDb {
     internal fun getPacketNumber(trip: String): Int {
         val prefs =
                 context?.getSharedPreferences(LAST_PACKET, Context.MODE_PRIVATE)
-        return prefs?.getInt(trip, -1)!!
+        return prefs?.getInt(trip, 0)!!
     }
 
 
@@ -122,7 +122,7 @@ internal class CollectionDb {
     internal fun getNumberPackets(trip: String): Int {
         val prefs =
                 context?.getSharedPreferences(NUMBER_PACKETS, Context.MODE_PRIVATE)
-        return prefs?.getInt(trip, -1)!!
+        return prefs?.getInt(trip, 0)!!
     }
 
     @Synchronized

@@ -60,12 +60,14 @@ internal class Collector : KoinComponentCallbacks {
         tracker.enableTracking();
         fixData = tracker.provideFixProducer() as Observable<List<Fix>>
 
-        fixData?.subscribeOn(Schedulers.single())?.subscribe { fixes ->
+        fixData?.subscribeOn(Schedulers.single())?.subscribe( { fixes ->
             fixProcessor.addFixes(fixes)
             if (fixes.size == 1 && fixes[0] is LocationFix) {
                 locations.onNext(fixes[0] as LocationFix)
             }
-        }
+        }, {throwable ->
+            print(throwable)
+        })
     }
 
     fun stopCollecting() {
@@ -76,12 +78,5 @@ internal class Collector : KoinComponentCallbacks {
             }
         }
         recording = false
-    }
-
-    fun numberOfTrackers(): Int {
-        if (trackers != null) {
-            return trackers.size
-        }
-        return 0
     }
 }

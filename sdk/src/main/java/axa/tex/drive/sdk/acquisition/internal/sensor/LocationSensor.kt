@@ -16,7 +16,6 @@ import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import java.util.*
 
 
 internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallbacks {
@@ -101,20 +100,23 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
 
         if (track) {
             //============================================================================================================================
-            autoModeTracker?.speedFilter?.gpsStream?.subscribe {
+            autoModeTracker?.speedFilter?.gpsStream?.subscribe ({
                 if (autoModeTracker?.speedFilter!!.collectionEnabled) {
-                    val locationFix = LocationFix(it.latitude.toDouble(),
+                    val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),
                             it.longitude.toDouble(),
                             it.accuracy,
                             it.speed,
                             it.bearing,
                             it.altitude.toDouble(),
                             it.time)
-                    fixProducer.onNext(listOf(locationFix))
-                    LOGGER.info("${Date().toString()} Got new location fix ", "private fun enableTracking(track: Boolean)")
+                    LOGGER.info("Got new location fix ", "private fun enableTracking(track: Boolean)")
+                    if (locationFix != null) {
+                        fixProducer.onNext(listOf(locationFix))
+                    }
                 }
-            }
-            //============================================================================================================================
+            }, {throwable ->
+                print(throwable)
+            })
             if (Build.VERSION.SDK_INT >= 23) {
                 if (context?.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                         context?.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

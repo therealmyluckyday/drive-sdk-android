@@ -17,7 +17,6 @@ import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -41,16 +40,13 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private val tripProgress = PublishSubject.create<TripProgress>()
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
 
-    override fun setCustomNotification(customNotification: Notification?) {
-        myCustomNotification = customNotification
+    override fun setCustomNotification(notification: Notification?) {
+        myCustomNotification = notification
     }
 
     override fun getCurrentTripId(): TripId? {
-        val tripManager : TripManager by inject()
-        return tripManager.tripId(context)
+        return fixProcessor?.currentTripChunk?.tripInfos?.tripId
     }
-
-
 
     constructor(context: Context) {
         this.context = context
@@ -64,7 +60,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
         }
 
 
-        disposable = automodeHandler.speedListener.locations.subscribe {
+        disposable = automodeHandler.speedListener.locations.subscribe( {
             var deltaDistance = 0.0
             if (mCurrentLocation != null) { // this is not the first point GPS received
                 deltaDistance = (mCurrentLocation!!.distanceTo(it) / 1000).toDouble() // Km
@@ -76,18 +72,15 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             val duration = System.currentTimeMillis() - start
             val progress = TripProgress(getCurrentTripId()!!,it,mCurrentSpeed,mCurrentDistance,duration)
             tripProgress.onNext(progress)
-        }
+        }, {throwable ->
+            print(throwable)
+        })
     }
 
     @Throws(PermissionException::class)
     private fun requestForLocationPermission() {
 
         if (Build.VERSION.SDK_INT >= 23) {
-
-           /* if (context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-               val exception = PermissionException("need permission.WRITE_EXTERNAL_STORAGE")
-                throw exception
-            }*/
 
             if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 val exception = PermissionException("need permission.ACCESS_FINE_LOCATION")
@@ -107,8 +100,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
         logger.info("${Date()} TripRecorder : Start tracking.", function = "fun startTrip(startTime: Long) : TripId?")
         requestForLocationPermission()
-        val tripManager : TripManager by inject()
-        tripManager.removeTripId(context)
         val serviceIntent = Intent(context, CollectorService::class.java)
         if(myCustomNotification != null) {
             serviceIntent.putExtra("notif", myCustomNotification)
@@ -119,12 +110,11 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             context.startService(serviceIntent)
         }
 
-        fixProcessor?.startTrip(startTime)
-
-        return tripManager.tripId(context)
+        return fixProcessor?.startTrip(startTime)
     }
 
     override fun stopTrip(endTime: Long) {
+        logger.info("TripRecorder : Stop tracking.", function = "fun stopTrip(startTime: Long) : TripId?")
         requestForLocationPermission()
         fixProcessor?.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
@@ -137,6 +127,8 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             }
 
             override fun onServiceDisconnected(componentName: ComponentName) {
+
+                logger.info(" CollectorService : onServiceDisconnected", function = "onServiceDisconnected")
             }
         }, 0);
         disposable.dispose()
