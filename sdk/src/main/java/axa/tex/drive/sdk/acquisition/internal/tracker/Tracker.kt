@@ -1,11 +1,14 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
+import axa.tex.drive.sdk.acquisition.model.Fix
+import io.reactivex.Observable
+
 interface Tracker {
 
     /**
      * @return An observable for listening fixes.
      */
-    fun provideFixProducer(): Any
+    fun provideFixProducer(): Observable<List<Fix>>
 
     /**
      * Enables tracking of a given tracker

@@ -41,28 +41,25 @@ class BatteryTrackerTest {
         val level = 20
         val time = Date().time
         val signal = CountDownLatch(1)
-
         val batteryTracker = BatteryTracker(FakeBatterySensor(level, state, time))
-
-        var failed = false
-        val batteryFixProducer = batteryTracker.provideFixProducer() as Observable<List<Fix>>
+        val batteryFixProducer = batteryTracker.provideFixProducer()
         batteryFixProducer.subscribe { fix ->
             try {
-                val batteryFix = (fix as List<Fix>).first() as BatteryFix
-                Assert.assertTrue(batteryFix.state == state && batteryFix.level == level && batteryFix.timestamp == time)
+                val firstFix = (fix as List<Fix>).first()
+                Assert.assertTrue(firstFix is BatteryFix)
+                val batteryFix = firstFix as BatteryFix
+                Assert.assertEquals(batteryFix.state, state)
+                Assert.assertEquals(batteryFix.level, level)
+                Assert.assertEquals(batteryFix.timestamp, time)
                 signal.countDown()
             } catch (e: Throwable) {
-                e.printStackTrace()
-                failed = true
+                Assert.assertNull(e.printStackTrace().toString(), e)
                 signal.countDown()
             }
-
         }
 
-
-
         batteryTracker.enableTracking()
+
         signal.await()
-        Assert.assertTrue(!failed)
     }
 }

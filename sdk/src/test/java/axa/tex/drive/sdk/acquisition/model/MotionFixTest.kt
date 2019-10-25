@@ -12,7 +12,6 @@ class MotionFixTest {
         val timestamp = Date().time
         val rotationRate = Motion(x = 0f, y = 1f, z = 2f, timestamp = timestamp)
         val acceleration = Motion(x = 1f, y = 3f, z = 0f, timestamp = timestamp)
-        val rawAcceleration = Motion(x = 2f, y = 2f, z = 0f, timestamp = timestamp)
         val gravity = Motion(x = 1f, y = 1f, z = 0f, timestamp = timestamp)
         val magnetometer = Motion(x = 2f, y = 2f, z = 0f, timestamp = timestamp)
 

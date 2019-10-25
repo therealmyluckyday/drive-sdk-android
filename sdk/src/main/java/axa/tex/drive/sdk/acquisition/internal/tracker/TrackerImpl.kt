@@ -1,6 +1,8 @@
 package axa.tex.drive.sdk.acquisition.internal.tracker
 
 import axa.tex.drive.sdk.acquisition.internal.sensor.TexSensor
+import axa.tex.drive.sdk.acquisition.model.Fix
+import io.reactivex.Observable
 
 open class TrackerImpl : Tracker {
 
@@ -10,7 +12,7 @@ open class TrackerImpl : Tracker {
         this.sensor = sensor
     }
 
-    override fun provideFixProducer(): Any {
+    override fun provideFixProducer(): Observable<List<Fix>> {
         return sensor.producer()
     }
 

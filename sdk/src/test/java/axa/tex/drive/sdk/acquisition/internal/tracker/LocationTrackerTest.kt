@@ -7,17 +7,12 @@ import axa.tex.drive.sdk.acquisition.model.LocationFix
 import io.reactivex.Observable
 import org.junit.Assert
 import org.junit.Test
-
 import java.util.concurrent.CountDownLatch
 
 class LocationTrackerTest {
 
     @Test
     fun locationTrackerCorrectlyEnabled() {
-        /*val locationTracker : LocationTracker = LocationTracker(context = null,fakeLocationTracker = FakeLocationTracker(false))
-        Assert.assertFalse(locationTracker.isEnabled());
-        locationTracker.enableTracking()
-        Assert.assertTrue(locationTracker.isEnabled());*/
         val locationTracker = LocationTracker(FakeLocationSensor())
         Assert.assertFalse(locationTracker.isEnabled());
         locationTracker.enableTracking()
@@ -26,10 +21,6 @@ class LocationTrackerTest {
 
     @Test
     fun locationTrackerCorrectlyDisable() {
-        /*val locationTracker : LocationTracker = LocationTracker(isEnabled = true,context = null,fakeLocationTracker = FakeLocationTracker(false))
-        Assert.assertTrue(locationTracker.isEnabled());
-        locationTracker.disableTracking()
-        Assert.assertFalse(locationTracker.isEnabled());*/
         val locationTracker = LocationTracker(FakeLocationSensor())
         locationTracker.enableTracking()
         Assert.assertTrue(locationTracker.isEnabled());
@@ -40,26 +31,30 @@ class LocationTrackerTest {
 
     @Test
     fun locationTrackerCorrectlyProvidesFixes() {
-       // val signal = CountDownLatch(1)
-        //val fakeLocationTracker = FakeLocationTracker(false);
         val locationTracker = LocationTracker(FakeLocationSensor())
         locationTracker.enableTracking()
-        var failed = false
-        val locationProducer = locationTracker?.provideFixProducer() as Observable<Fix>
-        locationProducer.subscribe { fix ->
+        val signal = CountDownLatch(1)
+        var isCalled= false
+        val locationProducer = locationTracker?.provideFixProducer()
+        locationProducer.subscribe { fixes ->
             try {
+                val fix = fixes.first()
+                Assert.assertTrue("fix is LocationFix", fix is LocationFix)
                 val locationFix = (fix as LocationFix)
-                Assert.assertTrue(locationFix.latitude == 12.0 && locationFix.longitude == 1.88282)
-             //   signal.countDown()
+                print(fix)
+                Assert.assertTrue("latitude : ${locationFix.latitude}",locationFix.latitude.toString() == "12.0")
+                Assert.assertTrue("longitude : ${locationFix.longitude}",locationFix.latitude.toString() == "1.88282")
+                isCalled = true
+                signal.countDown()
             } catch (e: Throwable) {
-                e.printStackTrace()
-                failed = true
-              //  signal.countDown()
+                isCalled = true
+                signal.countDown()
+                Assert.assertNull(e.printStackTrace().toString(), e)
             }
 
         }
         locationTracker.enableTracking()
-        //signal.await()
-        Assert.assertTrue(!failed)
+        signal.await()
+        Assert.assertTrue("isCalled", isCalled)
     }
 }

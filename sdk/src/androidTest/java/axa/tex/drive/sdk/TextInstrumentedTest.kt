@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
+import java.util.*
 
 
 @RunWith(AndroidJUnit4::class)
@@ -29,10 +30,10 @@ class TextInstrumentedTest : KoinTest {
     fun beforeTest() {
         val appContext = InstrumentationRegistry.getTargetContext()
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
-        val config: TexConfig = TexConfig.Builder(user, appContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build(appContext);
-        tripRecorder = TexService.configure(config)?.getTripRecorder();
+        val config: TexConfig = TexConfig.Builder(user, appContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build()
+        tripRecorder = TexService.configure(config)?.getTripRecorder()
         tripRecorder?.locationObservable()?.subscribe { fix -> lastLocation = fix }
-        tripRecorder?.track()
+        tripRecorder?.startTrip(Date().time)
 
         Thread.sleep(5000)
     }
@@ -53,19 +54,10 @@ class TextInstrumentedTest : KoinTest {
     @Test
     fun testIsRecording() {
         Assert.assertTrue(tripRecorder?.isRecording() == true)
-        tripRecorder?.stopTrip();
+        tripRecorder?.stopTrip(Date().time)
         Thread.sleep(1000)
         Assert.assertTrue(tripRecorder?.isRecording() == false)
-        tripRecorder?.track();
+        tripRecorder?.startTrip(Date().time)
     }
 
-    @Test
-    fun testMotionTracking() {
-        val appContext = InstrumentationRegistry.getTargetContext()
-        val motionTracker = MotionTracker(appContext, true)
-        val fixData = motionTracker.provideFixProducer() as Observable<Any>
-        fixData.subscribe { fixes ->
-            Assert.assertFalse((fixes as List<Fix>).isEmpty())
-        }
-    }
 }
