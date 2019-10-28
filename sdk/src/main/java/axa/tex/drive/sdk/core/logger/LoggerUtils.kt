@@ -29,8 +29,8 @@ internal class LoggerUtils {
                         fileWriter.flush()
                         fileWriter.close()
                     } catch (e1: IOException) {
+                        print(e1.printStackTrace())
                     }
-
                 }
             }
 

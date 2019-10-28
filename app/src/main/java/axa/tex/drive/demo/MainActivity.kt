@@ -113,10 +113,6 @@ class MainActivity : AppCompatActivity() {
         }, {throwable ->
             print(throwable)
         })
-
-
-
-
     }
 
     internal  val CHANNEL_ID = "tex-channel-id"
@@ -136,8 +132,6 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun startService() {
-
-
             var notification : Notification? = null
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channelId = createNotificationChannel();
@@ -156,7 +150,6 @@ class MainActivity : AppCompatActivity() {
         }catch (e: PermissionException){
             e.printStackTrace()
         }
-
     }
 
     private fun stopService() {
@@ -170,22 +163,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
     private fun requestForLocationPermission() {
         val locationPermission = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION)
-
-
-        if (Build.VERSION.SDK_INT >= 23) {
-
-
-            if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, locationPermission, 0)
-            }
+        if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, locationPermission, 0)
         }
     }
-
-
-
-
 }

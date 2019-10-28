@@ -91,6 +91,10 @@ class MotionBuffer {
     }
 
     fun isRelevant(norm: Double): Boolean {
-        return if (crashFix != null) crashFix?.norm()!! < norm else true
+        var relevant = true
+        if (crashFix != null) {
+            relevant = crashFix?.norm()!! < norm
+        }
+        return relevant
     }
 }

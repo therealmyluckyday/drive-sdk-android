@@ -20,7 +20,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     private var lastGpsTime: Long
     private var notMoving: Boolean = true
     private var noGPS: Boolean = true
-    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val disposables = mutableListOf<Disposable>()
     private var speedWatcher: TimerTask? = null
     private var gpsWatcher: TimerTask? = null
@@ -28,7 +28,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
 
     constructor(automode: Automode) {
         this.automode = automode
-        logger.info("${Date()} DrivingState : ${Date().toString()} Now driving...")
+        LOGGER.info("${Date()} DrivingState : ${Date().toString()} Now driving...")
         lastMvtTime = System.currentTimeMillis()
         lastGpsTime = System.currentTimeMillis()
         watchGPS()
@@ -82,7 +82,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
             val idleState = automode.states[AutomodeHandler.State.IDLE]
             idleState?.let { automode.setCurrentState(it) }
         }
-        logger.info(Date().toString() + ": $message", function = "stop(message : String)")
+        LOGGER.info(" $message", function = "stop(message : String)")
         automodeHandler.state.onNext(false)
         automode.getCurrentState().disable(false)
         automode.activityTracker.stopSpeedScanning()
@@ -99,13 +99,16 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     }
 
     private fun stopAllTimers() {
+        val funcName = "stopAllTimers"
         try {
             gpsWatcher?.cancel()
         } catch (e: Exception) {
+            LOGGER.error("${e.printStackTrace().toString()}", funcName)
         }
         try {
             speedWatcher?.cancel()
         } catch (e: Exception) {
+            LOGGER.error("${e.printStackTrace().toString()}", funcName)
         }
         disposables.clear()
         gpsWatcher = null

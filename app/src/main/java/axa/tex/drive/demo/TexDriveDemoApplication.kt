@@ -81,16 +81,16 @@ class TexDriveDemoApplication : Application() {
         val newService = TexService.configure(newConfig)
         service = newService
         val newTripRecorder = newService.getTripRecorder()
-        tripRecorder = service?.getTripRecorder()
+        tripRecorder = newTripRecorder
 
 
-        val autoModeHandler = service?.automodeHandler()
+        val autoModeHandler = newService.automodeHandler()
 
-        service?.logStream()?.subscribeOn(Schedulers.io())?.subscribe({ it ->
+        newService.logStream()?.subscribeOn(Schedulers.io())?.subscribe({ it ->
             log(applicationContext, "[" + java.util.Calendar.getInstance() + "][" + it.file + "][" + it.function + "]" + it.description + "\n")
         })
 
-        autoModeHandler?.state?.subscribe ( {driving ->
+        autoModeHandler.state?.subscribe ( {driving ->
             if (driving) {
                 this.driving()
             } else {
@@ -100,14 +100,12 @@ class TexDriveDemoApplication : Application() {
             log(applicationContext, "error on automodeHandler subscription ${throwable}\n")
         })
 
-        if(!autoModeHandler?.running!!) {
+        if(!autoModeHandler.running!!) {
             Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
             autoModeHandler.activateAutomode(applicationContext)
         }else{
-           // Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
+           Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
         }
-
-
     }
 
     fun log(context : Context?, data : String){

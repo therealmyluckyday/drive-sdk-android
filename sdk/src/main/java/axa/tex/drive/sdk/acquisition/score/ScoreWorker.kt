@@ -64,8 +64,6 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
         }catch (e : Exception){
             e.printStackTrace()
         }
-
-        //val config  = CollectionDb.getConfig(applicationContext)
         val collectorDb: CollectionDb by inject()
         val scoreRetriever: ScoreRetriever by inject()
         val config = collectorDb.getConfig()
@@ -81,15 +79,9 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
         }
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
-        /* if (!mTexUser.isAnonymous()) {
-             connection.addRequestProperty("X-UserId", getUserID())
-             if (mTexUser.getAuthToken() != null) {
-                 connection.addRequestProperty("X-AuthToken", getAuthToken())
-             }
-         }*/
+
         connection.addRequestProperty("X-AppKey", config?.appName)
         connection.connect()
-        //mLogger.debug("Scoring server response code: " + connection.responseCode)
         val inputStream = connection.inputStream
         val rd = BufferedReader(InputStreamReader(inputStream))
         var line = rd.readLine()
@@ -106,7 +98,7 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
             val score = mapper.readValue(node.get("scores_dil").toString(), ScoresDil::class.java)
             scoreRetriever.getScoreListener().onNext(ScoreResult(score))
         } catch (e: Exception) {
-            LOGGER.info("RESPONSE CODES ${connection.responseCode}", "scoreRequest")
+            LOGGER.error("RESPONSE CODES ${connection.responseCode}", "scoreRequest")
             if(connection.responseCode.toString().startsWith("2")) {
                 val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
                 scoreRetriever.getScoreListener().onNext(ScoreResult(scoreError = scoreError, response = responseString.toString()))
@@ -135,7 +127,6 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
         } else {
             nbAttempt = 0
             scoreRetriever.getScoreListener().onNext(ScoreResult(response = recievedPayload))
-            // return recievedPayload
         }
     }
 }

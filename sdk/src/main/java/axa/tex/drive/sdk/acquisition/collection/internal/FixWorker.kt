@@ -28,7 +28,6 @@ internal open class FixWorker() : Worker(), KoinComponentCallbacks {
     fun sendFixes(inputData: Data): WorkerResult {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
         val appName = inputData.getString(Constants.APP_NAME_KEY, "")
-        val clientId = inputData.getString(Constants.CLIENT_ID_KEY, "")
         val data = inputData.getString(Constants.DATA_KEY, "")
         LOGGER.info("COLLECTOR_WORKER SIZE :$inputData.keyValueMap.size.toString()", "private fun sendFixes(inputData : Data) : Boolean")
         return sendData(data, appName)

@@ -64,12 +64,9 @@ abstract class FakeTracker : TexActivityTracker, KoinComponentCallbacks {
     }
 
     override fun checkWhereAmI() {
-
         for (activity in activities){
-            if (activity.where == Where.IN_VEHICLE) {
-                if(!stopScanning) {
-                    filterer.activityInput.onNext(activity)
-                }
+            if (activity.where == Where.IN_VEHICLE && !stopScanning) {
+                filterer.activityInput.onNext(activity)
             }
         }
     }

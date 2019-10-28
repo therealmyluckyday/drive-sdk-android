@@ -17,14 +17,14 @@ import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.states.DrivingState
 import axa.tex.drive.sdk.core.TexConfig
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
 
 
 private const val NOTIFICATION_ID = 7071
 
 internal class AutomodeService : Service() {
-
-
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val binder = LocalBinder()
 
     inner class LocalBinder : Binder() {
@@ -84,6 +84,7 @@ internal class AutomodeService : Service() {
         try {
             TexConfig.setupKoin(applicationContext)
         } catch (e: Exception) {
+            LOGGER.error("${e.printStackTrace().toString()}", "activateAutomode")
         }
 
         val automode: Automode by inject()

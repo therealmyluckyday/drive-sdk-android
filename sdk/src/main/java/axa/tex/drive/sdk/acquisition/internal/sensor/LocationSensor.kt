@@ -88,15 +88,15 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-        LOGGER.info("location Tracker ", "onStatusChanged")
+        LOGGER.info("status: $status", "onStatusChanged")
     }
 
     override fun onProviderEnabled(provider: String?) {
-        LOGGER.info("location Tracker ", "onProviderEnabled")
+        LOGGER.info("provider $provider", "onProviderEnabled")
     }
 
     override fun onProviderDisabled(provider: String?) {
-        LOGGER.info("location Tracker ", "onProviderDisabled")
+        LOGGER.info("$provider", "onProviderDisabled")
     }
 
     private fun enableTracking(track: Boolean) {
@@ -119,11 +119,9 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
             }, {throwable ->
                 LOGGER.info("throwable $throwable", funcName)
             })
-            if (Build.VERSION.SDK_INT >= 23) {
-                if (context?.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                        context?.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return
-                }
+            if (Build.VERSION.SDK_INT >= 23 && context?.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    context?.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return
             }
             autoModeTracker?.activelyScanSpeed()
         } else {

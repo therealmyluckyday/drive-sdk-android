@@ -236,8 +236,7 @@ class ObscuredSharedPreferences
             val pbeCipher = Cipher.getInstance("PBEWithMD5AndDES")
             pbeCipher.init(Cipher.ENCRYPT_MODE, key, PBEParameterSpec(SALT!!, 20))
 
-            return String(Base64.encode(pbeCipher.doFinal(bytes), Base64.NO_WRAP), Charset.forName(UTF8));
-            //return String(Base64Support.encode(pbeCipher.doFinal(bytes), Base64Support.NO_WRAP), UTF8)
+            return String(Base64.encode(pbeCipher.doFinal(bytes), Base64.NO_WRAP), Charset.forName(UTF8))
         } catch (e: Exception) {
             throw RuntimeException(e)
         }
@@ -246,7 +245,6 @@ class ObscuredSharedPreferences
 
     protected fun decrypt(value: String?): String? {
         try {
-            //val bytes = if (value != null) Base64Support.decode(value, Base64Support.DEFAULT) else ByteArray(0)
             val bytes = if (value != null) Base64.decode(value, Base64.DEFAULT) else ByteArray(0)
             val keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES")
             val key = keyFactory.generateSecret(PBEKeySpec(SEKRIT))

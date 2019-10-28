@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
+import java.util.*
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -29,10 +30,10 @@ class ExampleInstrumentedTest : KoinTest {
     fun beforeTest() {
         val appContext = InstrumentationRegistry.getTargetContext()
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
-        val config: TexConfig = TexConfig.Builder(user, appContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build(appContext);
-        tripRecorder = TexService.configure(config)?.getTripRecorder();
+        val config: TexConfig = TexConfig.Builder(user, appContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build(appContext)
+        tripRecorder = TexService.configure(config)?.getTripRecorder()
         tripRecorder?.locationObservable()?.subscribe { fix -> lastLocation = fix }
-        tripRecorder?.track()
+        tripRecorder?.startTrip(Date().time)
 
         Thread.sleep(5000)
     }
@@ -53,9 +54,9 @@ class ExampleInstrumentedTest : KoinTest {
     @Test
     fun testIsRecording() {
         assertTrue(tripRecorder?.isRecording() == true)
-        tripRecorder?.stopTrip();
+        tripRecorder?.stopTrip(Date().time)
         Thread.sleep(1000)
         assertTrue(tripRecorder?.isRecording() == false)
-        tripRecorder?.track();
+        tripRecorder?.startTrip(Date().time)
     }
 }
