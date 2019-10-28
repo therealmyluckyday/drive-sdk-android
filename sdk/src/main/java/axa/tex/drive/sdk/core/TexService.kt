@@ -13,19 +13,17 @@ import org.koin.android.ext.android.inject
 class TexService : KoinComponentCallbacks {
     companion object : KoinComponentCallbacks {
         internal var instance: TexService? = null
-        private var recorder: TripRecorder? = null
         private var config: TexConfig? = null
 
-        fun configure(conf: TexConfig): TexService? {
+        fun configure(conf: TexConfig): TexService {
             config = conf
-            if (instance == null) {
-                instance = TexService()
-            }
-            return instance
+            val instanceToReturn = instance ?: TexService()
+            instance = instanceToReturn
+            return instanceToReturn
         }
     }
 
-    fun getTripRecorder(): TripRecorder? {
+    fun getTripRecorder(): TripRecorder {
         val tripRecorder: TripRecorder by inject()
         return tripRecorder
     }

@@ -57,7 +57,10 @@ abstract class FakeTracker : TexActivityTracker, KoinComponentCallbacks {
     }
 
     constructor(){
-
+/*
+    Fake Classe
+    // this is a Fake method
+    */
     }
 
     override fun checkWhereAmI() {
@@ -72,11 +75,17 @@ abstract class FakeTracker : TexActivityTracker, KoinComponentCallbacks {
     }
 
     override fun stopActivityScanning() {
-
+/*
+    Fake Classe
+    // this is a Fake method
+    */
     }
 
     override fun stopSpeedScanning() {
-
+/*
+    Fake Classe
+    // this is a Fake method
+    */
     }
 
     override fun passivelyScanSpeed() {

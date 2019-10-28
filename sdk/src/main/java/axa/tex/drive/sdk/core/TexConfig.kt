@@ -174,7 +174,6 @@ class TexConfig {
 
         fun build(): TexConfig {
             logger.logger.info("Building configuration", "build")
-            logger.logger.info("Configuring ssl certificate", "init")
             context?.getResources()?.openRawResource(R.raw.tex_elb_ssl)?.let { CertificateAuthority.configureDefaultSSLSocketFactory(it) }
             logger.logger.info("Done configuring ssl certificate", "init")
 

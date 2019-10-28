@@ -28,31 +28,30 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
     }
 
     fun canUpload() : Boolean {
-
+        val funcName = "canUpload"
         if ( this.toJson() == Constants.EMPTY_PACKET) {
-            LOGGER.info("this.toJson() == Constants.EMPTY_PACKET TRUE", function = "canUpload()")
+            LOGGER.info("this.toJson() == Constants.EMPTY_PACKET TRUE", function = funcName)
             return false
         }
 
         if ( this.toJson().count() > DEFAULT_JSON_SIZE) {
-            LOGGER.info("this.toJson().count() > 10000 TRUE", function = "canUpload()")
+            LOGGER.info("this.toJson().count() > 10000 TRUE", function = funcName)
             return true
         }
 
         if (this.isLast) {
-            LOGGER.info("this.isLast"+this.isLast, function = "canUpload()")
+            LOGGER.info("this.isLast"+this.isLast, function = funcName)
             return true
         }
         if (fixes.last() is MotionFix) {
             return false
         }
 
-        //LOGGER.info("fixes.count() > packetSize " + fixes.count() +" > " + packetSize, function = "canUpload()")
+        LOGGER.info("fixes.count() > packetSize " + fixes.count() +" > " + packetSize, function = funcName)
         return fixes.count() > packetSize
     }
 
     // Private Method
-
     // MARK: Serialize
     fun toJson() : String {
         val packet = FixPacket(fixes, tripInfos.model, tripInfos.os, tripInfos.timezone, tripInfos.uid, tripInfos.version, tripInfos.tripId.value, tripInfos.appName,

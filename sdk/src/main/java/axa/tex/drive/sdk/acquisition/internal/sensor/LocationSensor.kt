@@ -88,18 +88,20 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+        LOGGER.info("location Tracker ", "onStatusChanged")
     }
 
     override fun onProviderEnabled(provider: String?) {
+        LOGGER.info("location Tracker ", "onProviderEnabled")
     }
 
     override fun onProviderDisabled(provider: String?) {
+        LOGGER.info("location Tracker ", "onProviderDisabled")
     }
 
     private fun enableTracking(track: Boolean) {
-
+        val funcName = "enableTracking"
         if (track) {
-            //============================================================================================================================
             autoModeTracker?.speedFilter?.gpsStream?.subscribe ({
                 if (autoModeTracker?.speedFilter!!.collectionEnabled) {
                     val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),
@@ -109,13 +111,13 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
                             it.bearing,
                             it.altitude.toDouble(),
                             it.time)
-                    LOGGER.info("Got new location fix ", "private fun enableTracking(track: Boolean)")
+                    LOGGER.info("Got new location fix ", funcName)
                     if (locationFix != null) {
                         fixProducer.onNext(listOf(locationFix))
                     }
                 }
             }, {throwable ->
-                print(throwable)
+                LOGGER.info("throwable $throwable", funcName)
             })
             if (Build.VERSION.SDK_INT >= 23) {
                 if (context?.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -124,14 +126,10 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
                 }
             }
             autoModeTracker?.activelyScanSpeed()
-            autoModeTracker?.speedFilter?.collectionEnabled = true
-            LOGGER.info("location Tracker enabled", "private fun enableTracking(track: Boolean)")
         } else {
-            //locationManager?.removeUpdates(this)
-            autoModeTracker?.speedFilter?.collectionEnabled = false
             autoModeTracker?.stopSpeedScanning()
-            LOGGER.info("Location tracker disabled", "private fun enableTracking(track: Boolean)")
         }
-
+        autoModeTracker?.speedFilter?.collectionEnabled = track
+        LOGGER.info("location Tracker enabled: $track", funcName)
     }
 }

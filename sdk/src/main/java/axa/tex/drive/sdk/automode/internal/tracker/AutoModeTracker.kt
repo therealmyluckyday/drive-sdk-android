@@ -62,9 +62,15 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
 
     }
 
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-    override fun onProviderEnabled(provider: String?) {}
-    override fun onProviderDisabled(provider: String?) {}
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+        LOGGER.info("\"Status $status", "onStatusChanged")
+    }
+    override fun onProviderEnabled(provider: String?) {
+        LOGGER.info("", "onProviderEnabled")
+    }
+    override fun onProviderDisabled(provider: String?) {
+        LOGGER.info("", "onProviderDisabled")
+    }
 
     override fun passivelyScanSpeed() {
         locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 0L, 0.0f, this)

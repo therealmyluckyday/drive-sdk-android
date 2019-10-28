@@ -31,13 +31,13 @@ internal open class FixWorker() : Worker(), KoinComponentCallbacks {
         val clientId = inputData.getString(Constants.CLIENT_ID_KEY, "")
         val data = inputData.getString(Constants.DATA_KEY, "")
         LOGGER.info("COLLECTOR_WORKER SIZE :$inputData.keyValueMap.size.toString()", "private fun sendFixes(inputData : Data) : Boolean")
-        return sendData(data, appName, clientId)
+        return sendData(data, appName)
     }
 
 
     @Throws(IOException::class)
-    private fun sendData(data: String, appName: String, clientId: String): WorkerResult {
-
+    private fun sendData(data: String, appName: String): WorkerResult {
+        val funcName = "enableTracking"
         try {
             val collectorDb: CollectionDb by inject()
             val config = collectorDb.getConfig()
@@ -51,7 +51,7 @@ internal open class FixWorker() : Worker(), KoinComponentCallbacks {
             val platformToHostConverter = PlatformToHostConverter(platform);
             val url = URL(platformToHostConverter.getHost() + "/data")
 
-            LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = ${data}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+            LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = ${data}", funcName)
 
 
             val uid = DeviceInfo.getUid(applicationContext);
@@ -66,35 +66,24 @@ internal open class FixWorker() : Worker(), KoinComponentCallbacks {
             }
             urlConnection.addRequestProperty("X-AppKey", appName)
             urlConnection.connect()
-            LOGGER.info("SENDING : SENDING DATA", "Fixworkfun sendData(id: String, data: String, appName: String, clientId: String): Booleaner doWork()")
             urlConnection.outputStream.write(data.compress())
             urlConnection.outputStream.close()
-            LOGGER.info("UPLOADING DATA/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
             if (urlConnection.responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
-                LOGGER.error("SENDING : FAILED CODE = ${urlConnection.responseCode}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+                LOGGER.error("SENDING : error CODE = ${urlConnection.responseCode}", funcName)
                 return when (urlConnection.responseCode) {
-                    HttpURLConnection.HTTP_BAD_REQUEST -> {
-                        LOGGER.error("UPLOADING DATA ERROR/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
-                        // throw IOException()
-                        WorkerResult.FAILURE
-                    }
                     HttpURLConnection.HTTP_INTERNAL_ERROR -> {
-                        LOGGER.error("UPLOADING DATA ERROR/ RESPONSE CODE $urlConnection.responseCode", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
-
                         WorkerResult.RETRY
                     }
                     else -> {
-                        LOGGER.error("Exception", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
                         WorkerResult.FAILURE
                     }
                 }
             } else {
-                LOGGER.info("SENDING : SUCCEEDED CODE = ${urlConnection.responseCode}", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
-
+                LOGGER.info("SENDING worker: success ", funcName)
                 return WorkerResult.SUCCESS
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.error("SENDING : error = ${e.printStackTrace()}", funcName)
             return WorkerResult.RETRY
         }
     }
