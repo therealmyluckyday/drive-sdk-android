@@ -33,12 +33,23 @@ class MainActivity : AppCompatActivity() {
         val service = (application as TexDriveDemoApplication).service
         tripRecorder = (application as TexDriveDemoApplication).tripRecorder
 
-        play.setOnClickListener { play.visibility = View.GONE; stop.visibility = View.VISIBLE; startService(); }
-        stop.setOnClickListener {speedView.speedTo(0f); speedView.isWithTremble = false;  speedView.stop(); stop.visibility = View.GONE; play.visibility = View.VISIBLE; stopService()}
+        play.setOnClickListener {
+            play.visibility = View.GONE
+            stop.visibility = View.VISIBLE
+            startService()
+        }
+        stop.setOnClickListener {
+            speedView.speedTo(0f)
+            speedView.isWithTremble = false
+            speedView.stop()
+            stop.visibility = View.GONE
+            play.visibility = View.VISIBLE
+            stopService()
+        }
 
         if (tripRecorder?.isRecording()!!) {
-            play.visibility = View.GONE;
-            stop.visibility = View.VISIBLE;
+            play.visibility = View.GONE
+            stop.visibility = View.VISIBLE
         }
 
 

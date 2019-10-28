@@ -61,7 +61,13 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
     }
 
     fun data() : Data {
-        return Data.Builder().putString(Constants.ID_KEY, this.tripInfos.uid).putString(Constants.DATA_KEY, this.toJson()).putString(Constants.APP_NAME_KEY, this.tripInfos.appName).putString(Constants.CLIENT_ID_KEY,
-                this.tripInfos.clientId).putInt(Constants.WORK_TAG_KEY, idPacket).putString(Constants.TRIP_ID_KEY, this.tripInfos.tripId.value).build()
+        return Data.Builder()
+                .putString(Constants.ID_KEY, this.tripInfos.uid)
+                .putString(Constants.DATA_KEY, this.toJson())
+                .putString(Constants.APP_NAME_KEY, this.tripInfos.appName)
+                .putString(Constants.CLIENT_ID_KEY, this.tripInfos.clientId)
+                .putInt(Constants.WORK_TAG_KEY, idPacket)
+                .putString(Constants.TRIP_ID_KEY, this.tripInfos.tripId.value)
+                .build()
     }
 }
