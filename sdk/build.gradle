@@ -3,6 +3,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
+apply plugin: 'org.sonarqube'
 
 def getVersionName = { ->
     return "3.0.1"
@@ -35,6 +36,19 @@ android {
     }
 
 }
+project(":sdk") {
+    sonarqube {
+        properties {
+            property "sonar.projectKey", "drive-sdk-android-next"
+            property "sonar.sources", "src/main"
+            property "sonar.tests", "src/test"
+            property "sonar.coverage.jacoco.xmlReportPaths", "build/coverageReport/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml"
+            property "sonar.dependencyCheck.reportPath", "dependency-check-report.xml"
+            property "sonar.dependencyCheck.htmlReportPath", "dependency-check-report.html"
+        }
+    }
+}
+project.tasks["sonarqube"].dependsOn "testDebugUnitTestCoverage"
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -47,7 +61,6 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation "android.arch.lifecycle:livedata:$lifecycle_version"
     implementation 'org.koin:koin-android:1.0.2'
-
     implementation 'com.android.support:multidex:1.0.3'
 
     testImplementation 'junit:junit:4.12'
@@ -120,7 +133,7 @@ artifactory {
 jacoco {
     toolVersion = "0.8.4"
     // Custom reports directory can be specfied like this:
-     reportsDir = file("$buildDir/coverageReport")
+    reportsDir = file("$buildDir/coverageReport")
 }
 
 tasks.withType(Test) {

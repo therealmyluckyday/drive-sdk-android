@@ -16,6 +16,7 @@ pipeline {
     GIT_COMMITTER_EMAIL = sh(script: "git show -s --pretty=%ae",, returnStdout: true).trim()
     GITHUB_TOKEN = credentials('jenkins_pipeline')
     SLACK_USER_TOKEN = credentials('slack_user_token')
+    SONARQUBE_TOKEN = credentials('sonarqube_token')
     ARTIFACTORY_CREDENTIALS = credentials('axa_artifactory')
     ARTIFACTORY_USERNAME = "${ARTIFACTORY_CREDENTIALS_USR}"
     ARTIFACTORY_PASSWORD = "${ARTIFACTORY_CREDENTIALS_PSW}"
