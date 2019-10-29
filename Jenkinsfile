@@ -51,6 +51,7 @@ pipeline {
       steps {
         sh './gradlew test'
         sh './gradlew testDebugUnitTestCoverage'
+        sh './gradlew sonarqube'
       }
     }
 
