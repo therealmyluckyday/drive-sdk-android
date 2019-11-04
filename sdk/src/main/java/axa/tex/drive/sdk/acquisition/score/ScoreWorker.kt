@@ -52,8 +52,8 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
         }
         var result = theLocale?.language
         val region = theLocale?.country
-        if (region != null && !region!!.isEmpty()) {
-            result += "_" + region!!
+        if (region != null && !region.isEmpty()) {
+            result += "_" + region
         }
         return result!!
     }

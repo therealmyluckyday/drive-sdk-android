@@ -84,7 +84,7 @@ internal class AutomodeService : Service() {
         try {
             TexConfig.setupKoin(applicationContext)
         } catch (e: Exception) {
-            LOGGER.error("${e.printStackTrace().toString()}", "activateAutomode")
+            //LOGGER.error("${e.printStackTrace().toString()}", "activateAutomode")
         }
 
         val automode: Automode by inject()

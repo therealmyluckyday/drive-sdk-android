@@ -16,7 +16,6 @@ internal class IdleState : AutomodeState, KoinComponentCallbacks {
     constructor(automode: Automode) {
         this.automode = automode
         logger.info("Idle state")
-        val automodeHandler: AutomodeHandler by inject()
     }
 
     override fun next() {

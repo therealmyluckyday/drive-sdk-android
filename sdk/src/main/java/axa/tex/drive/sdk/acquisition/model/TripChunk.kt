@@ -56,7 +56,6 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
     fun toJson() : String {
         val packet = FixPacket(fixes, tripInfos.model, tripInfos.os, tripInfos.timezone, tripInfos.uid, tripInfos.version, tripInfos.tripId.value, tripInfos.appName,
                 tripInfos.clientId)
-        LOGGER.info("CONVERTING TO JSON", function = "fun serialize() : String")
         return packet.toJson()
     }
 

@@ -63,12 +63,7 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
     }
 
     override fun onLocationChanged(location: Location) {
-        var computedSpeed = 0.0
-        if (this.lastLocation != null)
-            computedSpeed = Math.sqrt(
-                    Math.pow(location.longitude - lastLocation?.longitude!!, 2.0) + Math.pow(location.latitude - lastLocation!!.latitude, 2.0)
-            ) / (location.time - this.lastLocation!!.time)
-
+        LOGGER.info("Sending location", "onLocationChanged")
         this.lastLocation = location
 
 
@@ -83,7 +78,6 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
                 location.bearing,
                 location.altitude,
                 location.time)
-        LOGGER.info("Sending location", "override fun onLocationChanged(location: Location)")
         fixProducer.onNext(listOf(locationFix))
     }
 

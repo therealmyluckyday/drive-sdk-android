@@ -15,9 +15,7 @@ data class MotionFix(val rotationRate: Motion? = null,
 
     fun norm(): Double {
         if(acceleration != null){
-            var value = 0f
-
-            value = acceleration.x*acceleration.x + acceleration.y*acceleration.y + acceleration.z*acceleration.z
+            val value = acceleration.x*acceleration.x + acceleration.y*acceleration.y + acceleration.z*acceleration.z
             return Math.sqrt(value.toDouble())
         }
         return -1.0

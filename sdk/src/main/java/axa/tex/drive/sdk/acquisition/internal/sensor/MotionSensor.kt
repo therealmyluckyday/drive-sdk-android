@@ -148,7 +148,7 @@ internal class MotionSensor : TexSensor, SensorEventListener {
 
     private fun processSensorEvent(event: SensorEvent) {
         val currentTimestamp = System.currentTimeMillis()
-        val sensorType = event?.sensor?.type
+        val sensorType = event.sensor?.type
         // We have to maintain an array of the sensor accuracies as declared in onAccuracyChanged instead of checking
         // event.accuracy because SensorEvent objects do not report correct accuracies on some devices (e.g. Samsung Galaxy S4)
         val accuracy = sensorType?.let { accuracies?.get(it, SensorManager.SENSOR_STATUS_UNRELIABLE) }
@@ -157,7 +157,7 @@ internal class MotionSensor : TexSensor, SensorEventListener {
         // Check if sensor values are not NaN or infinite
         if (!isCorrectValues(event.values)) return
 
-        event?.timestamp = currentTimestamp // Warning: this line convert timestamp from ns to ms
+        event.timestamp = currentTimestamp // Warning: this line convert timestamp from ns to ms
         if (sensorType == Sensor.TYPE_ACCELEROMETER) { // check if there is and event
             if (normL2(event.values) >= accelerationThreshold * GRAVITY_FORCE && motionBuffer.isRelevant(normL2(event.values)) && !isOverAccelerationThreshold) {
                 isOverAccelerationThreshold = true
@@ -174,7 +174,7 @@ internal class MotionSensor : TexSensor, SensorEventListener {
                 isOverAccelerationThreshold = false
             }
         } else {
-            val motionFix = event?.let { motionFix(it, event.timestamp) }
+            val motionFix = event.let { motionFix(it, event.timestamp) }
             if (motionFix != null) {
                 if (motionBuffer.afterAcceleration) {
                     motionBuffer.addMotionAfter(motionFix)
