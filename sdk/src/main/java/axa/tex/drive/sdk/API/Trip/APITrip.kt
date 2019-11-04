@@ -1,10 +1,8 @@
 package axa.tex.drive.sdk.API.Trip
 
+import android.content.Context
 
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
+import androidx.work.*
 import axa.tex.drive.sdk.acquisition.collection.internal.FixWorker
 import axa.tex.drive.sdk.acquisition.collection.internal.LastFixWorker
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb

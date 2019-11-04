@@ -3,23 +3,22 @@ package axa.tex.drive.demo
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.NotificationCompat
-import android.support.v7.app.AppCompatActivity
 import android.view.View
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.lifecycle.Observer
 import androidx.work.WorkManager
 import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-
 import java.util.*
 
 class MainActivity : AppCompatActivity() {

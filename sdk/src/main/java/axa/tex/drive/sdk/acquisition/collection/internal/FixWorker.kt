@@ -1,9 +1,11 @@
 package axa.tex.drive.sdk.acquisition.collection.internal
 
 
+import android.content.Context
 import androidx.work.Data
 import androidx.work.Worker
-import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
+import androidx.work.WorkerParameters
+import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
@@ -11,7 +13,6 @@ import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import axa.tex.drive.sdk.internal.extension.compress
-import org.koin.android.ext.android.inject
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL

@@ -1,10 +1,8 @@
 package axa.tex.drive.sdk.acquisition.collection.internal
 
 
-import androidx.work.Data
-import androidx.work.State
-import androidx.work.WorkManager
-import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
+import android.content.Context
+import androidx.work.*
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory

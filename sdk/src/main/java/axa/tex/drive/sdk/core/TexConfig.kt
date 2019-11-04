@@ -1,7 +1,6 @@
 package axa.tex.drive.sdk.core
 
 
-import android.app.Notification
 import android.content.Context
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.TripRecorder
@@ -24,15 +23,13 @@ import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import axa.tex.drive.sdk.core.internal.Constants
-import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.koin.dsl.module.Module
-import org.koin.dsl.module.module
-import org.koin.error.AlreadyStartedException
-import org.koin.standalone.StandAloneContext
+import org.koin.core.context.startKoin
+import org.koin.dsl.bind
+import org.koin.dsl.module
 
 
 class TexConfig {

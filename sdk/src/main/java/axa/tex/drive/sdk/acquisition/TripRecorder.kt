@@ -3,7 +3,6 @@ package axa.tex.drive.sdk.acquisition
 import android.app.Notification
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
-import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 

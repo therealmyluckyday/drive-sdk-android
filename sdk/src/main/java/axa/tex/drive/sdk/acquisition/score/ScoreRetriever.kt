@@ -1,8 +1,10 @@
 package axa.tex.drive.sdk.acquisition.score
 
+import android.content.Context
 import androidx.work.*
 import axa.tex.drive.sdk.acquisition.score.internal.ScoreWorker
 import axa.tex.drive.sdk.acquisition.score.model.ScoreResult
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import io.reactivex.subjects.PublishSubject
 
 class ScoreRetriever {

@@ -1,9 +1,10 @@
 package axa.tex.drive.sdk.acquisition.score.internal
 
 
-import android.content.res.Configuration
+import android.content.Context
 import androidx.work.Data
 import androidx.work.Worker
+import androidx.work.WorkerParameters
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.acquisition.score.model.ScoreError

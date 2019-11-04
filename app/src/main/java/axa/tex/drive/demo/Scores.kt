@@ -1,8 +1,8 @@
 package axa.tex.drive.demo
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import kotlinx.android.synthetic.main.activity_scores.*
 

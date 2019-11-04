@@ -9,8 +9,8 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.automode.AutomodeHandler
@@ -58,7 +58,7 @@ internal class AutomodeService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = createNotificationChannel();
             val notification: Notification
-            if (intent != null && intent.hasExtra("notif")) {
+            if (intent != null && intent.hasExtra("notif") && intent.getParcelableExtra("notif") as Notification != null) {
                 notification = intent.getParcelableExtra("notif")
             } else {
                 val notificationBuilder = NotificationCompat.Builder(this, channelId)
