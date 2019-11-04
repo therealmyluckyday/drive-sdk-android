@@ -75,19 +75,6 @@ class MainActivity : AppCompatActivity() {
             print(throwable)
         })
 
-
-        WorkManager.getInstance().getStatusesForUniqueWork("B9FBFF8B-D60C-4DA5-B37D-2B054E64612E").observe(this,Observer { stats ->
-            run {
-                if (stats != null) {
-                    for (s in stats){
-                        println("id = ${s.id} state = ${s.state} ")
-                    }
-                    println("THIS is the size : ${stats.size} ")
-                }
-            }
-        })
-
-
         trips.setOnLongClickListener {
             val intent = Intent(this, Trips::class.java)
             startActivity(intent)

@@ -13,9 +13,13 @@ import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
 
 internal class APITrip : KoinComponentCallbacks {
+    private val workerManager: WorkManager
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+    constructor(context: Context) {
+        this.workerManager = WorkManager.getInstance(context)
+    }
+
     fun sendTrip(tripChunk: TripChunk) {
-        val collectorDb: CollectionDb by inject()
         LOGGER.info("SENDING PACKET DATA FOR WORKER MANAGER ${tripChunk.data()}", function = "sendTrip")
         val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest
                 .Builder(if (tripChunk.isLast) LastFixWorker::class.java else FixWorker::class.java)
@@ -26,7 +30,6 @@ internal class APITrip : KoinComponentCallbacks {
                         .build())
                 .build()
         val pendingTrip = PendingTrip(tripChunk.tripInfos.uid, tripChunk.tripInfos.tripId.value, tripChunk.isLast)
-        collectorDb.saveTrip(pendingTrip)
-        WorkManager.getInstance().enqueue(fixUploadWork)
+        workerManager.enqueueUniqueWork(tripChunk.tripInfos.tripId.value, ExistingWorkPolicy.APPEND, fixUploadWork)
     }
 }

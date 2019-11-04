@@ -27,13 +27,14 @@ import java.util.*
 private const val TIME_TO_WAIT = 5000;
 private const val MAX_ATTEMPT = 5;
 
-internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
+internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
+    : Worker(appContext, workerParams), KoinComponentCallbacks {
 
 
     private var nbAttempt = 0
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
-    override fun doWork(): WorkerResult {
+    override fun doWork(): Result {
 
         val inputData: Data = inputData
         for ((tripId, state) in inputData.keyValueMap) {
@@ -41,7 +42,7 @@ internal class ScoreWorker() : Worker(), KoinComponentCallbacks {
         }
 
 
-        return WorkerResult.SUCCESS
+        return Result.success()
 
     }
 

@@ -8,24 +8,27 @@ import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
 
-internal class LastFixWorker(): FixWorker() {
+internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters)
+    : FixWorker(appContext, workerParams) {
 
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+    private val workManager: androidx.work.WorkManager by lazy {
+        WorkManager.getInstance(appContext)
+    }
 
-    override fun doWork(): WorkerResult {
+    override fun doWork(): Result {
 
         val inputData: Data = inputData
-        val tripId = inputData.getString(Constants.TRIP_ID_KEY, "")
-        val list = WorkManager.getInstance().getStatusesByTag(tripId).value
-        val tripChunkInQueue = list?.filter { it.state in setOf(State.ENQUEUED, State.RUNNING) }
+        val tripId = inputData.getString(Constants.TRIP_ID_KEY) ?: ""
+        val list = workManager.getWorkInfosByTagLiveData(tripId).value
+        val tripChunkInQueue = list?.filter { it.state in setOf(WorkInfo.State.ENQUEUED , WorkInfo.State.RUNNING) }
         if (tripChunkInQueue != null && tripChunkInQueue.count() > 0) {
-            return WorkerResult.RETRY
+            return Result.retry()
         }
 
         val result = sendFixes(inputData)
-        if (result == WorkerResult.SUCCESS) {
+        if (result == Result.success()) {
             val scoreRetriever: ScoreRetriever by inject()
-            val collectorDb: CollectionDb by inject()
             LOGGER.info("Packet sent successfully and trip id = ${tripId} stop = true", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
             val collector: Collector by inject()
             if (collector.currentTripId?.value == tripId) {
@@ -33,7 +36,6 @@ internal class LastFixWorker(): FixWorker() {
             }
 
             scoreRetriever.getAvailableScoreListener().onNext(tripId)
-            collectorDb.deleteTripNumberPackets(tripId)
         }
         return  result
     }
