@@ -1,4 +1,5 @@
 apply plugin: 'jacoco'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.jfrog.artifactory'
@@ -10,10 +11,10 @@ def getVersionName = { ->
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName getVersionName()
 
@@ -34,6 +35,7 @@ android {
             testCoverageEnabled = true
         }
     }
+    buildToolsVersion = '29.0.1'
 
 }
 project(":sdk") {
@@ -42,6 +44,7 @@ project(":sdk") {
             property "sonar.projectKey", "drive-sdk-android-next"
             property "sonar.sources", "src/main"
             property "sonar.tests", "src/test"
+            property "sonar.host.url", "https://cicd.next.dil.services/sonarqube"
             property "sonar.coverage.jacoco.xmlReportPaths", "build/coverageReport/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml"
             property "sonar.dependencyCheck.reportPath", "dependency-check-report.xml"
             property "sonar.dependencyCheck.htmlReportPath", "dependency-check-report.html"
@@ -53,30 +56,36 @@ project.tasks["sonarqube"].dependsOn "testDebugUnitTestCoverage"
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.google.android.gms:play-services-location:15.0.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.6'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
-    implementation "android.arch.work:work-runtime:1.0.0-alpha02"
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
-    implementation "android.arch.lifecycle:livedata:$lifecycle_version"
-    implementation 'org.koin:koin-android:1.0.2'
-    implementation 'com.android.support:multidex:1.0.3'
-
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.7"
+
+    // Google Location service
+    implementation "com.google.android.gms:play-services-location:17.0.0"
+
+    // Koin
+    def koin_version = '2.0.1'
+    implementation "org.koin:koin-android:$koin_version"
+
+    // WorkManager
+    def work_version = "2.2.0"
+    // Kotlin + coroutines
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    //Rx
+    def rx_kotlin_version = '2.4.0'
+    implementation("io.reactivex.rxjava2:rxkotlin:$rx_kotlin_version")
+
+    // Jackson
+    def jackson_version = '2.10.0'
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
+    implementation "com.fasterxml.jackson.core:jackson-core:$jackson_version"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
 
 
-
-    testImplementation 'org.koin:koin-test:1.0.2'
-    androidTestImplementation "org.koin:koin-test:0.9.3"
 }
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 
@@ -162,7 +171,14 @@ project.afterEvaluate {
                     '**/*Test*.*',
                     'android/**/*.*'
             ]
-            def javaClasses = fileTree(dir: variant.javaCompiler.destinationDir, excludes: excludes)
+            def javaCompileTask
+            if (variant.hasProperty('javaCompileProvider')) {
+                // Android 3.3.0+
+                javaCompileTask = variant.javaCompileProvider.get()
+            } else {
+                javaCompileTask = variant.javaCompile
+            }
+            def javaClasses = fileTree(dir: javaCompileTask.destinationDir, excludes: excludes)
             def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}", excludes: excludes)
             classDirectories = files([javaClasses, kotlinClasses])
 
