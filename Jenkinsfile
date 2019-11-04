@@ -39,7 +39,7 @@ pipeline {
       }
     }
 
-    stage('assembleDebug') {
+    stage('compileDebugSources') {
       steps {
          withCredentials([file(credentialsId: 'debugSigningKeystore', variable: 'FILE')]) {
           sh './gradlew -Pkeypass="android" -PstoretPass="android" -PstoreFilePath="${FILE}" compileDebugSources --debug'
