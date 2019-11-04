@@ -7,18 +7,22 @@ import axa.tex.drive.sdk.acquisition.score.model.ScoreResult
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import io.reactivex.subjects.PublishSubject
 
-class ScoreRetriever {
+class ScoreRetriever: KoinComponentCallbacks {
 
+    private val workManager: WorkManager
     private val scoreListener: PublishSubject<ScoreResult> = PublishSubject.create()
-
     private val availableScoreListener: PublishSubject<String?> = PublishSubject.create()
 
+    constructor(appContext: Context) {
+        this.workManager = WorkManager.getInstance(appContext)
+    }
+
     fun getScoreListener(): PublishSubject<ScoreResult> {
-        return scoreListener;
+        return scoreListener
     }
 
     internal fun getAvailableScoreListener(): PublishSubject<String?> {
-        return availableScoreListener;
+        return availableScoreListener
     }
 
     fun retrieveScore(tripId: String) {
@@ -27,6 +31,6 @@ class ScoreRetriever {
                 .build()
         val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(ScoreWorker::class.java).setInputData(data).setConstraints(constraints)
                 .build()
-        WorkManager.getInstance().enqueue(fixUploadWork)
+        this.workManager.enqueue(fixUploadWork)
     }
 }

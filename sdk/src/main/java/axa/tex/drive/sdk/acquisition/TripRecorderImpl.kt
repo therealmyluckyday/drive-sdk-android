@@ -16,6 +16,8 @@ import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
+import axa.tex.drive.sdk.core.Config
+import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
@@ -26,10 +28,9 @@ import java.util.*
 
 
 internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
-
     private val context: Context
-    private var fixProcessor: FixProcessor? = null
-    private var collector: Collector
+    private val fixProcessor: FixProcessor by inject()
+    private val collector: Collector by inject()
     private var myCustomNotification : Notification? = null
     private val automodeHandler: AutomodeHandler by inject()
     private var mCurrentLocation : Location? = null
@@ -50,15 +51,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
     constructor(context: Context) {
         this.context = context
-        val collector: Collector by inject()
-        this.collector = collector
-        try {
-            val fixProcessor: FixProcessor by inject()
-            this.fixProcessor = fixProcessor
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
 
         disposable = automodeHandler.speedListener.locations.subscribe( {
             var deltaDistance = 0.0
@@ -110,7 +102,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             context.startService(serviceIntent)
         }
 
-        return fixProcessor?.startTrip(startTime)
+        return fixProcessor?.startTrip(startTime, config)
     }
 
     override fun stopTrip(endTime: Long) {

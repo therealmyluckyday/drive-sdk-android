@@ -19,7 +19,7 @@ internal class Collector : KoinComponentCallbacks {
     private val trackers: MutableList<Tracker>?
     val logger = LoggerFactory().getLogger(this::class.java.name)
 
-    private var fixProcessor: FixProcessor
+    internal var fixProcessor: FixProcessor
 
     private var context: Context;
 
@@ -58,7 +58,7 @@ internal class Collector : KoinComponentCallbacks {
 
     private fun collect(tracker: Tracker) {
         tracker.enableTracking();
-        fixData = tracker.provideFixProducer() as Observable<List<Fix>>
+        fixData = tracker.provideFixProducer()
 
         fixData?.subscribeOn(Schedulers.single())?.subscribe( { fixes ->
             fixProcessor.addFixes(fixes)

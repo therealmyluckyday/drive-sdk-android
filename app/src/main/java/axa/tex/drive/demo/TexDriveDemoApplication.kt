@@ -28,7 +28,9 @@ class TexDriveDemoApplication : Application() {
     private var myTripId : TripId? = null
     internal  val CHANNEL_ID = "tex-channel-id"
     internal  val CHANNEL_NAME = "Notification"
-    var tripRecorder: TripRecorder? = null
+    val tripRecorder: TripRecorder? by lazy {
+        service?.getTripRecorder()
+    }
     var service: TexService? = null
     lateinit var notificationManager: NotificationManager
     private var config: TexConfig? = null
@@ -80,8 +82,6 @@ class TexDriveDemoApplication : Application() {
         config = newConfig
         val newService = TexService.configure(newConfig)
         service = newService
-        val newTripRecorder = newService.getTripRecorder()
-        tripRecorder = newTripRecorder
 
 
         val autoModeHandler = newService.automodeHandler()

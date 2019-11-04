@@ -23,13 +23,11 @@ class FixPacket(@JsonIgnore val fixes: List<Fix>,
             val jsonNode = mapper.readTree(mapper.writeValueAsString(this))
             val fixesNode: ArrayNode = mapper.readTree("[]") as ArrayNode;
             for (fix in fixes) {
-                if(fix != null) {
-                    fixesNode.add(mapper.readTree(fix.toJson()))
-                }else{
-                    println("Fix is nul")
-                }
+                fixesNode.add(mapper.readTree(fix.toJson()))
             }
-            (jsonNode as ObjectNode).set("fixes", fixesNode);
+
+            var objectNode: ObjectNode = jsonNode as ObjectNode
+            objectNode.set<ObjectNode>("fixes", fixesNode)
             jsonNode.toString()
         } catch (e: Exception) {
             e.printStackTrace()

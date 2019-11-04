@@ -46,42 +46,73 @@ class TexConfig {
         internal var clientId: String? = null
 
         internal fun setupKoin(context: Context) {
-            val myModule: Module = module(definition = {
+            val myModule = module {
                 single { AutomodeHandler() }
                 single { SpeedFilter() }
                 single { AutoModeTracker(context) as TexActivityTracker }
                 single { Automode(get()) }
                 single { TripManager() }
-                single { ScoreRetriever() }
+                single { ScoreRetriever(context ) }
                 single { CollectionDb(context) }
                 single { FixProcessor(context) }
-                single(LocationTracker::class.simpleName!!) { LocationTracker(LocationSensor(get(), get(), context, locationTrackerEnabled)) as Tracker }
-                single(BatteryTracker::class.simpleName!!) { BatteryTracker(BatterySensor(context, batteryTrackerEnabled)) as Tracker }
-                single(MotionTracker::class.simpleName!!) { MotionTracker(MotionSensor(context, motionTrackerEnabled)) as Tracker }
-                single { Collector(context, mutableListOf<Tracker>(get(LocationTracker::class.simpleName!!), get(BatteryTracker::class.simpleName!!))) }
-                single { TripRecorderImpl(context) as TripRecorder }
-            })
-            try {
-                StandAloneContext.startKoin(listOf(myModule))
-            } catch (e: AlreadyStartedException) {
-                e.printStackTrace()
+                single {
+                    LocationTracker(
+                            LocationSensor(
+                                    get(),
+                                    get(),
+                                    context,
+                                    locationTrackerEnabled)
+                    )}
+                single {
+                    BatteryTracker(
+                            BatterySensor(
+                            context,
+                            batteryTrackerEnabled)
+                    )}
+                single {
+                    MotionTracker(
+                            MotionSensor(
+                            context,
+                            motionTrackerEnabled)
+                    )}
+                single {
+                    Collector(context,
+                            mutableListOf<Tracker>(
+                            get<LocationTracker>(),
+                            get<BatteryTracker>())
+                    ) }
+                single { TripRecorderImpl(context) as TripRecorder } bind TripRecorder::class
             }
+            //try {
+                startKoin {
+                    // module list
+                    modules(listOf(myModule))
+                }
+            /*} catch (e: Exception) {
+                // @TODO erwan
+                e.printStackTrace()
+            }*/
 
         }
 
 
         fun loadAutoModeModule(context: Context) {
 
-            val myModule: Module = module(definition = {
+            val myModule = module {
                 single { AutomodeHandler() }
                 single { SpeedFilter() }
                 single { AutoModeTracker(context) as TexActivityTracker }
                 single { Automode(get()) }
-            })
+            }
 
             try {
-                StandAloneContext.startKoin(listOf(myModule))
-            } catch (e: AlreadyStartedException) {
+
+                startKoin {
+                    // module list
+                    modules(listOf(myModule))
+                }
+            } catch (e: Exception) {
+                // @TODO erwan
                 e.printStackTrace()
             }
 
@@ -138,8 +169,6 @@ class TexConfig {
         @JsonIgnore
         private var platform: Platform = Platform.PRODUCTION
         @JsonProperty
-        private var platformHost: String? = null;
-        @JsonProperty
         private var locationTrackerEnabled: Boolean = false
         @JsonProperty
         private var motionTrackerEnabled: Boolean = false
@@ -148,19 +177,15 @@ class TexConfig {
         @JsonProperty
         private var appName: String = Constants.DEFAULT_APP_NAME
         @JsonProperty
-        private var clientId: String? = null
-        private var customNotification: Notification? = null
+        private var clientId: String
         val logger = LoggerFactory().getLogger(this::class.java.name)
 
-        constructor() {
-        }
-
-        constructor(user: TexUser?, context: Context?) {
-            logger.logger.info("Configuring user and application context", "constructor(user: TexUser?, context: Context?)")
+        constructor(user: TexUser?, context: Context?, clientId: String) {
+            logger.logger.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
             this.user = user
             this.context = context
             TexConfig.user = user
-            logger.logger.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
+            this.clientId = clientId
         }
 
         constructor(context: Context?, appName: String, clientId: String) {
@@ -196,10 +221,9 @@ class TexConfig {
 
         fun platformHost(platform: Platform): Builder {
             logger.logger.info("Selecting platform", "build")
-            this.platform = platform;
-            this.platformHost = PlatformToHostConverter(platform).getHost();
+            this.platform = platform
             logger.logger.info("Selecting platform $platform selected", "platformHost")
-            return this;
+            return this
         }
 
         fun enableLocationTracker(): Builder {
