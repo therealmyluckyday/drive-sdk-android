@@ -7,7 +7,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'org.sonarqube'
 
 def getVersionName = { ->
-    return "3.0.1"
+    return "3.0.2"
 }
 
 android {
