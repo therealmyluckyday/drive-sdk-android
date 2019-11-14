@@ -2,12 +2,14 @@ apply plugin: 'jacoco'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'org.sonarqube'
 
+def currentVersionName = "3.0.2001"
 def getVersionName = { ->
-    return "3.0.2"
+    return currentVersionName
 }
 
 android {
@@ -18,12 +20,12 @@ android {
         versionCode 1
         versionName getVersionName()
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         multiDexEnabled true
 
         project.archivesBaseName = "sdk"
-        project.version = getVersionName()
+        project.version = currentVersionName
     }
 
     buildTypes {
@@ -60,11 +62,15 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     // Google Location service
-    implementation "com.google.android.gms:play-services-location:17.0.0"
+    def play_services_version = "17.0.0"
+    implementation "com.google.android.gms:play-services-location:$play_services_version"
 
     // Koin
     def koin_version = '2.0.1'
     implementation "org.koin:koin-android:$koin_version"
+    testImplementation "org.koin:koin-test:$koin_version"
+    androidTestImplementation "org.koin:koin-test:$koin_version"
+
 
     // WorkManager
     def work_version = "2.2.0"
@@ -82,6 +88,12 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
 
 
+    // JUnit 4 framework
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'junit:junit:4.12'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+
 }
 repositories {
     mavenCentral()
@@ -91,7 +103,6 @@ repositories {
 
 def libraryGroupId = 'axa.tex.drive'
 def libraryArtifactId = "${archivesBaseName}".toLowerCase()
-def libraryVersion = getVersionName()
 
 publishing {
     publications {
@@ -100,9 +111,9 @@ publishing {
                 def buildType = output.name // output.name is {debug, release}
                 "${buildType}"(MavenPublication) {
                     //groupId libraryGroupId
-                    version libraryVersion
+                    version currentVersionName
                     //artifactId "${libraryArtifactId}-sdk-${buildType}" // texdrive-sdk-{release,debug}
-                    artifact("$buildDir/outputs/aar/sdk-debug.aar") // TexDrive-{release,debug}-v2.1.3.aar
+                    artifact("$buildDir/outputs/aar/sdk-${buildType}.aar") // TexDrive-{release,debug}-v2.1.3.aar
 
 
                     pom.withXml {
@@ -127,8 +138,8 @@ artifactory {
     publish {
         repository {
             repoKey = 'android-tex'
-            username = System.getenv("ARTIFACTORY_USERNAME")
-            password = System.getenv("ARTIFACTORY_PASSWORD")
+            username = artifactory_username
+            password = artifactory_password
         }
         defaults {
             publications('release')
@@ -140,7 +151,7 @@ artifactory {
 }
 
 jacoco {
-    toolVersion = "0.8.4"
+    toolVersion = "0.8.5"
     // Custom reports directory can be specfied like this:
     reportsDir = file("$buildDir/coverageReport")
 }

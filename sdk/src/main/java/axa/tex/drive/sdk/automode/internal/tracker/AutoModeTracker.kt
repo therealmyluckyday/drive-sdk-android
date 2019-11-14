@@ -15,7 +15,6 @@ import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
 import axa.tex.drive.sdk.automode.internal.tracker.model.Where
-import axa.tex.drive.sdk.core.CertificateAuthority.Companion.LOGGER
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.google.android.gms.location.ActivityRecognitionClient

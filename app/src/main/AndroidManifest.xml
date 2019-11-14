@@ -32,8 +32,6 @@
 
         <activity android:name=".Scores" />
         <activity android:name=".Trips" />
-        <activity android:name=".ScroreError" />
-        <activity android:name=".ScoreError"></activity>
     </application>
 
 </manifest>

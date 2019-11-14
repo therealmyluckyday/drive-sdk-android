@@ -197,7 +197,21 @@ class TexConfig {
 
         fun build(): TexConfig {
             logger.logger.info("Building configuration", "build")
-            context?.getResources()?.openRawResource(R.raw.tex_elb_ssl)?.let { CertificateAuthority.configureDefaultSSLSocketFactory(it) }
+            if (context == null) {
+                logger.logger.error("No context error", "build")
+            }
+            if (context?.getResources() == null) {
+                logger.logger.error("No resources error", "build")
+            }
+            if (context?.getResources()?.openRawResource(R.raw.tex_elb_ssl) == null) {
+                logger.logger.error("No tex_elb_ssl error", "build")
+            }
+            try {
+                context?.getResources()?.openRawResource(R.raw.tex_elb_ssl)?.let { CertificateAuthority.configureDefaultSSLSocketFactory(it) }
+            } catch (e: Exception) {
+
+                logger.logger.error("Exception"+e.toString(), "build")
+            }
             logger.logger.info("Done configuring ssl certificate", "init")
 
             TexConfig.batteryTrackerEnabled = batteryTrackerEnabled;

@@ -1,17 +1,13 @@
 package axa.tex.drive.sdk
 
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry.*
+import androidx.test.runner.AndroidJUnit4
 import axa.tex.drive.sdk.acquisition.TripRecorder
-import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_MOTION_PERIOD_AFTER_ACCELERATION
-import axa.tex.drive.sdk.acquisition.internal.tracker.DEFAULT_OLDER_MOTION_AGE
-import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
-import io.reactivex.Observable
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -28,9 +24,9 @@ class TextInstrumentedTest : KoinTest {
 
     @Before
     fun beforeTest() {
-        val appContext = InstrumentationRegistry.getTargetContext()
+        val appContext = getTargetContext()
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
-        val config: TexConfig = TexConfig.Builder(user, appContext).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build()
+        val config: TexConfig = TexConfig.Builder(user, appContext, "clientIDToto").enableBatteryTracker().enableLocationTracker().enableMotionTracker().build()
         tripRecorder = TexService.configure(config)?.getTripRecorder()
         tripRecorder?.locationObservable()?.subscribe { fix -> lastLocation = fix }
         tripRecorder?.startTrip(Date().time)
@@ -41,7 +37,7 @@ class TextInstrumentedTest : KoinTest {
 
     @Test
     fun testPackage() {
-        val appContext = InstrumentationRegistry.getTargetContext()
+        val appContext = getTargetContext()
         Assert.assertEquals("axa.tex.drive.sdk.test", appContext.packageName)
     }
 

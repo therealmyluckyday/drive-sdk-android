@@ -14,10 +14,10 @@ import axa.tex.drive.sdk.automode.internal.states.InVehicleState
 import axa.tex.drive.sdk.automode.internal.states.TrackingState
 import org.junit.Assert
 import org.junit.Test
-import org.koin.dsl.module.Module
-import org.koin.dsl.module.module
-import org.koin.standalone.StandAloneContext
-import org.koin.standalone.inject
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.core.inject
+import org.koin.dsl.module
 import org.koin.test.KoinTest
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -27,62 +27,74 @@ class AutomaticModeTest : KoinTest {
 
     @Test
     fun testFromIdleToInVehicleState() {
-        val myModule:  Module = module(definition = {
+        val myModule = module {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleToInVehicleState() as TexActivityTracker }
             single { Automode(get()) }
-        })
-        StandAloneContext.startKoin(listOf(myModule))
+        }
+        startKoin {
+            // module list
+            modules(listOf(myModule))
+        }
         val automode: Automode by inject()
         Assert.assertTrue(automode.getCurrentState() is IdleState)
         automode.next()
         Assert.assertTrue(automode.getCurrentState() is InVehicleState)
-        StandAloneContext.stopKoin()
+        stopKoin()
     }
 
     @Test
     fun testFromIdleToTrackingState() {
-        val myModule:  Module = module(definition = {
+        val myModule = module{
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleTrackingState() as TexActivityTracker }
             single { Automode(get()) }
-        })
-        StandAloneContext.startKoin(listOf(myModule))
+        }
+        startKoin {
+            // module list
+            modules(listOf(myModule))
+        }
         val automode: Automode by inject()
         Assert.assertTrue(automode.getCurrentState() is IdleState)
         automode.next()
         Assert.assertTrue(automode.getCurrentState() is TrackingState)
-        StandAloneContext.stopKoin()
+        stopKoin()
     }
 
     @Test
     fun testFromIdleDriving() {
-        val idleToDrivingModule:  Module = module(definition = {
+        val idleToDrivingModule = module {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleDrivingState() as TexActivityTracker }
             single { Automode(get()) }
-        })
-        StandAloneContext.startKoin(listOf(idleToDrivingModule))
+        }
+        startKoin {
+            // module list
+            modules(listOf(idleToDrivingModule))
+        }
         val automode: Automode by inject()
         Assert.assertTrue(automode.getCurrentState() is IdleState)
         automode.next()
         Assert.assertTrue(automode.getCurrentState() is DrivingState)
-        StandAloneContext.stopKoin()
+        stopKoin()
     }
 
 
     @Test
     fun testFromDrivingToIdleAfterNoGps() {
-        val drivingToIdleAfterNoGps:  Module = module(definition = {
+        val drivingToIdleAfterNoGps = module {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleDrivingState() as TexActivityTracker }
             single { Automode(get()) }
-        })
-        StandAloneContext.startKoin(listOf(drivingToIdleAfterNoGps))
+        }
+        startKoin {
+            // module list
+            modules(listOf(drivingToIdleAfterNoGps))
+        }
         val automode: Automode by inject()
         automode.timeToWaitForGps = 100
         Assert.assertTrue(automode.getCurrentState() is IdleState)
@@ -97,18 +109,21 @@ class AutomaticModeTest : KoinTest {
         }
         signal.await()
 
-        StandAloneContext.stopKoin()
+        stopKoin()
     }
 
     @Test
     fun testFromDrivingToIdleAfterLongStop() {
-        val idleToDrivingModule:  Module = module(definition = {
+        val idleToDrivingModule =  module {
             single { SpeedFilter() }
             single { FromDrivingToLongStop() as TexActivityTracker }
             single { AutomodeHandler() }
             single { Automode(get()) }
-        })
-        StandAloneContext.startKoin(listOf(idleToDrivingModule))
+        }
+        startKoin {
+            // module list
+            modules(listOf(idleToDrivingModule))
+        }
         val automode: Automode by inject()
         automode.acceptableStopDuration = 500
         Assert.assertTrue(automode.getCurrentState() is IdleState)
@@ -122,7 +137,7 @@ class AutomaticModeTest : KoinTest {
         }
         signal.await(1, TimeUnit.MICROSECONDS)
 
-        StandAloneContext.stopKoin()
+        stopKoin()
     }
 
 }
