@@ -88,6 +88,8 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
 
     override fun startTrip(startTime: Long) : TripId?{
+        //val config = this.mConfig ?:
+        val config = Config(false, true, false, "APP-TEST", "22910000", Platform.PRODUCTION)
         start = startTime
 
         logger.info("${Date()} TripRecorder : Start tracking.", function = "fun startTrip(startTime: Long) : TripId?")
