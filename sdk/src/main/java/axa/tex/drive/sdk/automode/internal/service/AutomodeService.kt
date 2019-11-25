@@ -53,9 +53,9 @@ internal class AutomodeService : Service() {
         activateAutomode()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = createNotificationChannel();
+            val channelId = createNotificationChannel()
             val notification: Notification
-            if (intent != null && intent.hasExtra("notif") && intent.getParcelableExtra("notif") as Notification != null) {
+            if (intent != null && intent.hasExtra("notif")) {
                 notification = intent.getParcelableExtra("notif")
             } else {
                 val notificationBuilder = NotificationCompat.Builder(this, channelId)
@@ -72,10 +72,6 @@ internal class AutomodeService : Service() {
         return START_STICKY
     }
 
-
-    fun stopCollectorService() {
-        stopSelf()
-    }
 
     private fun activateAutomode() {
         try {

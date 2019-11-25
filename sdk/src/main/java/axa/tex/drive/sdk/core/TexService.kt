@@ -45,12 +45,4 @@ class TexService : KoinComponentCallbacks {
         return automodeHandler
     }
 
-    internal fun automodeTracker(): AutoModeTracker {
-        val autoModeTracker: AutoModeTracker by inject()
-        return autoModeTracker
-    }
-
-    internal fun getService(): TexService? {
-        return instance
-    }
 }
