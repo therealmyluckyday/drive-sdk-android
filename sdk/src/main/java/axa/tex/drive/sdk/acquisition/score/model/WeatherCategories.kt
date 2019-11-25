@@ -14,9 +14,7 @@ class WeatherCategories {
     var thundery: Int = -1
     var unknown: Int = -1
 
-    constructor() {
-
-    }
+    constructor()
 
     constructor(cloudy: Int,
                 foggy: Int,

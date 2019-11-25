@@ -9,10 +9,10 @@ import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
+import axa.tex.drive.sdk.core.internal.utils.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
 import axa.tex.drive.sdk.core.logger.LoggerFactory
-import axa.tex.drive.sdk.internal.extension.compress
+import axa.tex.drive.sdk.internal.compress
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -56,10 +56,10 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
 
 
 
-            val platformToHostConverter = PlatformToHostConverter(platform);
+            val platformToHostConverter = PlatformToHostConverter(platform)
             val url = URL(platformToHostConverter.getHost() + "/data")
 
-            LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = ${data}", funcName)
+            LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = $data", funcName)
 
 
 

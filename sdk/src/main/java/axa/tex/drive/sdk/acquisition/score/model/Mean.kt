@@ -11,11 +11,6 @@ class Mean {
     var weight: Int = -1
 
 
-    constructor() {
-
-    }
-
-
     constructor(acceleration: Double,
                 braking: Double,
                 expert: Double,

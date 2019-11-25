@@ -21,7 +21,7 @@ internal class Collector : KoinComponentCallbacks {
 
     internal var fixProcessor: FixProcessor
 
-    private var context: Context;
+    private var context: Context
 
     internal var currentTripId: TripId? = null
 
@@ -57,7 +57,7 @@ internal class Collector : KoinComponentCallbacks {
 
 
     private fun collect(tracker: Tracker) {
-        tracker.enableTracking();
+        tracker.enableTracking()
         fixData = tracker.provideFixProducer()
 
         fixData?.subscribeOn(Schedulers.single())?.subscribe( { fixes ->

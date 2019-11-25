@@ -14,10 +14,6 @@ class ContextualizedScores {
     var snow: Snow? = null
     var urban: Urban? = null
 
-    constructor() {
-
-    }
-
     constructor(day: Day,
                 fog: Fog,
                 motorway: Motorway,

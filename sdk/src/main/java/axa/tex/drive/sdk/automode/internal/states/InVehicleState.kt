@@ -12,7 +12,6 @@ import java.util.*
 internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
 
     private var automode: Automode
-    private val automodeHandler: AutomodeHandler by inject()
     private val filterer: SpeedFilter by inject()
     private var disabled = false
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger

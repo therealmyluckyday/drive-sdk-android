@@ -14,14 +14,14 @@ class FixPacket(@JsonIgnore val fixes: List<Fix>,
                 val os: String,
                 val timezone: String,
                 val uid: String,
-                val version: String, val trip_id: String?, val app_name: String, val client_id: String) {
+                val version: String, val trip_id: String?, val app_name: String) {
 
     fun toJson(): String {
         return try {
-            val mapper = ObjectMapper();
+            val mapper = ObjectMapper()
             mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false)
             val jsonNode = mapper.readTree(mapper.writeValueAsString(this))
-            val fixesNode: ArrayNode = mapper.readTree("[]") as ArrayNode;
+            val fixesNode: ArrayNode = mapper.readTree("[]") as ArrayNode
             for (fix in fixes) {
                 fixesNode.add(mapper.readTree(fix.toJson()))
             }

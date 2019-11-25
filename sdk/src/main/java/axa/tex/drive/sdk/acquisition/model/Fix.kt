@@ -19,15 +19,15 @@ open class Fix {
 
     open fun toJson(): String {
         return try {
-            val mapper = ObjectMapper();
-            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
-            val jsonStr: String = mapper.writeValueAsString(this);
+            val mapper = ObjectMapper()
+            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
+            val jsonStr: String = mapper.writeValueAsString(this)
             val jsonNode = mapper.readTree(jsonStr)
             (jsonNode as ObjectNode).put("timestamp", timestamp)
             jsonNode.toString()
         } catch (e: Exception) {
             e.printStackTrace()
-            "{}";
+            "{}"
         }
     }
 }

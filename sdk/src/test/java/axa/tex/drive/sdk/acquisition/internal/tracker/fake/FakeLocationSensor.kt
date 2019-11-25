@@ -35,7 +35,7 @@ class FakeLocationSensor : TexSensor {
 
         Thread {
             while (enabled) {
-                val fakeFix = LocationFix(12.0, 1.88282, 28.0f, 10.9f, 18.0f, 10.0, time);
+                val fakeFix = LocationFix(12.0, 1.88282, 28.0f, 10.9f, 18.0f, 10.0, time)
                 time += 1000L
                 Thread.sleep(1000)
                 fixProducer.onNext(listOf(fakeFix))

@@ -11,10 +11,6 @@ class Logger {
         return logger.subjects()
     }
 
-    fun stopLogging() {
-        logger.subjects().onComplete()
-    }
-
     fun setFile(file: String) {
         logger.file = file
     }

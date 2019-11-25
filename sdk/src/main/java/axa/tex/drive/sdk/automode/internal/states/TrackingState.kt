@@ -12,7 +12,6 @@ import java.util.*
 
 internal class TrackingState : AutomodeState, KoinComponentCallbacks {
 
-    private val automodeHandler: AutomodeHandler by inject()
     private val filterer: SpeedFilter by inject()
 
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger

@@ -22,7 +22,7 @@ class FixPacketTest {
         val tripId = "4260e592-008b-4fcf-877d-fe8d3923b5s1"
         val appName = "APP-TEST"
         val clientId = "00001111"
-        val packet = FixPacket(fixes, model, os, timezone, uid, version, tripId, appName, clientId)
+        val packet = FixPacket(fixes, model, os, timezone, uid, version, tripId, appName)
 
         val json = packet.toJson()
 
@@ -45,7 +45,7 @@ class FixPacketTest {
         val tripId = "4260e592-008b-4fcf-877d-fe8d3923b5s1"
         val appName = "APP-TEST"
         val clientId = "00001111"
-        val packet = FixPacket(fixes, model, os, timezone, uid, version, tripId, appName, clientId)
+        val packet = FixPacket(fixes, model, os, timezone, uid, version, tripId, appName)
 
         Assert.assertTrue(packet.fixes.size == 2)
         Assert.assertTrue(packet.fixes[0] == firstLocationFix)

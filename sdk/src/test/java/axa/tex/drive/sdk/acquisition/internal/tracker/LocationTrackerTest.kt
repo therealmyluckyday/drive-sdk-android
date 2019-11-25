@@ -14,18 +14,18 @@ class LocationTrackerTest {
     @Test
     fun locationTrackerCorrectlyEnabled() {
         val locationTracker = LocationTracker(FakeLocationSensor())
-        Assert.assertFalse(locationTracker.isEnabled());
+        Assert.assertFalse(locationTracker.isEnabled())
         locationTracker.enableTracking()
-        Assert.assertTrue(locationTracker.isEnabled());
+        Assert.assertTrue(locationTracker.isEnabled())
     }
 
     @Test
     fun locationTrackerCorrectlyDisable() {
         val locationTracker = LocationTracker(FakeLocationSensor())
         locationTracker.enableTracking()
-        Assert.assertTrue(locationTracker.isEnabled());
+        Assert.assertTrue(locationTracker.isEnabled())
         locationTracker.disableTracking()
-        Assert.assertFalse(locationTracker.isEnabled());
+        Assert.assertFalse(locationTracker.isEnabled())
     }
 
 
@@ -35,7 +35,7 @@ class LocationTrackerTest {
         locationTracker.enableTracking()
         val signal = CountDownLatch(1)
         var isCalled= false
-        val locationProducer = locationTracker?.provideFixProducer()
+        val locationProducer = locationTracker.provideFixProducer()
         locationProducer.subscribe { fixes ->
             try {
                 val fix = fixes.first()

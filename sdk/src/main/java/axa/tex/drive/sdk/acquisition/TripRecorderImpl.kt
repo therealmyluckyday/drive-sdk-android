@@ -1,5 +1,6 @@
 package axa.tex.drive.sdk.acquisition
 
+import android.Manifest
 import android.app.Notification
 import android.content.ComponentName
 import android.content.Context
@@ -9,6 +10,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
+import androidx.core.app.ActivityCompat
 import axa.tex.drive.sdk.acquisition.collection.internal.Collector
 import axa.tex.drive.sdk.acquisition.collection.internal.CollectorService
 import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
@@ -40,13 +42,12 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private var disposable : Disposable
     private val tripProgress = PublishSubject.create<TripProgress>()
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
-
     override fun setCustomNotification(notification: Notification?) {
         myCustomNotification = notification
     }
 
     override fun getCurrentTripId(): TripId? {
-        return fixProcessor?.currentTripChunk?.tripInfos?.tripId
+        return fixProcessor.currentTripChunk?.tripInfos?.tripId
     }
 
     constructor(context: Context) {
@@ -104,27 +105,27 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             context.startService(serviceIntent)
         }
 
-        return fixProcessor?.startTrip(startTime, config)
+        return fixProcessor.startTrip(startTime, config)
     }
 
     override fun stopTrip(endTime: Long) {
         logger.info("TripRecorder : Stop tracking.", function = "fun stopTrip(startTime: Long) : TripId?")
         requestForLocationPermission()
-        fixProcessor?.endTrip(endTime)
+        fixProcessor.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
         context.bindService(serviceIntent, object : ServiceConnection {
 
             override fun onServiceConnected(className: ComponentName,
                                             service: IBinder) {
                 val binder = service as CollectorService.LocalBinder
-                binder.service.stopCollectorService();
+                binder.service.stopCollectorService()
             }
 
             override fun onServiceDisconnected(componentName: ComponentName) {
 
                 logger.info(" CollectorService : onServiceDisconnected", function = "onServiceDisconnected")
             }
-        }, 0);
+        }, 0)
         disposable.dispose()
     }
 

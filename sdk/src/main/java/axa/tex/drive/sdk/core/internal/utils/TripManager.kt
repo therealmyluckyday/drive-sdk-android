@@ -14,14 +14,13 @@ private const val TRIP_ID = "TRIP_ID"
 
 class TripManager : KoinComponentCallbacks {
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
-    private val automodeHandler: AutomodeHandler by inject()
     internal fun tripId(context: Context): TripId? {
         val prefs = context.getSharedPreferences(TRIP_ID, Context.MODE_PRIVATE)
         if (prefs.contains(TRIP_ID)) {
             val tripId = prefs.getString(TRIP_ID, "")
             val mapper = ObjectMapper()
-            val node = mapper.readTree(tripId);
-            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            val node = mapper.readTree(tripId)
+            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             return mapper.readValue(node.get(TripId::class.java.simpleName).toString(), TripId::class.java)
 
         } else {
@@ -33,11 +32,4 @@ class TripManager : KoinComponentCallbacks {
         }
     }
 
-    internal fun removeTripId(context: Context) {
-        val prefs = context.getSharedPreferences(TRIP_ID, Context.MODE_PRIVATE)
-        if (prefs.contains(TRIP_ID)) {
-            logger.info("${Date()} Removing trip id", function = "fun tripId(context: Context): TripId?")
-            prefs.edit().clear().apply()
-        }
-    }
 }

@@ -30,7 +30,7 @@ internal class Config {
 
     internal fun toJson(): String {
         return try {
-            val mapper = ObjectMapper();
+            val mapper = ObjectMapper()
             mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
             mapper.writeValueAsString(this)
         } catch (e: Exception) {

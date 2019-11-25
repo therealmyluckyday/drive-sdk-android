@@ -6,10 +6,6 @@ class Rural {
     var scores: Scores? = null
 
 
-    constructor() {
-
-    }
-
     constructor(percentage: Int,
                 scores: Scores) {
         this.percentage = percentage

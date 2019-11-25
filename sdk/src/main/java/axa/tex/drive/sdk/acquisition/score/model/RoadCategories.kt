@@ -7,9 +7,7 @@ class RoadCategories {
     var rural: Double = (-1).toDouble()
     var urban: Double = (-1).toDouble()
 
-    constructor() {
-
-    }
+    constructor()
 
     constructor(motorway: Int,
                 mountain: Int,

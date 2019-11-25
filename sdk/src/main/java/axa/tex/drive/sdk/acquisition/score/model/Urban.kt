@@ -5,8 +5,6 @@ class Urban {
     var percentage: Int = -1
     var scores: Scores? = null
 
-    constructor() {}
-
     constructor(percentage: Int,
                 scores: Scores) {
         this.percentage = percentage

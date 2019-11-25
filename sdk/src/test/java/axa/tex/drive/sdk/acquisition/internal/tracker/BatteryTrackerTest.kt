@@ -17,8 +17,8 @@ class BatteryTrackerTest {
 
         val batteryTracker = BatteryTracker(FakeBatterySensor())
         batteryTracker.enableTracking()
-        Assert.assertTrue(batteryTracker.isEnabled());
-        Assert.assertFalse(!batteryTracker.isEnabled());
+        Assert.assertTrue(batteryTracker.isEnabled())
+        Assert.assertFalse(!batteryTracker.isEnabled())
     }
 
     @Test
@@ -26,13 +26,13 @@ class BatteryTrackerTest {
 
         val batteryTracker = BatteryTracker(FakeBatterySensor())
         batteryTracker.enableTracking()
-        Assert.assertTrue(batteryTracker.isEnabled());
-        Assert.assertFalse(!batteryTracker.isEnabled());
+        Assert.assertTrue(batteryTracker.isEnabled())
+        Assert.assertFalse(!batteryTracker.isEnabled())
 
         batteryTracker.disableTracking()
 
-        Assert.assertFalse(batteryTracker.isEnabled());
-        Assert.assertTrue(!batteryTracker.isEnabled());
+        Assert.assertFalse(batteryTracker.isEnabled())
+        Assert.assertTrue(!batteryTracker.isEnabled())
     }
 
     @Test

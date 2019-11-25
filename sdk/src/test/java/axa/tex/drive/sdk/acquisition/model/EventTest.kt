@@ -18,7 +18,7 @@ class EventTest {
     @Test
     fun testEventOutput() {
         val time = 1543938100057
-        val end = Event(listOf("stop"), time);
+        val end = Event(listOf("stop"), time)
         val json = end.toJson()
         Assert.assertTrue(json == "{\"timestamp\":1543938100057,\"event\":[\"stop\"]}")
     }

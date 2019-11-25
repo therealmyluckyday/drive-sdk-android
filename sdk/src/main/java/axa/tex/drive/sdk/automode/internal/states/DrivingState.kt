@@ -19,7 +19,6 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     private var lastMvtTime: Long
     private var lastGpsTime: Long
     private var notMoving: Boolean = true
-    private var noGPS: Boolean = true
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val disposables = mutableListOf<Disposable>()
     private var speedWatcher: TimerTask? = null
@@ -28,7 +27,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
 
     constructor(automode: Automode) {
         this.automode = automode
-        LOGGER.info("${Date()} DrivingState : ${Date().toString()} Now driving...")
+        LOGGER.info("${Date()} DrivingState : ${Date()} Now driving...")
         lastMvtTime = System.currentTimeMillis()
         lastGpsTime = System.currentTimeMillis()
         watchGPS()
@@ -103,12 +102,12 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
         try {
             gpsWatcher?.cancel()
         } catch (e: Exception) {
-            LOGGER.error("${e.printStackTrace().toString()}", funcName)
+            LOGGER.error("${e.printStackTrace()}", funcName)
         }
         try {
             speedWatcher?.cancel()
         } catch (e: Exception) {
-            LOGGER.error("${e.printStackTrace().toString()}", funcName)
+            LOGGER.error("${e.printStackTrace()}", funcName)
         }
         disposables.clear()
         gpsWatcher = null

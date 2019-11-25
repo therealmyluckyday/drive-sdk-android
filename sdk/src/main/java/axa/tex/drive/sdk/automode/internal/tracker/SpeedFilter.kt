@@ -49,7 +49,7 @@ class SpeedFilter {
                 locationOutputWhatEverTheAccuracy.onNext(it)
             }
             if (it.speed >= requiredSpeedForMovement && it.accuracy < speedAccuracyLimit) {
-                locationOutputWithAccuracy.onNext(it);
+                locationOutputWithAccuracy.onNext(it)
             }
         }
 

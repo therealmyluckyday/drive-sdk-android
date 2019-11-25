@@ -24,16 +24,13 @@ import org.koin.android.ext.android.inject
 private const val NOTIFICATION_ID = 7071
 
 internal class AutomodeService : Service() {
-    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val binder = LocalBinder()
 
     inner class LocalBinder : Binder() {
-        internal val service: AutomodeService
-            get() = this@AutomodeService
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        return binder;
+        return binder
     }
 
 

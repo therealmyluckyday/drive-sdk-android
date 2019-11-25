@@ -11,11 +11,6 @@ class TripInfo {
     var weather_categories: WeatherCategories? = null
 
 
-    constructor() {
-
-    }
-
-
     constructor(battery: Int,
                 daylight_ratio: Int,
                 duration: Int,

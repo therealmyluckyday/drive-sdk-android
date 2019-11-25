@@ -5,12 +5,9 @@ import android.content.Context
 import androidx.work.*
 import axa.tex.drive.sdk.acquisition.collection.internal.FixWorker
 import axa.tex.drive.sdk.acquisition.collection.internal.LastFixWorker
-import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.model.PendingTrip
 import axa.tex.drive.sdk.acquisition.model.TripChunk
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
-import org.koin.android.ext.android.inject
 
 internal class APITrip : KoinComponentCallbacks {
     private val workerManager: WorkManager
@@ -29,7 +26,6 @@ internal class APITrip : KoinComponentCallbacks {
                         .setRequiredNetworkType(NetworkType.CONNECTED)
                         .build())
                 .build()
-        val pendingTrip = PendingTrip(tripChunk.tripInfos.uid, tripChunk.tripInfos.tripId.value, tripChunk.isLast)
         workerManager.enqueueUniqueWork(tripChunk.tripInfos.tripId.value, ExistingWorkPolicy.APPEND, fixUploadWork)
     }
 }

@@ -24,7 +24,7 @@ class MotionBufferTest {
         val beginTime = Date().time
         var timestamp = beginTime
 
-        val motion = Motion(0.5f, 1f, 1.1f, beginTime);
+        val motion = Motion(0.5f, 1f, 1.1f, beginTime)
         var sensorType = (0 until 4).random()
 
         var i = 0
@@ -36,7 +36,7 @@ class MotionBufferTest {
                 TYPE_GRAVITY -> MotionFix(gravity = motion, timestamp = timestamp)
                 TYPE_GYROSCOPE -> MotionFix(rotationRate = motion, timestamp = timestamp)
                 TYPE_MAGNETIC_FIELD -> MotionFix(magnetometer = motion, timestamp = timestamp)
-                else -> null;
+                else -> null
             }
             buffer.addFix(fix)
 
@@ -54,7 +54,7 @@ class MotionBufferTest {
         val beginTime = Date().time
         var timestamp = beginTime
 
-        val motion = Motion(0.5f, 1f, 1.1f, beginTime);
+        val motion = Motion(0.5f, 1f, 1.1f, beginTime)
         var sensorType = (0 until 4).random()
 
         var i = 0
@@ -66,7 +66,7 @@ class MotionBufferTest {
                 TYPE_GRAVITY -> MotionFix(gravity = motion, timestamp = timestamp)
                 TYPE_GYROSCOPE -> MotionFix(rotationRate = motion, timestamp = timestamp)
                 TYPE_MAGNETIC_FIELD -> MotionFix(magnetometer = motion, timestamp = timestamp)
-                else -> null;
+                else -> null
             }
             buffer.addFix(fix)
 

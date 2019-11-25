@@ -7,12 +7,12 @@ class ScoresDil {
 
     internal fun toJson(): String {
         return try {
-            val mapper = ObjectMapper();
-            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
-            mapper.writeValueAsString(this);
+            val mapper = ObjectMapper()
+            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
+            mapper.writeValueAsString(this)
         } catch (e: Exception) {
             e.printStackTrace()
-            "{}";
+            "{}"
         }
 
     }
@@ -31,10 +31,6 @@ class ScoresDil {
     var speed: Double = (-1).toDouble()
     var weather_penalization: Int = -1
 
-
-    constructor() {
-
-    }
 
     constructor(acceleration: Double,
                 braking: Double,

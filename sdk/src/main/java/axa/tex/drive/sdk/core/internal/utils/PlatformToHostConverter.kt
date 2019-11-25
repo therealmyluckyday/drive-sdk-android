@@ -1,4 +1,4 @@
-package axa.tex.drive.sdk.core.internal.util
+package axa.tex.drive.sdk.core.internal.utils
 
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.Platform.*
@@ -22,7 +22,7 @@ internal class PlatformToHostConverter(platform: Platform) {
     }
 
     fun getHost(): String? {
-        return host;
+        return host
     }
 
 }

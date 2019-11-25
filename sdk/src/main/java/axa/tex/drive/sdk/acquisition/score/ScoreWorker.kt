@@ -1,4 +1,4 @@
-package axa.tex.drive.sdk.acquisition.score.internal
+package axa.tex.drive.sdk.acquisition.score
 
 
 import android.content.Context
@@ -6,13 +6,12 @@ import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.acquisition.score.model.ScoreError
 import axa.tex.drive.sdk.acquisition.score.model.ScoreResult
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.core.internal.util.PlatformToHostConverter
+import axa.tex.drive.sdk.core.internal.utils.PlatformToHostConverter
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -24,8 +23,8 @@ import java.net.URL
 import java.util.*
 
 
-private const val TIME_TO_WAIT = 5000;
-private const val MAX_ATTEMPT = 5;
+private const val TIME_TO_WAIT = 5000
+private const val MAX_ATTEMPT = 5
 
 internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
     : Worker(appContext, workerParams), KoinComponentCallbacks {
@@ -93,8 +92,8 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
         }
 
         val mapper = ObjectMapper()
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        val node = mapper.readTree(responseString.toString());
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        val node = mapper.readTree(responseString.toString())
 
         try {
             val score = mapper.readValue(node.get("scores_dil").toString(), ScoresDil::class.java)

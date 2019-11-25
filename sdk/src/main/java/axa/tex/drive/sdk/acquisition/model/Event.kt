@@ -10,11 +10,11 @@ data class Event(val event: List<String>,
 
     override fun toJson(): String {
         return try {
-            val mapper = ObjectMapper();
-            mapper.writeValueAsString(this);
+            val mapper = ObjectMapper()
+            mapper.writeValueAsString(this)
         } catch (e: Exception) {
             e.printStackTrace()
-            "{}";
+            "{}"
         }
     }
 }

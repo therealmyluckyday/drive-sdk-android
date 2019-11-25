@@ -44,7 +44,7 @@ internal class LoggerUtils {
 
         private fun getLogFile(folderName: String, fileName: String): File {
 
-            val storage = Environment.getExternalStorageDirectory().getAbsolutePath()
+            val storage = Environment.getExternalStorageDirectory().absolutePath
             val folder = File(storage, folderName)
             if (!folder.exists()) {
                 folder.mkdirs()

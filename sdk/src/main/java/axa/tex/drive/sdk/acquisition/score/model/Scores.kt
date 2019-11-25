@@ -8,9 +8,7 @@ class Scores {
     var smoothness: Double = (-1).toDouble()
 
 
-    constructor() {
-
-    }
+    constructor()
 
 
     constructor(acceleration: Double,

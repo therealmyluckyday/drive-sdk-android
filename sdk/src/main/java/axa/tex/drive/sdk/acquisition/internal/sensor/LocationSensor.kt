@@ -1,5 +1,6 @@
 package axa.tex.drive.sdk.acquisition.internal.sensor
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -7,6 +8,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.automode.internal.Automode
@@ -20,10 +22,9 @@ import io.reactivex.subjects.PublishSubject
 
 internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallbacks {
 
-
     private var lastLocation: Location? = null
     internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
-    private var context: Context? = null;
+    private var context: Context? = null
     private var locationManager: LocationManager? = null
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
 
@@ -106,9 +107,7 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
                             it.altitude.toDouble(),
                             it.time)
                     LOGGER.info("Got new location fix ", funcName)
-                    if (locationFix != null) {
-                        fixProducer.onNext(listOf(locationFix))
-                    }
+                    fixProducer.onNext(listOf(locationFix))
                 }
             }, {throwable ->
                 LOGGER.info("throwable $throwable", funcName)

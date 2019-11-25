@@ -13,31 +13,15 @@ class ScoreError {
     var trip_id: String? = null
     var status_details: List<String>? = null
 
-    constructor()
-
-    constructor(flags: List<String>,
-                score_type: String,
-                scoregw_version: String,
-                status: String,
-                trip_id: String,
-                status_details: List<String>) {
-        this.flags = flags
-        this.score_type = score_type
-        this.scoregw_version = scoregw_version
-        this.status = status
-        this.trip_id = trip_id
-        this.status_details = status_details
-    }
-
 
     internal fun toJson(): String {
         return try {
-            val mapper = ObjectMapper();
-            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
-            mapper.writeValueAsString(this);
+            val mapper = ObjectMapper()
+            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
+            mapper.writeValueAsString(this)
         } catch (e: Exception) {
             e.printStackTrace()
-            "{}";
+            "{}"
         }
 
     }

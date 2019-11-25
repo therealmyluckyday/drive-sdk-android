@@ -24,7 +24,7 @@ private const val NOTIFICATION_ID = 7071
 internal class CollectorService : Service() {
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val binder = LocalBinder()
-    private var collector: Collector? = null;
+    private var collector: Collector? = null
 
     inner class LocalBinder : Binder() {
         internal val service: CollectorService
@@ -32,7 +32,7 @@ internal class CollectorService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        return binder;
+        return binder
     }
 
 
@@ -55,8 +55,8 @@ internal class CollectorService : Service() {
 
     @TargetApi(26)
     fun startNotification(intent: Intent?) {
-        val channelId = createNotificationChannel();
-        val notification: Notification
+        val channelId = createNotificationChannel()
+        val notification: Notification?
         if (intent != null && intent.hasExtra("notif")) {
             notification = intent.getParcelableExtra("notif")
         } else {
@@ -66,7 +66,9 @@ internal class CollectorService : Service() {
                     .setCategory(Notification.CATEGORY_SERVICE)
                     .build()
         }
-        this.startForeground(NOTIFICATION_ID, notification)
+        if (notification != null) {
+            this.startForeground(NOTIFICATION_ID, notification)
+        }
     }
 
     fun subscribeScoreAvailability() {

@@ -29,7 +29,7 @@ internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters
         val result = sendFixes(inputData)
         if (result == Result.success()) {
             val scoreRetriever: ScoreRetriever by inject()
-            LOGGER.info("Packet sent successfully and trip id = ${tripId} stop = true", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
+            LOGGER.info("Packet sent successfully and trip id = $tripId stop = true", "fun sendData(id: String, data: String, appName: String, clientId: String): Boolean")
             val collector: Collector by inject()
             if (collector.currentTripId?.value == tripId) {
                 collector.currentTripId = null

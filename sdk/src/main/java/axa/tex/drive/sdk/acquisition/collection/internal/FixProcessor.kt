@@ -39,7 +39,7 @@ internal class FixProcessor : KoinComponentCallbacks {
     
     fun endTrip(endTime: Long) {
         LOGGER.info("stop trip Begin", "endTrip")
-        val end = Event(listOf("stop"), endTime);
+        val end = Event(listOf("stop"), endTime)
         addFix(end)
         currentTripChunk = null
         LOGGER.info("stop trip End", "endTrip")

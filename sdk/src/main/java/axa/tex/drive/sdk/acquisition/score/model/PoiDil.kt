@@ -17,10 +17,6 @@ class PoiDil {
     var type: String? = null
     var weather_code: String? = null
 
-    constructor() {
-
-    }
-
     constructor(alerts: List<String>, base_speed: Int,
                 distance: Double,
                 intensity: String,

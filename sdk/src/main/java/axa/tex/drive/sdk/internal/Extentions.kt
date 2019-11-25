@@ -1,20 +1,7 @@
-package axa.tex.drive.sdk.internal.extension
+package axa.tex.drive.sdk.internal
 
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPOutputStream
-
-
-internal fun String.capitalize(): String {
-    if (this.isNullOrEmpty()) {
-        return ""
-    }
-    val first = this[0]
-    return if (Character.isUpperCase(first)) {
-        this
-    } else {
-        Character.toUpperCase(first) + this.substring(1)
-    }
-}
 
 
 internal fun String.compress(): ByteArray {

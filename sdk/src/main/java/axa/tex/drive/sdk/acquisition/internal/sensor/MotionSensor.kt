@@ -27,11 +27,10 @@ internal class MotionSensor : TexSensor, SensorEventListener {
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
 
 
-    private val MOTION_TAG: String = "MOTION_" + (Collector::class.java.simpleName).toUpperCase();
+    private val MOTION_TAG: String = "MOTION_" + (Collector::class.java.simpleName).toUpperCase()
     private val SENSORS_TYPES = intArrayOf(Sensor.TYPE_GRAVITY, Sensor.TYPE_LINEAR_ACCELERATION, Sensor.TYPE_MAGNETIC_FIELD, Sensor.TYPE_ACCELEROMETER)
     private val GRAVITY_FORCE = 9.81f
     private val DEFAULT_ACCELERATION_THRESHOLD = 2.5f // [G]
-    private val DEFAULT_STRESSED_CAPTURE_RATE = 10 * 1000 // 10 ms = 100 Hz
 
     private var sensors: SparseArray<Sensor>? = null
     private var sensorManager: SensorManager? = null
@@ -75,8 +74,8 @@ internal class MotionSensor : TexSensor, SensorEventListener {
 
     private fun enableTracking(track: Boolean) {
         val mSensorThread = HandlerThread("sensor_thread")
-        mSensorThread.start();
-        val mHandler = Handler(mSensorThread.looper);
+        mSensorThread.start()
+        val mHandler = Handler(mSensorThread.looper)
         if (track) {
             for (i in 0 until sensors!!.size()) {
                 sensorManager?.registerListener(this, sensors!!.valueAt(i), SensorManager.SENSOR_DELAY_UI, mHandler)
@@ -116,7 +115,7 @@ internal class MotionSensor : TexSensor, SensorEventListener {
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         if (sensor != null) {
-            accuracies?.put(sensor.getType(), accuracy)
+            accuracies?.put(sensor.type, accuracy)
         }
     }
 
@@ -174,7 +173,7 @@ internal class MotionSensor : TexSensor, SensorEventListener {
                 isOverAccelerationThreshold = false
             }
         } else {
-            val motionFix = event.let { motionFix(it, event.timestamp) }
+            val motionFix = motionFix(event, event.timestamp)
             if (motionFix != null) {
                 if (motionBuffer.afterAcceleration) {
                     motionBuffer.addMotionAfter(motionFix)
@@ -186,14 +185,14 @@ internal class MotionSensor : TexSensor, SensorEventListener {
     }
 
     private fun motionFix(event: SensorEvent, timestamp: Long): MotionFix? {
-        val motion = Motion(event.values[0], event.values[1], event.values[2], timestamp);
+        val motion = Motion(event.values[0], event.values[1], event.values[2], timestamp)
         return when (event.sensor.type) {
             Sensor.TYPE_LINEAR_ACCELERATION -> MotionFix(acceleration = motion, timestamp = timestamp)
             Sensor.TYPE_ACCELEROMETER -> MotionFix(rawAcceleration = motion, timestamp = timestamp)
             Sensor.TYPE_GRAVITY -> MotionFix(gravity = motion, timestamp = timestamp)
             Sensor.TYPE_GYROSCOPE -> MotionFix(rotationRate = motion, timestamp = timestamp)
             Sensor.TYPE_MAGNETIC_FIELD -> MotionFix(magnetometer = motion, timestamp = timestamp)
-            else -> null;
+            else -> null
         }
     }
 }
