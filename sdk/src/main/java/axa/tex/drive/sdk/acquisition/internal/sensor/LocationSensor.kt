@@ -112,9 +112,14 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
             }, {throwable ->
                 LOGGER.info("throwable $throwable", funcName)
             })
-            if (Build.VERSION.SDK_INT >= 23 && context?.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    context?.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return
+            if (Build.VERSION.SDK_INT >= 23 ) {
+                val hasForegroundLocationPermission = ActivityCompat.checkSelfPermission(this.context!!,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                val hasBackgroundLocationPermission = ActivityCompat.checkSelfPermission(this.context!!,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+                if (!hasBackgroundLocationPermission || !hasForegroundLocationPermission) {
+                    return
+                }
             }
             autoModeTracker?.activelyScanSpeed()
         } else {

@@ -23,7 +23,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private var tripRecorder: TripRecorder? = null
-
+    val REQUEST_CODE_BACKGROUND = 1545
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -163,8 +163,21 @@ class MainActivity : AppCompatActivity() {
     private fun requestForLocationPermission() {
         val locationPermission = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION)
-        if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, locationPermission, 0)
+        if (Build.VERSION.SDK_INT >= 23 ) {
+            val hasForegroundLocationPermission = ActivityCompat.checkSelfPermission(this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            if (hasForegroundLocationPermission) {
+                val hasBackgroundLocationPermission = ActivityCompat.checkSelfPermission(this,
+                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+                if (!hasBackgroundLocationPermission) {
+                    ActivityCompat.requestPermissions(this,
+                            arrayOf(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
+                }
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
+            }
         }
     }
 }

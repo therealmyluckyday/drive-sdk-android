@@ -74,7 +74,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private fun requestForLocationPermission() {
 
         if (Build.VERSION.SDK_INT >= 23) {
-
             if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 val exception = PermissionException("need permission.ACCESS_FINE_LOCATION")
                 throw exception
@@ -82,6 +81,10 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
             if (context.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 val exception = PermissionException("need permission.ACCESS_COARSE_LOCATION")
+                throw exception
+            }
+            if (context.checkSelfPermission(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                val exception = PermissionException("need permission.ACCESS_BACKGROUND_LOCATION")
                 throw exception
             }
         }
