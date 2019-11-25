@@ -7,7 +7,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'org.sonarqube'
 
-def currentVersionName = "3.0.2001"
+def currentVersionName = "3.0.3"
 def getVersionName = { ->
     return currentVersionName
 }
