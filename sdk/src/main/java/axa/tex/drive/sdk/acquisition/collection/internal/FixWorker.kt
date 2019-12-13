@@ -50,17 +50,9 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
     private fun sendData(data: String, appName: String, platform: Platform): Result {
         val funcName = "enableTracking"
         try {
-            // @TODO Erwan Change
-
-
-
             val platformToHostConverter = PlatformToHostConverter(platform)
             val url = URL(platformToHostConverter.getHost() + "/data")
-
             LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = $data", funcName)
-
-
-
             val urlConnection: HttpURLConnection
             urlConnection = url.openConnection() as HttpURLConnection
             urlConnection.doOutput = true

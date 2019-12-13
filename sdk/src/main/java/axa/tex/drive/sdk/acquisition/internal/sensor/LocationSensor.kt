@@ -97,42 +97,51 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
     private fun enableTracking(track: Boolean) {
         val funcName = "enableTracking"
         if (track) {
-            autoModeTracker?.speedFilter?.gpsStream?.subscribe ({
-                if (autoModeTracker?.speedFilter!!.collectionEnabled) {
-                    val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),
-                            it.longitude.toDouble(),
-                            it.accuracy,
-                            it.speed,
-                            it.bearing,
-                            it.altitude.toDouble(),
-                            it.time)
-                    LOGGER.info("Got new location fix ", funcName)
-                    fixProducer.onNext(listOf(locationFix))
-                }
-            }, {throwable ->
-                LOGGER.info("throwable $throwable", funcName)
-            })
-            if (Build.VERSION.SDK_INT >= 23 ) {
-                val hasForegroundLocationPermission = ActivityCompat.checkSelfPermission(this.context!!,
-                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
-                if (Build.VERSION.SDK_INT >= 29 ) {
-                    val hasBackgroundLocationPermission = ActivityCompat.checkSelfPermission(this.context!!,
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    if (!hasBackgroundLocationPermission || !hasForegroundLocationPermission) {
-                        return
-                    }
-                } else {
-                    if (!hasForegroundLocationPermission) {
-                        return
-                    }
-                }
-            }
+            subscribeGPSSTream()
+            checkPermission()
             autoModeTracker?.activelyScanSpeed()
         } else {
             autoModeTracker?.stopSpeedScanning()
         }
         autoModeTracker?.speedFilter?.collectionEnabled = track
         LOGGER.info("location Tracker enabled: $track", funcName)
+    }
+
+    fun subscribeGPSSTream() {
+        val funcName = "subscribeGPSSTream"
+        autoModeTracker?.speedFilter?.gpsStream?.subscribe ({
+            if (autoModeTracker?.speedFilter!!.collectionEnabled) {
+                val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),
+                        it.longitude.toDouble(),
+                        it.accuracy,
+                        it.speed,
+                        it.bearing,
+                        it.altitude.toDouble(),
+                        it.time)
+                LOGGER.info("Got new location fix ", funcName)
+                fixProducer.onNext(listOf(locationFix))
+            }
+        }, {throwable ->
+            LOGGER.info("throwable $throwable", funcName)
+        })
+    }
+
+    fun checkPermission() {
+        if (Build.VERSION.SDK_INT >= 23 ) {
+            val hasForegroundLocationPermission = ActivityCompat.checkSelfPermission(this.context!!,
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+            if (Build.VERSION.SDK_INT >= 29 ) {
+                val hasBackgroundLocationPermission = ActivityCompat.checkSelfPermission(this.context!!,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
+                if (!hasBackgroundLocationPermission || !hasForegroundLocationPermission) {
+                    return
+                }
+            } else {
+                if (!hasForegroundLocationPermission) {
+                    return
+                }
+            }
+        }
     }
 }

@@ -41,6 +41,7 @@ class TexConfig {
         var config: Config? = null
         internal var user: TexUser? = null
 
+        val logger = LoggerFactory().getLogger(this::class.java.name)
         internal fun setupKoin(context: Context) {
             val myModule = module {
                 single { AutomodeHandler() }
@@ -79,18 +80,15 @@ class TexConfig {
                     ) }
                 single { TripRecorderImpl(context) as TripRecorder } bind TripRecorder::class
             }
-            //try {
+            try {
                 startKoin {
                     // module list
                     modules(listOf(myModule))
                 }
-            /*} catch (e: Exception) {
-                // @TODO erwan
-                e.printStackTrace()
-            }*/
-
+            } catch (e: Exception) {
+                logger.logger.error("Exception during setup koin", "setupKoin")
+            }
         }
-
 
         fun loadAutoModeModule(context: Context) {
 
@@ -102,18 +100,14 @@ class TexConfig {
             }
 
             try {
-
                 startKoin {
                     // module list
                     modules(listOf(myModule))
                 }
             } catch (e: Exception) {
-                // @TODO erwan
-                e.printStackTrace()
+                logger.logger.error("Exception during koin load automodule", "loadAutoModeModule")
             }
-
         }
-
 
         internal fun init(config: Config) {
             val logger = LoggerFactory().getLogger(this::class.java.name)
@@ -125,7 +119,6 @@ class TexConfig {
     private constructor(context: Context?) {
         this.context = context
     }
-
 
     class Builder {
         @JsonProperty

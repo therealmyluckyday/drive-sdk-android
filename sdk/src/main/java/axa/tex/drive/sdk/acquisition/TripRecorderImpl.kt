@@ -87,11 +87,9 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
                 throw exception
             }
 
-            if (Build.VERSION.SDK_INT >= 29) {
-                if (context.checkSelfPermission(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if ((Build.VERSION.SDK_INT >= 29) && (context.checkSelfPermission(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
                     val exception = PermissionException("need permission.ACCESS_BACKGROUND_LOCATION")
                     throw exception
-                }
             }
         }
     }
@@ -128,7 +126,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
         fixProcessor.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
         context.bindService(serviceIntent, object : ServiceConnection {
-
             override fun onServiceConnected(className: ComponentName,
                                             service: IBinder) {
                 val binder = service as CollectorService.LocalBinder
@@ -163,6 +160,4 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     fun setConfig(config: Config) {
         this.mConfig = config
     }
-
-
 }
