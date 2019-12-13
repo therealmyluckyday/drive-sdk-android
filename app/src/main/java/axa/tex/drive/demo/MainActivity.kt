@@ -29,8 +29,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         requestForLocationPermission();
 
-        val service = (application as TexDriveDemoApplication).service
-        tripRecorder = (application as TexDriveDemoApplication).tripRecorder
+        val texApplication = application as TexDriveDemoApplication
+        texApplication.configure()
+        val service = texApplication.service
+        tripRecorder = texApplication.tripRecorder
 
         play.setOnClickListener {
             play.visibility = View.GONE
@@ -52,14 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        service?.logStream()?.subscribeOn(Schedulers.computation())?.subscribe ( {
-            Thread{
-                println("["+it.file +"]["+ it.function + "]"+ it.description )
-            }.start()
 
-        }, {throwable ->
-            print(throwable)
-        })
 
         val scoreRetriever = service?.scoreRetriever()
         scoreRetriever?.getScoreListener()?.subscribe ( {
@@ -143,6 +138,11 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val tripId =  tripRecorder?.startTrip(Date().time);
+
+            if (tripId!= null) {
+                val texApplication = application as TexDriveDemoApplication
+                texApplication.driving(tripId)
+            }
             println(tripId)
         }catch (e: PermissionException){
             e.printStackTrace()
@@ -153,6 +153,10 @@ class MainActivity : AppCompatActivity() {
         Thread{
             try {
                 tripRecorder?.stopTrip(Date().time)
+
+                val texApplication = application as TexDriveDemoApplication
+                texApplication.stopDriving()
+
             }catch (e: PermissionException){
                 e.printStackTrace()
             }
