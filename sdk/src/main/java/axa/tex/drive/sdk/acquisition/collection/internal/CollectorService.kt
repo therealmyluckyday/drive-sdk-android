@@ -57,17 +57,20 @@ internal class CollectorService : Service() {
     fun startNotification(intent: Intent?) {
         val channelId = createNotificationChannel()
         val notification: Notification?
-        if (intent != null && intent.hasExtra("notif")) {
-            notification = intent.getParcelableExtra("notif")
-        } else {
-            val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            notification = notificationBuilder.setOngoing(true)
-                    .setSmallIcon(R.drawable.ic_logo)
-                    .setCategory(Notification.CATEGORY_SERVICE)
-                    .build()
-        }
-        if (notification != null) {
-            this.startForeground(NOTIFICATION_ID, notification)
+
+        if (intent != null) {
+            if (intent.hasExtra("notif")) {
+                notification = intent.getParcelableExtra("notif")
+            } else {
+                val notificationBuilder = NotificationCompat.Builder(this, channelId)
+                notification = notificationBuilder.setOngoing(true)
+                        .setSmallIcon(R.drawable.ic_logo)
+                        .setCategory(Notification.CATEGORY_SERVICE)
+                        .build()
+            }
+            if (notification != null) {
+                this.startForeground(NOTIFICATION_ID, notification)
+            }
         }
     }
 
@@ -77,9 +80,9 @@ internal class CollectorService : Service() {
             scoreRetriever.getAvailableScoreListener().subscribe ( { tripId ->
                 scoreRetriever.getScoreListener().subscribe { scoreResult ->
                     if (scoreResult.scoreDil == null) {
-                        LOGGER.info("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "onStartCommand")
+                        LOGGER.info("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "subscribeScoreAvailability")
                     } else {
-                        LOGGER.info("The retrieved score : ${scoreResult.scoreDil.toJson()}", "onStartCommand")
+                        LOGGER.info("The retrieved score : ${scoreResult.scoreDil.toJson()}", "subscribeScoreAvailability")
                     }
 
                 }
@@ -88,12 +91,12 @@ internal class CollectorService : Service() {
                     tripId?.let { scoreRetriever.retrieveScore(it) }
                 }.start()
             }, {throwable ->
-                LOGGER.error("The retrieved rx score exception: ${throwable.printStackTrace()}", "onStartCommand")
+                LOGGER.error("The retrieved rx score exception: ${throwable.printStackTrace()}", "subscribeScoreAvailability")
             })
         } catch (e: Exception) {
-            LOGGER.error("The retrieved score exception: ${e.printStackTrace()}", "onStartCommand")
+            LOGGER.error("The retrieved score exception: ${e.printStackTrace()}", "subscribeScoreAvailability")
         } catch (err: Error) {
-            LOGGER.error("The retrieved score error: ${err.printStackTrace()}", "onStartCommand")
+            LOGGER.error("The retrieved score error: ${err.printStackTrace()}", "subscribeScoreAvailability")
         }
     }
 
