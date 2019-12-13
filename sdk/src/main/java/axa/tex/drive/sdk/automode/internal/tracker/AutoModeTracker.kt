@@ -76,7 +76,12 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
     }
 
     override fun activelyScanSpeed() {
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0.0f, this)
+        try {
+            // Request location updates
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0.0f, this)
+        } catch(ex: SecurityException) {
+            LOGGER.error("Security Exception, no location available", "activelyScanSpeed")
+        }
     }
 
     @SuppressLint("MissingPermission")
