@@ -38,11 +38,11 @@ class ScoresDil {
                 smoothness: Double,
                 eco_ness: Double,
                 jam: Double,
-                mean: Mean,
-                poi_dil: List<PoiDil>,
+                mean: Mean?,
+                poi_dil: List<PoiDil>?,
                 speed: Double,
                 weather_penalization: Int,
-                contextualized_scores: ContextualizedScores) {
+                contextualized_scores: ContextualizedScores?) {
         this.acceleration = acceleration
         this.braking = braking
         this.expert = expert
