@@ -115,17 +115,11 @@ class TexConfig {
         }
 
 
-        internal fun init(context: Context, config: Config) {
+        internal fun init(config: Config) {
             val logger = LoggerFactory().getLogger(this::class.java.name)
-
             logger.logger.info("Initializing sdk", "init")
-
             TexConfig.config = config
-
-            logger.logger.info("Create koin module", "init")
         }
-
-
     }
 
     private constructor(context: Context?) {
@@ -189,6 +183,7 @@ class TexConfig {
             val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform)
             TexConfig.config = config
 
+            logger.logger.info("Create koin module", "build")
             context?.let { setupKoin(it) }
 
             logger.logger.info("Done building configuration", "build")

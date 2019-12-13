@@ -81,7 +81,7 @@ internal class CollectorService : Service() {
             scoreRetriever.getAvailableScoreListener().subscribe ( { tripId ->
                 scoreRetriever.getScoreListener().subscribe { scoreResult ->
                     if (scoreResult.scoreDil == null) {
-                        LOGGER.info("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "subscribeScoreAvailability")
+                        LOGGER.error("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "subscribeScoreAvailability")
                     } else {
                         LOGGER.info("The retrieved score : ${scoreResult.scoreDil.toJson()}", "subscribeScoreAvailability")
                     }
@@ -115,8 +115,8 @@ internal class CollectorService : Service() {
 
 
         if ((intent != null) && (intent.hasExtra(Constants.APP_NAME_KEY))&& (intent.hasExtra(Constants.PLATFORM_KEY))) {
-            val appName: String = intent.getStringExtra(Constants.APP_NAME_KEY)
-            val platformValue: String = intent.getStringExtra(Constants.PLATFORM_KEY)
+            val appName = intent.getStringExtra(Constants.APP_NAME_KEY)
+            val platformValue = intent.getStringExtra(Constants.PLATFORM_KEY)
             val platform : Platform
             when (platformValue) {
                 Platform.PRODUCTION.endPoint -> platform = Platform.PRODUCTION
@@ -124,8 +124,12 @@ internal class CollectorService : Service() {
                 Platform.PREPROD.endPoint -> platform = Platform.PREPROD
                 else -> platform = Platform.PRODUCTION
             }
-
-            subscribeScoreAvailability(appName, platform)
+            if ((appName!=null)) {
+                subscribeScoreAvailability(appName, platform)
+            }
+            else {
+                LOGGER.info("AppName is null", "onStartCommand")
+            }
         }
         
         return START_STICKY
