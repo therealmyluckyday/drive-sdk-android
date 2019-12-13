@@ -32,27 +32,25 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
 
     fun sendFixes(inputData: Data): Result {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
-        // @TODO Erwan Change
         val appName = inputData.getString(Constants.APP_NAME_KEY) ?: "APP_TEST"
+        val platform : Platform
+        when (inputData.getString(Constants.PLATFORM_KEY)) {
+            Platform.PRODUCTION.endPoint -> platform = Platform.PRODUCTION
+            Platform.TESTING.endPoint -> platform = Platform.TESTING
+            Platform.PREPROD.endPoint -> platform = Platform.PREPROD
+            else -> platform = Platform.PRODUCTION
+        }
         val data = inputData.getString(Constants.DATA_KEY) ?: ""
         LOGGER.info("COLLECTOR_WORKER SIZE :$inputData.keyValueMap.size.toString()", "private fun sendFixes(inputData : Data) : Boolean")
-        return sendData(data, appName)
+        return sendData(data, appName, platform)
     }
 
 
     @Throws(IOException::class)
-    private fun sendData(data: String, appName: String): Result {
+    private fun sendData(data: String, appName: String, platform: Platform): Result {
         val funcName = "enableTracking"
         try {
             // @TODO Erwan Change
-            //val collectorDb: CollectionDb by inject()
-            //val config = collectorDb.getConfig()
-
-            val config = Config(false, true, false, "APP-TEST", "22910000", Platform.PRODUCTION)
-            var platform: Platform = Platform.PRODUCTION
-            //if (config != null) {
-                platform = config.endPoint
-           // }
 
 
 

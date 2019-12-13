@@ -20,6 +20,8 @@ import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.Platform
+import axa.tex.drive.sdk.core.TexConfig
+import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
@@ -38,6 +40,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private var mCurrentLocation : Location? = null
     private var mCurrentDistance: Double = 0.toDouble()
     private var mCurrentSpeed: Int = 0
+    private var mConfig: Config? = null
     private var start : Long  = 0
     private var disposable : Disposable
     private val tripProgress = PublishSubject.create<TripProgress>()
@@ -95,23 +98,28 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
 
     override fun startTrip(startTime: Long) : TripId?{
-        //val config = this.mConfig ?:
-        val config = Config(false, true, false, "APP-TEST", "22910000", Platform.PRODUCTION)
-        start = startTime
+        if (mConfig != null) {
+            val config = mConfig!!
+            start = startTime
+            logger.info("${Date()} TripRecorder : Start tracking.", function = "startTrip")
+            requestForLocationPermission()
+            val serviceIntent = Intent(context, CollectorService::class.java)
+            if(myCustomNotification != null) {
+                serviceIntent.putExtra("notif", myCustomNotification)
+            }
+            serviceIntent.putExtra(Constants.APP_NAME_KEY, config.appName)
+            serviceIntent.putExtra(Constants.PLATFORM_KEY, config.endPoint.endPoint)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            }else{
+                context.startService(serviceIntent)
+            }
 
-        logger.info("${Date()} TripRecorder : Start tracking.", function = "fun startTrip(startTime: Long) : TripId?")
-        requestForLocationPermission()
-        val serviceIntent = Intent(context, CollectorService::class.java)
-        if(myCustomNotification != null) {
-            serviceIntent.putExtra("notif", myCustomNotification)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(serviceIntent)
-        }else{
-            context.startService(serviceIntent)
+            return fixProcessor.startTrip(startTime, config)
         }
 
-        return fixProcessor.startTrip(startTime, config)
+        logger.error("TripREcorderImpl has no config", "startTrip")
+        return null
     }
 
     override fun stopTrip(endTime: Long) {
@@ -152,6 +160,9 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
         return tripProgress
     }
 
+    fun setConfig(config: Config) {
+        this.mConfig = config
+    }
 
 
 }

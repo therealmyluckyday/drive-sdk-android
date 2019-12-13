@@ -1,6 +1,7 @@
 package axa.tex.drive.sdk.core
 
 import axa.tex.drive.sdk.acquisition.TripRecorder
+import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
@@ -19,6 +20,10 @@ class TexService : KoinComponentCallbacks {
             config = conf
             val instanceToReturn = instance ?: TexService()
             instance = instanceToReturn
+            if (instanceToReturn.getTripRecorder() is TripRecorderImpl) {
+                val triprecorderImpl = instanceToReturn.getTripRecorder() as TripRecorderImpl
+                triprecorderImpl.setConfig(TexConfig.config!!)
+            }
             return instanceToReturn
         }
     }

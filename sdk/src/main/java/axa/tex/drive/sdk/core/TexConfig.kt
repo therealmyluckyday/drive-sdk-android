@@ -38,12 +38,8 @@ class TexConfig {
 
 
     internal companion object {
-        private var locationTrackerEnabled: Boolean = true
-        private var motionTrackerEnabled: Boolean = true
-        private var batteryTrackerEnabled: Boolean = true
+        var config: Config? = null
         internal var user: TexUser? = null
-        internal var appName: String? = null
-        internal var clientId: String? = null
 
         internal fun setupKoin(context: Context) {
             val myModule = module {
@@ -61,19 +57,19 @@ class TexConfig {
                                     get(),
                                     get(),
                                     context,
-                                    locationTrackerEnabled)
+                                    config?.locationTrackerEnabled!!)
                     )}
                 single {
                     BatteryTracker(
                             BatterySensor(
                             context,
-                            batteryTrackerEnabled)
+                            config?.batteryTrackerEnabled!!)
                     )}
                 single {
                     MotionTracker(
                             MotionSensor(
                             context,
-                            motionTrackerEnabled)
+                            config?.motionTrackerEnabled!!)
                     )}
                 single {
                     Collector(context,
@@ -119,36 +115,12 @@ class TexConfig {
         }
 
 
-        internal fun init(context: Context, config: Config?) {
+        internal fun init(context: Context, config: Config) {
             val logger = LoggerFactory().getLogger(this::class.java.name)
 
             logger.logger.info("Initializing sdk", "init")
 
-            TexConfig.locationTrackerEnabled = if (config == null) {
-                false
-            } else {
-                config.locationTrackerEnabled
-            }
-
-            TexConfig.motionTrackerEnabled = if (config == null) {
-                false
-            } else {
-                config.motionTrackerEnabled
-            }
-
-            TexConfig.batteryTrackerEnabled = if (config == null) {
-                false
-            } else {
-                config.batteryTrackerEnabled
-            }
-
-            if (config?.appName != null) {
-                TexConfig.appName = config.appName
-            }
-
-            if (config?.clientId != null) {
-                TexConfig.clientId = config.clientId
-            }
+            TexConfig.config = config
 
             logger.logger.info("Create koin module", "init")
         }
@@ -214,22 +186,15 @@ class TexConfig {
             }
             logger.logger.info("Done configuring ssl certificate", "init")
 
-            TexConfig.batteryTrackerEnabled = batteryTrackerEnabled
-            TexConfig.locationTrackerEnabled = locationTrackerEnabled
-            TexConfig.motionTrackerEnabled = motionTrackerEnabled
-            TexConfig.appName = appName
-            TexConfig.clientId = clientId
+            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform)
+            TexConfig.config = config
 
             context?.let { setupKoin(it) }
 
-            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform)
-            if (context != null) {
-                val collectorDb = CollectionDb(context)
-                collectorDb.setConfig(config)
-            }
-
             logger.logger.info("Done building configuration", "build")
-            return TexConfig(context)
+            val texconfig = TexConfig(context)
+            TexConfig.config = config
+            return texconfig
         }
 
 

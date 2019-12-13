@@ -6,7 +6,7 @@ import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
 import axa.tex.drive.sdk.core.internal.utils.Utils
 import java.util.*
 
-class TripInfos(val appName: String, val clientId: String) {
+class TripInfos(val appName: String, val clientId: String, val platform: Platform) {
     companion object {
         private fun generateTripId() : TripId {
             val generatedTripId = TripId(UUID.randomUUID().toString().toUpperCase(Locale.US))

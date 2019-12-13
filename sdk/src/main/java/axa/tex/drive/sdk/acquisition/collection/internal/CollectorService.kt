@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
+import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
@@ -74,7 +75,7 @@ internal class CollectorService : Service() {
         }
     }
 
-    fun subscribeScoreAvailability() {
+    fun subscribeScoreAvailability(appName: String, platform: Platform) {
         try {
             val scoreRetriever: ScoreRetriever by inject()
             scoreRetriever.getAvailableScoreListener().subscribe ( { tripId ->
@@ -88,7 +89,7 @@ internal class CollectorService : Service() {
                 }
                 Thread {
                     Thread.sleep(10000)
-                    tripId?.let { scoreRetriever.retrieveScore(it) }
+                    tripId?.let { scoreRetriever.retrieveScore(it, appName, platform, true) }
                 }.start()
             }, {throwable ->
                 LOGGER.error("The retrieved rx score exception: ${throwable.printStackTrace()}", "subscribeScoreAvailability")
@@ -111,7 +112,21 @@ internal class CollectorService : Service() {
             startNotification(intent)
         }
 
-        subscribeScoreAvailability()
+
+
+        if ((intent != null) && (intent.hasExtra(Constants.APP_NAME_KEY))&& (intent.hasExtra(Constants.PLATFORM_KEY))) {
+            val appName: String = intent.getStringExtra(Constants.APP_NAME_KEY)
+            val platformValue: String = intent.getStringExtra(Constants.PLATFORM_KEY)
+            val platform : Platform
+            when (platformValue) {
+                Platform.PRODUCTION.endPoint -> platform = Platform.PRODUCTION
+                Platform.TESTING.endPoint -> platform = Platform.TESTING
+                Platform.PREPROD.endPoint -> platform = Platform.PREPROD
+                else -> platform = Platform.PRODUCTION
+            }
+
+            subscribeScoreAvailability(appName, platform)
+        }
         
         return START_STICKY
     }
