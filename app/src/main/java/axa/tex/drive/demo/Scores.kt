@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
+import axa.tex.drive.sdk.core.Platform
 import kotlinx.android.synthetic.main.activity_scores.*
 
 class Scores : AppCompatActivity() {
@@ -40,9 +41,10 @@ class Scores : AppCompatActivity() {
 
             }
         }
+        val appName = "APP-TEST"
+        val platform = Platform.PRODUCTION
 
-        //Thread { scoreRetriever.retrieveScore("4260e592-008b-4fcf-877d-fe8d3923b5f5") }.start()
-        Thread { scoreRetriever.retrieveScore(tripId) }.start()
+        Thread { scoreRetriever.retrieveScore(tripId, appName, platform, true) }.start()
 
     }
 }
