@@ -1,3 +1,5 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
-data class ScoreResult (val scoreDil: ScoresDil? = null, val scoreError: ScoreError? = null, val response : String = "")
+import axa.tex.drive.sdk.acquisition.score.Score
+
+data class ScoreResult (val score: Score? = null, val scoreError: ScoreError? = null)

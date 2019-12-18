@@ -1,5 +1,6 @@
 package axa.tex.drive.demo
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -9,6 +10,7 @@ import kotlinx.android.synthetic.main.activity_scores.*
 
 class Scores : AppCompatActivity() {
 
+    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scores)
@@ -21,19 +23,20 @@ class Scores : AppCompatActivity() {
 
         scoreRetriever.getScoreListener().subscribe {
             this.runOnUiThread {
-                if (it.scoreDil != null) {
+                if (it.score?.scores_dil != null) {
+                    val scoreDil = it.score?.scores_dil!!
                     speed.visibility = View.VISIBLE
-                    speed.text = "${it.scoreDil?.acceleration}"
+                    speed.text = "${scoreDil.acceleration}"
 
                     breaking.visibility = View.VISIBLE
-                    breaking.text = "${it.scoreDil?.braking}"
+                    breaking.text = "${scoreDil.braking}"
 
                     smoothness.visibility = View.VISIBLE
-                    smoothness.text = "${it.scoreDil?.smoothness}"
-                    println("SCORES ${it.scoreDil?.acceleration}")
+                    smoothness.text = "${scoreDil.smoothness}"
+                    println("SCORES ${scoreDil.acceleration}")
                 }else{
 
-                    error.text = it.response
+                    error.text = it.scoreError.toString()
                     error.visibility = android.view.View.VISIBLE
 
 
