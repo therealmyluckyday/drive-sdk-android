@@ -1,6 +1,7 @@
 package axa.tex.drive.sdk.core.internal
 
 object Constants {
+    internal const val CONFIG_RETRIEVE_SCORE_AUTO_BOOLEAN_KEY = "CONFIG_RETRIEVE_SCORE_AUTO_BOOLEAN_KEY"
     internal const val CHANNEL_ID = "tex-channel-id"
     internal const val CHANNEL_NAME = "Notification"
     internal const val JSON_SCHEMA_VERSION = "2.0"

@@ -8,6 +8,7 @@ internal class Config {
     var batteryTrackerEnabled: Boolean = false
     var locationTrackerEnabled: Boolean = false
     var motionTrackerEnabled: Boolean = false
+    var isRetrievingScoreAutomatically: Boolean = true
     var appName: String//Constants.DEFAULT_APP_NAME
     var clientId: String
     var endPoint: Platform

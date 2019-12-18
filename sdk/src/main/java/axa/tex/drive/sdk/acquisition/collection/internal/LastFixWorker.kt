@@ -11,8 +11,6 @@ import org.koin.android.ext.android.inject
 
 internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters)
     : FixWorker(appContext, workerParams) {
-
-    private val isRetrievingScoreAutomatically = false
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val workManager: androidx.work.WorkManager by lazy {
         WorkManager.getInstance(appContext)
@@ -42,6 +40,7 @@ internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters
 
     fun retrieveScore(tripId: String) {
         val appName = inputData.getString(Constants.APP_NAME_KEY) ?: "APP_TEST"
+        val isRetrievingScoreAutomatically = inputData.getBoolean(Constants.CONFIG_RETRIEVE_SCORE_AUTO_BOOLEAN_KEY, true)
         val platform : Platform
         when (inputData.getString(Constants.PLATFORM_KEY)) {
             Platform.PRODUCTION.endPoint -> platform = Platform.PRODUCTION
@@ -51,7 +50,7 @@ internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters
         }
         val scoreRetriever: ScoreRetriever by inject()
         if (isRetrievingScoreAutomatically) {
-            scoreRetriever.retrieveScore(tripId, appName, platform, true)
+            scoreRetriever.retrieveScore(tripId, appName, platform, true, delay = 60)
         }
         else {
             scoreRetriever.getAvailableScoreListener().onNext(tripId)

@@ -75,32 +75,6 @@ internal class CollectorService : Service() {
         }
     }
 
-    fun subscribeScoreAvailability(appName: String, platform: Platform) {
-        try {
-            val scoreRetriever: ScoreRetriever by inject()
-            scoreRetriever.getAvailableScoreListener().subscribe ( { tripId ->
-                scoreRetriever.getScoreListener().subscribe { scoreResult ->
-                    if (scoreResult.scoreDil == null) {
-                        LOGGER.error("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "subscribeScoreAvailability")
-                    } else {
-                        LOGGER.info("The retrieved score : ${scoreResult.scoreDil.toJson()}", "subscribeScoreAvailability")
-                    }
-
-                }
-                Thread {
-                    Thread.sleep(10000)
-                    tripId?.let { scoreRetriever.retrieveScore(it, appName, platform, true) }
-                }.start()
-            }, {throwable ->
-                LOGGER.error("The retrieved rx score exception: ${throwable.printStackTrace()}", "subscribeScoreAvailability")
-            })
-        } catch (e: Exception) {
-            LOGGER.error("The retrieved score exception: ${e.printStackTrace()}", "subscribeScoreAvailability")
-        } catch (err: Error) {
-            LOGGER.error("The retrieved score error: ${err.printStackTrace()}", "subscribeScoreAvailability")
-        }
-    }
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         val collector: Collector by inject()
@@ -110,26 +84,6 @@ internal class CollectorService : Service() {
 
         if (isNewerPhone()) {
             startNotification(intent)
-        }
-
-
-
-        if ((intent != null) && (intent.hasExtra(Constants.APP_NAME_KEY))&& (intent.hasExtra(Constants.PLATFORM_KEY))) {
-            val appName = intent.getStringExtra(Constants.APP_NAME_KEY)
-            val platformValue = intent.getStringExtra(Constants.PLATFORM_KEY)
-            val platform : Platform
-            when (platformValue) {
-                Platform.PRODUCTION.endPoint -> platform = Platform.PRODUCTION
-                Platform.TESTING.endPoint -> platform = Platform.TESTING
-                Platform.PREPROD.endPoint -> platform = Platform.PREPROD
-                else -> platform = Platform.PRODUCTION
-            }
-            if ((appName!=null)) {
-                subscribeScoreAvailability(appName, platform)
-            }
-            else {
-                LOGGER.info("AppName is null", "onStartCommand")
-            }
         }
         
         return START_STICKY

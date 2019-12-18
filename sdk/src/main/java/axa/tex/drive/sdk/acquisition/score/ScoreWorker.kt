@@ -6,6 +6,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import axa.tex.drive.sdk.acquisition.score.model.ScoreError
 import axa.tex.drive.sdk.acquisition.score.model.ScoreResult
+import axa.tex.drive.sdk.acquisition.score.model.ScoreStatus
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
@@ -23,14 +24,10 @@ import java.net.URL
 import java.util.*
 
 
-private const val TIME_TO_WAIT = 5000
-private const val MAX_ATTEMPT = 5
 
 internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
     : Worker(appContext, workerParams), KoinComponentCallbacks {
 
-
-    private var nbAttempt = 0
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     override fun doWork(): Result {
@@ -47,7 +44,7 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
         val finalScore = inputData.getBoolean(Constants.FINAL_SCORE_BOOLEAN_KEY, true)
 
         if (tripId != null) {
-            scoreRequest(tripId, finalScore, platform, appName)
+            return scoreRequest(tripId, finalScore, platform, appName)
         }
 
         return Result.success()
@@ -67,7 +64,8 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
     }
 
     @Throws(Exception::class)
-    private fun scoreRequest(tripId: String, finalScore: Boolean, platform: Platform, appName: String) {
+    private fun scoreRequest(tripId: String, finalScore: Boolean, platform: Platform, appName: String): Result {
+
         try {
             Thread.sleep(5)
         }catch (e : Exception){
@@ -96,44 +94,37 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
             responseString.append(line)
             line = rd.readLine()
         }
+        if(connection.responseCode.toString().startsWith("5")){
+            return Result.retry()
+        }
         val mapper = ObjectMapper().registerKotlinModule()
         mapper.configure(
                 DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         val node = mapper.readTree(responseString.toString())
 
         try {
-            val score = mapper.readValue(node.get("scores_dil").toString(), ScoresDil::class.java)
-            scoreRetriever.getScoreListener().onNext(ScoreResult(score))
+            //{"flags":[],"score_type":"final","scoregw_version":"2.2.6","status":"trip_too_short","status_details":["not_enough_locations"],"trip_id":"7F05D5C6-D56E-4455-9A11-096CDC94CD75"}
+            val fullScore = mapper.readValue(node.toString(), Score::class.java)
+            println("FULLSCORE "+fullScore.tripId.value + " Score Status"+fullScore.status.name)
+            if (fullScore.status == ScoreStatus.pending) {
+                return Result.retry()
+            }
+            if (fullScore.scores_dil != null && fullScore.status == ScoreStatus.ok) {
+                scoreRetriever.getScoreListener().onNext(ScoreResult(fullScore))
+                return Result.success()
+            } else {
+                val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
+                scoreRetriever.getScoreListener().onNext(ScoreResult(scoreError = scoreError))
+                return Result.success()
+            }
         } catch (e: Exception) {
             LOGGER.error(" Exception ${e}", "scoreRequest")
             LOGGER.error("RESPONSE CODES ${connection.responseCode}", "scoreRequest")
-            if(connection.responseCode.toString().startsWith("2")) {
-                val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
-                scoreRetriever.getScoreListener().onNext(ScoreResult(scoreError = scoreError, response = responseString.toString()))
-            }else if(connection.responseCode.toString().startsWith("5")){
-                 retry(scoreRetriever,tripId, finalScore, platform, appName, responseString.toString())
-            }
+            return Result.failure()
 
         } catch (err: Error) {
-            if(connection.responseCode.toString().startsWith("5")){
-                 retry(scoreRetriever,tripId, finalScore, platform, appName, responseString.toString())
-            }
+            return Result.failure()
         }
-
-        nbAttempt = 0
-    }
-
-
-
-    private fun retry(scoreRetriever: ScoreRetriever,tripId: String, finalScore: Boolean, platform: Platform, appName: String, recievedPayload: String) {
-        if (nbAttempt < MAX_ATTEMPT) {
-            nbAttempt++
-            Thread.sleep(TIME_TO_WAIT.toLong())
-            scoreRequest(tripId, finalScore, platform, appName)
-
-        } else {
-            nbAttempt = 0
-            scoreRetriever.getScoreListener().onNext(ScoreResult(response = recievedPayload))
-        }
+        return Result.failure()
     }
 }

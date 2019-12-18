@@ -7,6 +7,7 @@ import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import io.reactivex.subjects.PublishSubject
+import java.util.concurrent.TimeUnit
 
 class ScoreRetriever: KoinComponentCallbacks {
 
@@ -26,7 +27,7 @@ class ScoreRetriever: KoinComponentCallbacks {
         return availableScoreListener
     }
 
-    fun retrieveScore(tripId: String, appName: String, platform: Platform, isFinalScore: Boolean) {
+    fun retrieveScore(tripId: String, appName: String, platform: Platform, isFinalScore: Boolean, delay: Long = 0) {
         val data: Data = Data.Builder()
                 .putBoolean(Constants.FINAL_SCORE_BOOLEAN_KEY, isFinalScore)
                 .putString(Constants.APP_NAME_KEY, appName)
@@ -35,7 +36,7 @@ class ScoreRetriever: KoinComponentCallbacks {
                 .build()
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
-        val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(ScoreWorker::class.java).setInputData(data).setConstraints(constraints)
+        val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest.Builder(ScoreWorker::class.java).setInputData(data).setInitialDelay(delay, TimeUnit.SECONDS).setConstraints(constraints)
                 .build()
         this.workManager.enqueue(fixUploadWork)
     }
