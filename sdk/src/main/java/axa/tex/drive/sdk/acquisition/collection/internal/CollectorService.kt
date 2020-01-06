@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
+import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
@@ -57,43 +58,20 @@ internal class CollectorService : Service() {
     fun startNotification(intent: Intent?) {
         val channelId = createNotificationChannel()
         val notification: Notification?
-        if (intent != null && intent.hasExtra("notif")) {
-            notification = intent.getParcelableExtra("notif")
-        } else {
-            val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            notification = notificationBuilder.setOngoing(true)
-                    .setSmallIcon(R.drawable.ic_logo)
-                    .setCategory(Notification.CATEGORY_SERVICE)
-                    .build()
-        }
-        if (notification != null) {
-            this.startForeground(NOTIFICATION_ID, notification)
-        }
-    }
 
-    fun subscribeScoreAvailability() {
-        try {
-            val scoreRetriever: ScoreRetriever by inject()
-            scoreRetriever.getAvailableScoreListener().subscribe ( { tripId ->
-                scoreRetriever.getScoreListener().subscribe { scoreResult ->
-                    if (scoreResult.scoreDil == null) {
-                        LOGGER.info("The retrieved score error: ${scoreResult.scoreError?.toJson()}", "onStartCommand")
-                    } else {
-                        LOGGER.info("The retrieved score : ${scoreResult.scoreDil.toJson()}", "onStartCommand")
-                    }
-
-                }
-                Thread {
-                    Thread.sleep(10000)
-                    tripId?.let { scoreRetriever.retrieveScore(it) }
-                }.start()
-            }, {throwable ->
-                LOGGER.error("The retrieved rx score exception: ${throwable.printStackTrace()}", "onStartCommand")
-            })
-        } catch (e: Exception) {
-            LOGGER.error("The retrieved score exception: ${e.printStackTrace()}", "onStartCommand")
-        } catch (err: Error) {
-            LOGGER.error("The retrieved score error: ${err.printStackTrace()}", "onStartCommand")
+        if (intent != null) {
+            if (intent.hasExtra("notif")) {
+                notification = intent.getParcelableExtra("notif")
+            } else {
+                val notificationBuilder = NotificationCompat.Builder(this, channelId)
+                notification = notificationBuilder.setOngoing(true)
+                        .setSmallIcon(R.drawable.ic_logo)
+                        .setCategory(Notification.CATEGORY_SERVICE)
+                        .build()
+            }
+            if (notification != null) {
+                this.startForeground(NOTIFICATION_ID, notification)
+            }
         }
     }
 
@@ -107,8 +85,6 @@ internal class CollectorService : Service() {
         if (isNewerPhone()) {
             startNotification(intent)
         }
-
-        subscribeScoreAvailability()
         
         return START_STICKY
     }

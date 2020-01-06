@@ -35,10 +35,9 @@ class TexDriveDemoApplication : Application() {
     lateinit var notificationManager: NotificationManager
     private var config: TexConfig? = null
 
-    fun driving() {
+    fun driving(myTripId: TripId) {
         val tripRecorder = tripRecorder ?: return
         if (!tripRecorder.isRecording()) {
-            myTripId = startTheService()
             notifyStart(if (myTripId != null) {
                 "Start trip : ${myTripId!!.value}"
             } else {
@@ -54,19 +53,36 @@ class TexDriveDemoApplication : Application() {
     fun stopDriving() {
         val tripRecorder = tripRecorder ?: return
         if (tripRecorder.isRecording()) {
-            notifyStart(if(myTripId != null){
-                "End of trip : ${myTripId!!.value}"
-            }else{
-                ""
-            }, 8)
-
-            stopTheService()
+            notifyStart("End of trip :", 8)
             log(applicationContext, "Enf of trip at ${Date().toString()}\n")
-            if(myTripId != null) {
-                log(applicationContext, "${Date().toString()}Trip Id =  at ${myTripId?.value}\n")
-            }
             log(applicationContext, "=====================================================================\n")
 
+        }
+    }
+
+    fun configure() {
+        val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000").enableTrackers().platformHost(Platform.PRODUCTION).build()
+        config = newConfig
+        val newService = TexService.configure(newConfig)
+        service = newService
+
+
+        val autoModeHandler = newService.automodeHandler()
+
+        newService.logStream()?.subscribeOn(Schedulers.io())?.subscribe({ it ->
+            log(applicationContext, "[" + java.util.Calendar.getInstance() + "][" + it.file + "][" + it.function + "]" + it.description + "\n")
+            Thread{
+                println("["+it.file +"]["+ it.function + "]"+ it.description )
+            }.start()
+        })
+
+
+
+        if(!autoModeHandler.running!!) {
+            Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
+            autoModeHandler.activateAutomode(applicationContext)
+        }else{
+            Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -78,37 +94,12 @@ class TexDriveDemoApplication : Application() {
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000").enableTrackers().platformHost(Platform.PREPROD).build()
-        config = newConfig
-        val newService = TexService.configure(newConfig)
-        service = newService
 
 
-        val autoModeHandler = newService.automodeHandler()
-
-        newService.logStream()?.subscribeOn(Schedulers.io())?.subscribe({ it ->
-            log(applicationContext, "[" + java.util.Calendar.getInstance() + "][" + it.file + "][" + it.function + "]" + it.description + "\n")
-        })
-
-        autoModeHandler.state?.subscribe ( {driving ->
-            if (driving) {
-                this.driving()
-            } else {
-                this.stopDriving()
-            }
-        }, {throwable ->
-            log(applicationContext, "error on automodeHandler subscription ${throwable}\n")
-        })
-
-        if(!autoModeHandler.running!!) {
-            Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
-            autoModeHandler.activateAutomode(applicationContext)
-        }else{
-           Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
-        }
     }
 
     fun log(context : Context?, data : String){
+
         try {
             val rootPath = context?.getExternalFilesDir("AUTOMODE")
             val root = File(rootPath?.toURI())
@@ -149,28 +140,6 @@ class TexDriveDemoApplication : Application() {
     }
 
 
-
-    private fun startTheService() : TripId?{
-        try {
-           return  tripRecorder?.startTrip(Date().time)
-
-
-        } catch (e: PermissionException) {
-            e.printStackTrace()
-        }
-    return null
-    }
-
-    private fun stopTheService() {
-        Thread {
-            try {
-                tripRecorder?.stopTrip(Date().time)
-            } catch (e: PermissionException) {
-                e.printStackTrace()
-            }
-        }.start()
-
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {

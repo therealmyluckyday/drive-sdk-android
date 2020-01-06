@@ -21,6 +21,7 @@ internal class FixProcessor : KoinComponentCallbacks {
     internal var currentTripChunk: TripChunk? = null
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
+
     constructor(context: Context) {
         this.context = context
         this.apiTrip = APITrip(context)
@@ -29,8 +30,9 @@ internal class FixProcessor : KoinComponentCallbacks {
     fun startTrip(startTime: Long, config: Config) : TripId {
         val appName = config.appName
         val clientId = config.clientId
+        this.apiTrip.isRetrievingScoreAutomatically = config.isRetrievingScoreAutomatically
         val start = Event(listOf("start"), startTime)
-        val tripInfos = TripInfos(appName, clientId)
+        val tripInfos = TripInfos(appName, clientId, config.endPoint)
         currentTripChunk = TripChunk(tripInfos, 0)
         LOGGER.info("Start trip ", "startTrip")
         addFix(start)

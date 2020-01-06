@@ -29,8 +29,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         requestForLocationPermission();
 
-        val service = (application as TexDriveDemoApplication).service
-        tripRecorder = (application as TexDriveDemoApplication).tripRecorder
+        val texApplication = application as TexDriveDemoApplication
+        texApplication.configure()
+        val service = texApplication.service
+        tripRecorder = texApplication.tripRecorder
 
         play.setOnClickListener {
             play.visibility = View.GONE
@@ -52,14 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        service?.logStream()?.subscribeOn(Schedulers.computation())?.subscribe ( {
-            Thread{
-                println("["+it.file +"]["+ it.function + "]"+ it.description )
-            }.start()
 
-        }, {throwable ->
-            print(throwable)
-        })
 
         val scoreRetriever = service?.scoreRetriever()
         scoreRetriever?.getScoreListener()?.subscribe ( {
@@ -143,6 +138,11 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val tripId =  tripRecorder?.startTrip(Date().time);
+
+            if (tripId!= null) {
+                val texApplication = application as TexDriveDemoApplication
+                texApplication.driving(tripId)
+            }
             println(tripId)
         }catch (e: PermissionException){
             e.printStackTrace()
@@ -153,6 +153,10 @@ class MainActivity : AppCompatActivity() {
         Thread{
             try {
                 tripRecorder?.stopTrip(Date().time)
+
+                val texApplication = application as TexDriveDemoApplication
+                texApplication.stopDriving()
+
             }catch (e: PermissionException){
                 e.printStackTrace()
             }
@@ -161,22 +165,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestForLocationPermission() {
-        val locationPermission = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION)
+        ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), 123)
         if (Build.VERSION.SDK_INT >= 23 ) {
             val hasForegroundLocationPermission = ActivityCompat.checkSelfPermission(this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-            if (hasForegroundLocationPermission) {
-                val hasBackgroundLocationPermission = ActivityCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
-                if (!hasBackgroundLocationPermission) {
+            if (Build.VERSION.SDK_INT >= 29 ) {
+                if (hasForegroundLocationPermission) {
+                    val hasBackgroundLocationPermission = ActivityCompat.checkSelfPermission(this,
+                            android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                            ) == PackageManager.PERMISSION_GRANTED
+                    if (!hasBackgroundLocationPermission) {
+                        ActivityCompat.requestPermissions(this,
+                                arrayOf(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
+                    }
+                } else {
                     ActivityCompat.requestPermissions(this,
-                            arrayOf(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
+                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
                 }
             } else {
-                ActivityCompat.requestPermissions(this,
-                        arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
-                                android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
+                if (!hasForegroundLocationPermission) {
+                    ActivityCompat.requestPermissions(this,
+                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
+                }
             }
         }
     }

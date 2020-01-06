@@ -1,7 +1,7 @@
 package axa.tex.drive.sdk.core
 
-enum class Platform {
-    PRODUCTION,
-    TESTING,
-    PREPROD
+enum class Platform (val endPoint: String) {
+    PRODUCTION("PRODUCTION"),
+    TESTING("TESTING"),
+    PREPROD("PREPROD")
 }

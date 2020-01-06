@@ -6,7 +6,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'org.sonarqube'
 
-def currentVersionName = "3.0.3"
+def currentVersionName = "3.0.4"
 def getVersionName = { ->
     return currentVersionName
 }
@@ -82,6 +82,7 @@ dependencies {
 
     // Jackson
     def jackson_version = '2.10.0'
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
     implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
     implementation "com.fasterxml.jackson.core:jackson-core:$jackson_version"
     implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
@@ -137,8 +138,8 @@ artifactory {
     publish {
         repository {
             repoKey = 'android-tex'
-            username = artifactory_username
-            password = artifactory_password
+            username = System.getenv("ARTIFACTORY_USERNAME") //artifactory_username
+            password = System.getenv("ARTIFACTORY_PASSWORD") //artifactory_password
         }
         defaults {
             publications('release')

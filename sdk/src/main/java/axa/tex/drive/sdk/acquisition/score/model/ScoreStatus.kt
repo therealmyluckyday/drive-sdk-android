@@ -1,11 +1,22 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 enum class ScoreStatus {
-    OK,
+    @JsonProperty("ok")
+    ok,
+    @JsonProperty("pending")
     pending,
-    trip_too_short,
-    trip_invalid,
-    trip_too_long,
-    no_external_data,
+    @JsonProperty("trip_not_found")
+    tripNotFound,
+    @JsonProperty("trip_too_short")
+    tooShort,
+    @JsonProperty("trip_invalid")
+    invalid,
+    @JsonProperty("trip_too_long")
+    tooLong,
+    @JsonProperty("no_external_data")
+    noExternalData,
+    @JsonProperty("error")
     error
 }

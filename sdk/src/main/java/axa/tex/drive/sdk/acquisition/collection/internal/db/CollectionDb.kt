@@ -17,28 +17,4 @@ internal class CollectionDb {
     constructor(context: Context?) {
         this.context = context
     }
-
-    internal fun setConfig(config: Config) {
-        val prefs =
-                context?.getSharedPreferences(PENDING_TRIP, Context.MODE_PRIVATE)
-        prefs?.edit()?.putString(CONFIG, config.toJson())?.apply()
-    }
-
-    internal fun getConfig(): Config? {
-        try {
-            val prefs =
-                    context?.getSharedPreferences(PENDING_TRIP, Context.MODE_PRIVATE)
-            val json = prefs?.getString(CONFIG, "")
-            val mapper = ObjectMapper()
-            val node = mapper.readTree(json)
-            mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            val conf = mapper.readValue(node.get(Config::class.java.simpleName).toString(), Config::class.java)
-            return conf
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
-        }
-
-    }
 }
