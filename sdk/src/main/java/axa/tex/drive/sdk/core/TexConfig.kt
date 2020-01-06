@@ -40,8 +40,9 @@ class TexConfig {
     internal companion object {
         var config: Config? = null
         internal var user: TexUser? = null
-
-        val logger = LoggerFactory().getLogger(this::class.java.name)
+        
+        private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+        
         internal fun setupKoin(context: Context) {
             val myModule = module {
                 single { AutomodeHandler() }
@@ -86,7 +87,7 @@ class TexConfig {
                     modules(listOf(myModule))
                 }
             } catch (e: Exception) {
-                logger.logger.error("Exception during setup koin", "setupKoin")
+                LOGGER.error("Exception during setup koin", "setupKoin")
             }
         }
 
@@ -105,13 +106,12 @@ class TexConfig {
                     modules(listOf(myModule))
                 }
             } catch (e: Exception) {
-                logger.logger.error("Exception during koin load automodule", "loadAutoModeModule")
+                LOGGER.error("Exception during koin load automodule", "loadAutoModeModule")
             }
         }
 
         internal fun init(config: Config) {
-            val logger = LoggerFactory().getLogger(this::class.java.name)
-            logger.logger.info("Initializing sdk", "init")
+            LOGGER.info("Initializing sdk", "init")
             TexConfig.config = config
         }
     }
@@ -140,7 +140,7 @@ class TexConfig {
         val logger = LoggerFactory().getLogger(this::class.java.name)
 
         constructor(user: TexUser?, context: Context?, clientId: String) {
-            logger.logger.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
+            LOGGER.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
             this.user = user
             this.context = context
             TexConfig.user = user
@@ -148,38 +148,38 @@ class TexConfig {
         }
 
         constructor(context: Context?, appName: String, clientId: String) {
-            logger.logger.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
+            LOGGER.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
             this.context = context
             this.appName = appName
             this.clientId = clientId
         }
 
         fun build(): TexConfig {
-            logger.logger.info("Building configuration", "build")
+            LOGGER.info("Building configuration", "build")
             if (context == null) {
-                logger.logger.error("No context error", "build")
+                LOGGER.error("No context error", "build")
             }
             if (context?.resources == null) {
-                logger.logger.error("No resources error", "build")
+                LOGGER.error("No resources error", "build")
             }
             if (context?.resources?.openRawResource(R.raw.tex_elb_ssl) == null) {
-                logger.logger.error("No tex_elb_ssl error", "build")
+                LOGGER.error("No tex_elb_ssl error", "build")
             }
             try {
                 context?.resources?.openRawResource(R.raw.tex_elb_ssl)?.let { CertificateAuthority.configureDefaultSSLSocketFactory(it) }
             } catch (e: Exception) {
 
-                logger.logger.error("Exception"+e.toString(), "build")
+                LOGGER.error("Exception"+e.toString(), "build")
             }
-            logger.logger.info("Done configuring ssl certificate", "init")
+            LOGGER.info("Done configuring ssl certificate", "init")
 
             val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform)
             TexConfig.config = config
 
-            logger.logger.info("Create koin module", "build")
+            LOGGER.info("Create koin module", "build")
             context?.let { setupKoin(it) }
 
-            logger.logger.info("Done building configuration", "build")
+            LOGGER.info("Done building configuration", "build")
             val texconfig = TexConfig(context)
             TexConfig.config = config
             return texconfig
@@ -187,56 +187,56 @@ class TexConfig {
 
 
         fun platformHost(platform: Platform): Builder {
-            logger.logger.info("Selecting platform", "build")
+            LOGGER.info("Selecting platform", "build")
             this.platform = platform
-            logger.logger.info("Selecting platform $platform selected", "platformHost")
+            LOGGER.info("Selecting platform $platform selected", "platformHost")
             return this
         }
 
         fun enableLocationTracker(): Builder {
-            logger.logger.info("Enabling location tracker", "enableLocationTracker")
+            LOGGER.info("Enabling location tracker", "enableLocationTracker")
             locationTrackerEnabled = true
-            logger.logger.info("Location tracker Enabled", "enableLocationTracker")
+            LOGGER.info("Location tracker Enabled", "enableLocationTracker")
             return this
         }
 
         fun disableLocationTracker(): Builder {
-            logger.logger.info("Disabling location tracker", "enableLocationTracker")
+            LOGGER.info("Disabling location tracker", "enableLocationTracker")
             locationTrackerEnabled = false
-            logger.logger.info("Location tracker disable", "enableLocationTracker")
+            LOGGER.info("Location tracker disable", "enableLocationTracker")
 
             return this
         }
 
         fun enableBatteryTracker(): Builder {
-            logger.logger.info("Enabling battery tracker", "enableBatteryTracker")
+            LOGGER.info("Enabling battery tracker", "enableBatteryTracker")
 
             batteryTrackerEnabled = true
-            logger.logger.info("Battery tracker enabled", "enableBatteryTracker")
+            LOGGER.info("Battery tracker enabled", "enableBatteryTracker")
             return this
         }
 
         fun disableBatteryTracker(): Builder {
-            logger.logger.info("Disabling battery tracker", "disableBatteryTracker")
+            LOGGER.info("Disabling battery tracker", "disableBatteryTracker")
             batteryTrackerEnabled = false
-            logger.logger.info("Battery tracker disable", "disableBatteryTracker")
+            LOGGER.info("Battery tracker disable", "disableBatteryTracker")
 
             return this
         }
 
         fun enableMotionTracker(): Builder {
-            logger.logger.info("Enabling motion tracker", "enableMotionTracker")
+            LOGGER.info("Enabling motion tracker", "enableMotionTracker")
 
             motionTrackerEnabled = true
-            logger.logger.info("Battery tracker enabled", "enableMotionTracker")
+            LOGGER.info("Battery tracker enabled", "enableMotionTracker")
             return this
         }
 
         fun disableMotionTracker(): Builder {
-            logger.logger.info("Disabling motion tracker", "disableMotionTracker")
+            LOGGER.info("Disabling motion tracker", "disableMotionTracker")
 
             motionTrackerEnabled = false
-            logger.logger.info("Motion tracker disabled", "disableMotionTracker")
+            LOGGER.info("Motion tracker disabled", "disableMotionTracker")
 
             return this
         }

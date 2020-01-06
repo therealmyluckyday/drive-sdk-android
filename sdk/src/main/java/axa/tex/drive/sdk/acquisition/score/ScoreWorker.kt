@@ -111,19 +111,15 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
             }
             if (fullScore.scores_dil != null && fullScore.status == ScoreStatus.ok) {
                 scoreRetriever.getScoreListener().onNext(ScoreResult(fullScore))
-                return Result.success()
             } else {
                 val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
                 scoreRetriever.getScoreListener().onNext(ScoreResult(scoreError = scoreError))
-                return Result.success()
             }
+            return Result.success()
         } catch (e: Exception) {
-            LOGGER.error(" Exception ${e}", "scoreRequest")
-            LOGGER.error("RESPONSE CODES ${connection.responseCode}", "scoreRequest")
-            return Result.failure()
-
+            LOGGER.error("RESPONSE CODES ${connection.responseCode}"+" Exception ${e}", "scoreRequest")
         } catch (err: Error) {
-            return Result.failure()
+            LOGGER.error("RESPONSE CODES ${connection.responseCode}"+" Error ${err}", "scoreRequest")
         }
         return Result.failure()
     }
