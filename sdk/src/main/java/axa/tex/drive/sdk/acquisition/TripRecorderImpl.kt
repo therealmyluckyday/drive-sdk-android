@@ -108,7 +108,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             serviceIntent.putExtra(Constants.APP_NAME_KEY, config.appName)
             serviceIntent.putExtra(Constants.PLATFORM_KEY, config.endPoint.endPoint)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent)
+                context.startService(serviceIntent)
             }else{
                 context.startService(serviceIntent)
             }

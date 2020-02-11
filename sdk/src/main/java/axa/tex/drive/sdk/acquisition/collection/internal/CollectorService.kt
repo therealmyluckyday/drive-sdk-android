@@ -98,4 +98,9 @@ internal class CollectorService : Service() {
         }
         collector?.recording = false
     }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+            stopSelf()
+    }
 }

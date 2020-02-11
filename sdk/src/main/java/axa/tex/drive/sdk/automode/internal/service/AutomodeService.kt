@@ -24,6 +24,7 @@ import org.koin.android.ext.android.inject
 private const val NOTIFICATION_ID = 7071
 
 internal class AutomodeService : Service() {
+    private var automodeHandler: AutomodeHandler? = null
     private val binder = LocalBinder()
 
     inner class LocalBinder : Binder() {
@@ -65,9 +66,9 @@ internal class AutomodeService : Service() {
             }
             this.startForeground(NOTIFICATION_ID, notification)
         }
-
-        val automodeHandler: AutomodeHandler by inject()
-        automodeHandler.running = true
+        val automodeHandler : AutomodeHandler by inject()
+        this.automodeHandler = automodeHandler
+        this.automodeHandler!!.running = true
 
         return START_STICKY
     }
@@ -89,4 +90,8 @@ internal class AutomodeService : Service() {
         }
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+            stopSelf()
+    }
 }

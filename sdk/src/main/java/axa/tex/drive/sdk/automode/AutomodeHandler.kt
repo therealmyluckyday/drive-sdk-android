@@ -10,8 +10,8 @@ import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 
-class AutomodeHandler : KoinComponentCallbacks {
-    val state: PublishSubject<Boolean> = PublishSubject.create()
+public class AutomodeHandler : KoinComponentCallbacks {
+    public val state: PublishSubject<Boolean> = PublishSubject.create()
     var running = false
     val speedListener: SpeedFilter by inject()
 
@@ -30,11 +30,13 @@ class AutomodeHandler : KoinComponentCallbacks {
         val serviceIntent = Intent(context, AutomodeService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(serviceIntent)
+            context.startService(serviceIntent)
         } else {
             context.startService(serviceIntent)
         }
     }
 
-
+    fun disableAutoMode(context: Context) {
+        val serviceIntent = Intent(context, AutomodeService::class.java)
+    }
 }
