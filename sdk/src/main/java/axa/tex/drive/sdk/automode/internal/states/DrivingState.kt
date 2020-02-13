@@ -28,9 +28,8 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     constructor(automode: Automode) {
         this.automode = automode
         LOGGER.info("${Date()} DrivingState : ${Date()} Now driving...")
-        lastMvtTime = System.currentTimeMillis()
+        lastMvtTime = System.currentTimeMillis() - 180000
         lastGpsTime = System.currentTimeMillis()
-        watchGPS()
     }
 
     override fun next() {
@@ -38,31 +37,37 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
         automodeHandler.state.onNext(true)
         lastMvtTime = System.currentTimeMillis()
         lastGpsTime = lastMvtTime
-
+        watchSpeed()
+        watchGPS()
         disposables.add(filterer.locationOutputOverOrEqualsToMovementSpeedWhatEverTheAccuracy.subscribe {
             notMoving = false
             lastMvtTime = System.currentTimeMillis()
-            if (speedWatcher == null) {
-                watchSpeed()
             LOGGER.info("\"location speed ${it.speed} activate watchspeed", "watchspeed")
+            val speedWatcher = speedWatcher
+            if (speedWatcher != null) {
+                speedWatcher.cancel()
             }
         })
 
 
         disposables.add(filterer.gpsStream.subscribe {
             lastGpsTime = System.currentTimeMillis()
-            if (gpsWatcher == null) {
-                watchGPS()
+            val gpsWatcher = gpsWatcher
+            LOGGER.info("\"$it", "activate gpsWatcher")
+            if (gpsWatcher != null) {
+                gpsWatcher.cancel()
             }
         })
     }
 
 
     private fun watchSpeed() {
-        speedWatcher = Timer("Timer for speed").schedule(1000 * 60, automode.acceptableStopDuration) {
-            if ((System.currentTimeMillis() - lastMvtTime) >= automode.acceptableStopDuration) {
+
         LOGGER.info("\"Timer for speed  ", "new")
+        speedWatcher = Timer("Timer for speed").schedule(automode.acceptableStopDuration, automode.acceptableStopDuration) {
+            val timeInterval = (System.currentTimeMillis() - lastMvtTime)
             LOGGER.info("\"Timer for speed $timeInterval ", "called")
+            if (timeInterval >= automode.acceptableStopDuration) {
                 LOGGER.info("\"Timer for speed", "stop")
                 stop("Speed = 0, We need to stop. from speedWatcher")
             }
@@ -72,8 +77,9 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
 
     private fun watchGPS() {
         gpsWatcher = Timer("Timer for gps").schedule(automode.timeToWaitForGps, automode.timeToWaitForGps) {
-            if ((System.currentTimeMillis() - lastGpsTime) >= automode.timeToWaitForGps) {
+            val timeInterval = (System.currentTimeMillis() - lastGpsTime)
             LOGGER.info("\"Timer for GPS $timeInterval $automode.timeToWaitForGps", "called")
+            if (timeInterval >= automode.timeToWaitForGps) {
                 LOGGER.info("\"Timer for GPS $timeInterval $automode.timeToWaitForGps", "stop")
                 stop("No gps:Stop driving. from watchGPS")
             }
@@ -81,6 +87,9 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     }
 
     private fun stop(message: String) {
+        dispose()
+        stopAllTimers()
+
         if (!automode.states.containsKey(AutomodeHandler.State.IDLE)) {
             automode.setCurrentState(IdleState(automode))
         } else {
@@ -92,16 +101,10 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
         automode.getCurrentState().disable(false)
         automode.activityTracker.stopSpeedScanning()
 
-        // @ERWAN WTF???
-        //Wait for thirty seconds before going back to scan state. This allows not clear the current trip id while the
-        // the stop not already sent.
-        Thread.sleep(1000 * 30)
 
         LOGGER.info("\"Driving state End", "stop")
         automode.next()
 
-        dispose()
-        stopAllTimers()
     }
 
     private fun stopAllTimers() {
