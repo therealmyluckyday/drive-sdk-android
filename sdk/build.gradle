@@ -6,7 +6,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'org.sonarqube'
 
-def currentVersionName = "3.0.4"
+def currentVersionName = "3.0.4-alpha-69a2221"
 def getVersionName = { ->
     return currentVersionName
 }
@@ -37,6 +37,10 @@ android {
         }
     }
     buildToolsVersion = '29.0.1'
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
 
 }
 project(":sdk") {
@@ -58,8 +62,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-
     // Google Location service
     def play_services_version = "17.0.0"
     implementation "com.google.android.gms:play-services-location:$play_services_version"
@@ -138,8 +140,8 @@ artifactory {
     publish {
         repository {
             repoKey = 'android-tex'
-            username = System.getenv("ARTIFACTORY_USERNAME") //artifactory_username
-            password = System.getenv("ARTIFACTORY_PASSWORD") //artifactory_password
+            username = artifactory_username
+            password = artifactory_password
         }
         defaults {
             publications('release')
