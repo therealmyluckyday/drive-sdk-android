@@ -14,18 +14,18 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
     private var automode: Automode
     private val filterer: SpeedFilter by inject()
     private var disabled = false
-    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
+    internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     constructor(automode: Automode) {
         this.automode = automode
-        logger.info("Really in vehicle")
+        LOGGER.info("InVehicleState", "Constructor")
     }
 
     override fun next() {
         var locationSubscription: Disposable? = null
         locationSubscription = filterer.locationOutputWithAccuracy.subscribe( {
             if (!disabled) {
-                logger.info(Date().toString() + ":Speed of ${it.speed} reached with ${it.accuracy} of accuracy", function = "fun next()")
+                LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached with ${it.accuracy} of accuracy", function = "next")
                 locationSubscription?.dispose()
 
                 if (!automode.states.containsKey(AutomodeHandler.State.DRIVING)) {
@@ -34,7 +34,7 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
                     val drivingState = automode.states[AutomodeHandler.State.DRIVING]
                     drivingState?.let { automode.setCurrentState(it) }
                 }
-
+                LOGGER.info("In vehicule state next", "next")
                 this@InVehicleState.disable(true)
                 automode.getCurrentState().disable(false)
                 automode.next()

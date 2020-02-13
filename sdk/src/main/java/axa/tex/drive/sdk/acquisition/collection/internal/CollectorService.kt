@@ -101,6 +101,6 @@ internal class CollectorService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-            stopSelf()
+        stopSelf()
     }
 }

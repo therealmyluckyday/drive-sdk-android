@@ -34,7 +34,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     }
 
     override fun next() {
-
+        LOGGER.info("\"Driving state ACTIVATE", "next")
         automodeHandler.state.onNext(true)
         lastMvtTime = System.currentTimeMillis()
         lastGpsTime = lastMvtTime
@@ -44,6 +44,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
             lastMvtTime = System.currentTimeMillis()
             if (speedWatcher == null) {
                 watchSpeed()
+            LOGGER.info("\"location speed ${it.speed} activate watchspeed", "watchspeed")
             }
         })
 
@@ -60,6 +61,9 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     private fun watchSpeed() {
         speedWatcher = Timer("Timer for speed").schedule(1000 * 60, automode.acceptableStopDuration) {
             if ((System.currentTimeMillis() - lastMvtTime) >= automode.acceptableStopDuration) {
+        LOGGER.info("\"Timer for speed  ", "new")
+            LOGGER.info("\"Timer for speed $timeInterval ", "called")
+                LOGGER.info("\"Timer for speed", "stop")
                 stop("Speed = 0, We need to stop. from speedWatcher")
             }
         }
@@ -69,6 +73,8 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     private fun watchGPS() {
         gpsWatcher = Timer("Timer for gps").schedule(automode.timeToWaitForGps, automode.timeToWaitForGps) {
             if ((System.currentTimeMillis() - lastGpsTime) >= automode.timeToWaitForGps) {
+            LOGGER.info("\"Timer for GPS $timeInterval $automode.timeToWaitForGps", "called")
+                LOGGER.info("\"Timer for GPS $timeInterval $automode.timeToWaitForGps", "stop")
                 stop("No gps:Stop driving. from watchGPS")
             }
         }
@@ -81,7 +87,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
             val idleState = automode.states[AutomodeHandler.State.IDLE]
             idleState?.let { automode.setCurrentState(it) }
         }
-        LOGGER.info(" $message", function = "stop(message : String)")
+        LOGGER.info(" $message", function = "stop")
         automodeHandler.state.onNext(false)
         automode.getCurrentState().disable(false)
         automode.activityTracker.stopSpeedScanning()
@@ -91,6 +97,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
         // the stop not already sent.
         Thread.sleep(1000 * 30)
 
+        LOGGER.info("\"Driving state End", "stop")
         automode.next()
 
         dispose()

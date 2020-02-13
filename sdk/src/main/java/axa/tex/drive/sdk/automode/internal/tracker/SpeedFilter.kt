@@ -20,8 +20,6 @@ class SpeedFilter {
     val locationInput: PublishSubject<TexSpeed> = PublishSubject.create()
     internal val locationOutputWithAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
     internal val locationOutputWhatEverTheAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
-    internal val locationOutputUnderStartSpeed: PublishSubject<TexSpeed> = PublishSubject.create()
-    internal val locationOutputUnderMovementSpeedWhatEverTheAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
     internal val locationOutputOverOrEqualsToMovementSpeedWhatEverTheAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
     internal val activityInput: PublishSubject<TexActivity> = PublishSubject.create()
     internal val activityOutput: PublishSubject<TexActivity> = PublishSubject.create()
@@ -34,17 +32,10 @@ class SpeedFilter {
                 speedAccuracyLimit: Int = LOCATION_ACCURACY_THRESHOLD) {
         locationInput.subscribe {
 
-            if (it.speed < requiredSpeedForMovement) {
-                locationOutputUnderMovementSpeedWhatEverTheAccuracy.onNext(it)
-            }
             if (it.speed >= requiredSpeedForMovement) {
                 locationOutputOverOrEqualsToMovementSpeedWhatEverTheAccuracy.onNext(it)
             }
 
-
-            if (it.speed < requiredSpeedForStart) {
-                locationOutputUnderStartSpeed.onNext(it)
-            }
             if (it.speed >= requiredSpeedForMovement) {
                 locationOutputWhatEverTheAccuracy.onNext(it)
             }

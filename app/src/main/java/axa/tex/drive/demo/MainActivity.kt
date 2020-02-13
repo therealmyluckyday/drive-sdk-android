@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         val scoreRetriever = service?.scoreRetriever()
         scoreRetriever?.getScoreListener()?.subscribe ( {
             it?.let { score ->
-                println(score) }
+                println("ScoreWorker result" + score) }
         }, {throwable ->
             print(throwable)
         })

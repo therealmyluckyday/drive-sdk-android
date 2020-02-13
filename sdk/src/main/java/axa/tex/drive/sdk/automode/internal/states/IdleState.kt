@@ -11,11 +11,11 @@ internal class IdleState : AutomodeState, KoinComponentCallbacks {
 
     private var automode: Automode
     private var disabled = false
-    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
+    internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     constructor(automode: Automode) {
         this.automode = automode
-        logger.info("Idle state")
+        LOGGER.info("\"Idle state created", "constructor")
     }
 
     override fun next() {
@@ -28,6 +28,7 @@ internal class IdleState : AutomodeState, KoinComponentCallbacks {
             }
 
             this@IdleState.disable(true)
+            LOGGER.info("\"Idle state next", "next")
             automode.getCurrentState().disable(false)
             automode.next()
         }

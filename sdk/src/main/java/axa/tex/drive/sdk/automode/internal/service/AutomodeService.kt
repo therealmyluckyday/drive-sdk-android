@@ -92,6 +92,6 @@ internal class AutomodeService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-            stopSelf()
+        stopSelf()
     }
 }

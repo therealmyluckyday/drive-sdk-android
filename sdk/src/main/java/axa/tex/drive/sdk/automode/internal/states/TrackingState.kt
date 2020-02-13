@@ -14,16 +14,18 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
 
     private val filterer: SpeedFilter by inject()
 
-    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
+    internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private var automode: Automode
     private var disabled = false
 
+
     constructor(automode: Automode) {
         this.automode = automode
-        logger.info( ":Tracking state")
+        LOGGER.info( ":Tracking state", "Constructor")
     }
 
     override fun next() {
+        LOGGER.info("\"Tracking Activity state ACTIVATE", "next")
         val tracker = automode.activityTracker
         var activitySubscription: Disposable? = null
         activitySubscription = filterer.activityOutput.subscribe( {
@@ -31,19 +33,17 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
                 activitySubscription?.dispose()
                 tracker.stopActivityScanning()
                 var subscription: Disposable? = null
-                logger.info(Date().toString() + " : In vehicle according to Activity Recognition Client", function = "fun next()")
+                LOGGER.info(Date().toString() + " : In vehicle according to Activity Recognition Client", function = "fun next()")
                 subscription = filterer.locationOutputWhatEverTheAccuracy.subscribe {
-
-                    logger.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun next()")
+                    LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun next()")
                     subscription?.dispose()
-
                     if (!automode.states.containsKey(AutomodeHandler.State.IN_VEHICLE)) {
                         automode.setCurrentState(InVehicleState(automode))
                     } else {
                         val vehicleState = automode.states[AutomodeHandler.State.IN_VEHICLE]
                         vehicleState?.let { automode.setCurrentState(it) }
                     }
-
+                    LOGGER.info("\"Tracking Activity state next", "next")
                     this@TrackingState.disable(true)
                     automode.getCurrentState().disable(false)
                     automode.next()
@@ -53,8 +53,10 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
             }
         }, {throwable ->
             print(throwable)
+            LOGGER.error("\"Tracking Activity exception $throwable", "next")
         })
         //Scanning activity
+        LOGGER.info("\"Tracking Activity start checking activity", "next")
         tracker.checkWhereAmI()
     }
 

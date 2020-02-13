@@ -122,7 +122,7 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
                 fixProducer.onNext(listOf(locationFix))
             }
         }, {throwable ->
-            LOGGER.info("throwable $throwable", funcName)
+            LOGGER.error("throwable $throwable", funcName)
         })
     }
 
