@@ -9,6 +9,7 @@ import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
 private const val TIME_TO_WAIT_FOR_GPS = 1000 * 60 * 4L
 private const val ACCEPTABLE_STOPPED_DURATION = 1000 * 60 * 3L
+internal const val AUTOMODE_SIMULATE_DRIVING = false
 internal class Automode : KoinComponentCallbacks{
     internal var activityTracker: TexActivityTracker
     internal val autoModeHandler : AutomodeHandler by inject()

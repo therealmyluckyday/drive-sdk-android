@@ -2,50 +2,26 @@ package axa.tex.drive.sdk.automode.internal.tracker
 
 
 import android.location.Location
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
+
+import axa.tex.drive.sdk.core.logger.LoggerFactory
+import com.google.android.gms.location.DetectedActivity
 import io.reactivex.subjects.PublishSubject
 
 // 2.8 m/s 10km/h
-private const val SPEED_MOVEMENT_THRESHOLD = 10 * 0.28f
+internal const val SPEED_MOVEMENT_THRESHOLD = 10 * 0.28f
 
 // 5.6 m/s 20km/h
 private const val SPEED_START_THRESHOLD = 20 * 0.28f
 
 //Accuracy for speed
-private const val LOCATION_ACCURACY_THRESHOLD = 20
+internal const val LOCATION_ACCURACY_THRESHOLD = 20
 
 class SpeedFilter {
-    val locationInput: PublishSubject<TexSpeed> = PublishSubject.create()
-    internal val locationOutputWithAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
-    internal val locationOutputWhatEverTheAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
-    internal val locationOutputOverOrEqualsToMovementSpeedWhatEverTheAccuracy: PublishSubject<TexSpeed> = PublishSubject.create()
-    internal val activityInput: PublishSubject<TexActivity> = PublishSubject.create()
-    internal val activityOutput: PublishSubject<TexActivity> = PublishSubject.create()
-    internal val gpsStream: PublishSubject<TexLocation> = PublishSubject.create()
+    internal val activityStream: PublishSubject<DetectedActivity> = PublishSubject.create()
+    public val gpsStream: PublishSubject<TexLocation> = PublishSubject.create()
     internal val locations: PublishSubject<Location> = PublishSubject.create()
     internal var collectionEnabled = false
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
-    constructor(requiredSpeedForMovement: Float = SPEED_MOVEMENT_THRESHOLD,
-                requiredSpeedForStart: Float = SPEED_START_THRESHOLD,
-                speedAccuracyLimit: Int = LOCATION_ACCURACY_THRESHOLD) {
-        locationInput.subscribe {
-
-            if (it.speed >= requiredSpeedForMovement) {
-                locationOutputOverOrEqualsToMovementSpeedWhatEverTheAccuracy.onNext(it)
-            }
-
-            if (it.speed >= requiredSpeedForMovement) {
-                locationOutputWhatEverTheAccuracy.onNext(it)
-            }
-            if (it.speed >= requiredSpeedForMovement && it.accuracy < speedAccuracyLimit) {
-                locationOutputWithAccuracy.onNext(it)
-            }
-        }
-
-        activityInput.subscribe {
-            activityOutput.onNext(it)
-        }
-    }
 }

@@ -6,9 +6,7 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
+import android.os.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import axa.tex.drive.sdk.R
@@ -26,6 +24,7 @@ private const val NOTIFICATION_ID = 7071
 internal class AutomodeService : Service() {
     private var automodeHandler: AutomodeHandler? = null
     private val binder = LocalBinder()
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     inner class LocalBinder : Binder() {
     }
@@ -75,19 +74,26 @@ internal class AutomodeService : Service() {
 
 
     private fun activateAutomode() {
-        try {
-            TexConfig.setupKoin(applicationContext)
-        } catch (e: Exception) {
-            //LOGGER.error("${e.printStackTrace().toString()}", "activateAutomode")
-        }
 
-        val automode: Automode by inject()
-        val tripRecorder: TripRecorder by inject()
-        if (tripRecorder.isRecording()) {
-            automode.setCurrentState(DrivingState(automode))
-        } else {
-            automode.next()
+        // Get a handler that can be used to post to the main thread
+        val mainHandler = Handler(Looper.getMainLooper())
+        val myRunnable = Runnable() {
+
+            try {
+                TexConfig.setupKoin(applicationContext)
+            } catch (e: Exception) {
+                LOGGER.error("${e.printStackTrace().toString()}", "activateAutomode")
+            }
+
+            val automode: Automode by inject()
+            val tripRecorder: TripRecorder by inject()
+            if (tripRecorder.isRecording()) {
+                automode.setCurrentState(DrivingState(automode))
+            } else {
+                automode.next()
+            }
         }
+        mainHandler.post(myRunnable);
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {

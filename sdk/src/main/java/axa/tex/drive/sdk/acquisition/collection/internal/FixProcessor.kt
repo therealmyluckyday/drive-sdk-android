@@ -34,7 +34,7 @@ internal class FixProcessor : KoinComponentCallbacks {
         val start = Event(listOf("start"), startTime)
         val tripInfos = TripInfos(appName, clientId, config.endPoint)
         currentTripChunk = TripChunk(tripInfos, 0)
-        LOGGER.info("Start trip ", "startTrip")
+        LOGGER.info("Start trip, tripId : "+tripInfos.tripId.value, "startTrip")
         addFix(start)
         return tripInfos.tripId
     }

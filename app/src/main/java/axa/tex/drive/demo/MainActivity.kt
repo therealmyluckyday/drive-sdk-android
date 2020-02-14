@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
             print(throwable)
         })
 
-        autoModeHandler?.speedListener?.locationInput?.subscribe({
+        autoModeHandler?.speedListener?.gpsStream?.subscribe({
             speedView.speedTo(it.speed*3.6f, 50)
         }, {throwable ->
             print(throwable)

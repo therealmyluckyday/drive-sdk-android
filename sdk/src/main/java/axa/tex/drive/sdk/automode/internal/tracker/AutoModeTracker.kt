@@ -11,10 +11,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.widget.Toast
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexActivity
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexSpeed
-import axa.tex.drive.sdk.automode.internal.tracker.model.Where
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.google.android.gms.location.ActivityRecognitionClient
@@ -50,9 +47,7 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
     }
 
     override fun onLocationChanged(location: Location) {
-        LOGGER.info("\"Location $location", "onLocationChanged")
-        val texSpeed = TexSpeed(location.speed, location.accuracy)
-        speedFilter.locationInput.onNext(texSpeed)
+        //LOGGER.info("\"Location $location", "onLocationChanged")
         val texLocation = TexLocation(location.latitude.toFloat(), location.longitude.toFloat(), location.accuracy, location.speed, location.bearing, location.altitude.toFloat(), location.time)
 
         speedFilter.gpsStream.onNext(texLocation)
@@ -102,14 +97,10 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
 
         activityReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-
                 val result = ActivityRecognitionResult.extractResult(intent)
                 val activity = result.mostProbableActivity
-                Toast.makeText(context, result.mostProbableActivity.toString(), Toast.LENGTH_LONG).show()
-
-                if (activity.type == DetectedActivity.IN_VEHICLE) {
-                    speedFilter.activityInput.onNext(TexActivity(Where.IN_VEHICLE, activity.confidence))
-                }
+                //Toast.makeText(context, result.mostProbableActivity.toString(), Toast.LENGTH_LONG).show()
+                speedFilter.activityStream.onNext(activity)
             }
         }
         context.registerReceiver(activityReceiver, IntentFilter(ACTIVITY_INTENT_ACTION))

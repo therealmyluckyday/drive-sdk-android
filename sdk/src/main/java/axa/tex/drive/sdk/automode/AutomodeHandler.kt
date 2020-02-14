@@ -30,7 +30,7 @@ public class AutomodeHandler : KoinComponentCallbacks {
         val serviceIntent = Intent(context, AutomodeService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startService(serviceIntent)
+            context.startForegroundService(serviceIntent)
         } else {
             context.startService(serviceIntent)
         }
@@ -38,5 +38,6 @@ public class AutomodeHandler : KoinComponentCallbacks {
 
     fun disableAutoMode(context: Context) {
         val serviceIntent = Intent(context, AutomodeService::class.java)
+        context.stopService(serviceIntent)
     }
 }
