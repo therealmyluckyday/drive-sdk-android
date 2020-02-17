@@ -26,10 +26,11 @@ public class AutomodeHandler : KoinComponentCallbacks {
     }
 
 
-    fun activateAutomode(context: Context) {
+    fun activateAutomode(context: Context, isForeground: Boolean = true, isSimulatedDriving: Boolean = false) {
         val serviceIntent = Intent(context, AutomodeService::class.java)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isForeground) {
+            serviceIntent.putExtra("isForeground", isForeground)
+            serviceIntent.putExtra("isSimulatedDriving", isSimulatedDriving)
             context.startForegroundService(serviceIntent)
         } else {
             context.startService(serviceIntent)

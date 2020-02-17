@@ -62,7 +62,8 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     private fun watchSpeed() {
         timerSpeedWatcher = Timer("Timer for speed")
         LOGGER.info("\"Timer for speed  ", "new")
-        speedWatcher = timerSpeedWatcher!!.schedule(55000, automode.acceptableStopDuration) {
+        val delayTimerSpeedWatcher: Long = (if (automode.isSimulateDriving) 80000 else 55000)
+        speedWatcher = timerSpeedWatcher!!.schedule(delayTimerSpeedWatcher, automode.acceptableStopDuration) {
             val timeInterval = (System.currentTimeMillis() - lastMvtTime)
             LOGGER.info("\"Timer for speed $timeInterval ", "called")
             if (timeInterval >= 50000) {

@@ -8,6 +8,7 @@ import android.os.BatteryManager
 import axa.tex.drive.sdk.acquisition.model.BatteryFix
 import axa.tex.drive.sdk.acquisition.model.BatteryState
 import axa.tex.drive.sdk.acquisition.model.Fix
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import java.util.*
@@ -18,6 +19,7 @@ internal class BatterySensor : TexSensor, BroadcastReceiver {
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
     private var enabled = true
 
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     var canBeEnabled: Boolean
 
 
@@ -34,7 +36,11 @@ internal class BatterySensor : TexSensor, BroadcastReceiver {
     override fun enableSensor() {
         if (canBeEnabled) {
             val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-            context?.registerReceiver(this, intentFilter)
+            try {
+                context?.registerReceiver(this, intentFilter)
+            } catch (e: IllegalArgumentException) {
+                LOGGER.warn("Unable to register : The receiver may already be registered", "enableSensor")
+            }
             enabled = true
         }
     }
@@ -44,9 +50,8 @@ internal class BatterySensor : TexSensor, BroadcastReceiver {
             context?.unregisterReceiver(this)
         } catch (e: IllegalArgumentException) {
             //The receiver may not be registered yet.
-            e.printStackTrace()
+            LOGGER.warn("Unable to unregister: The receiver may not be registered yet.", "disableSensor")
         }
-
         enabled = false
     }
 

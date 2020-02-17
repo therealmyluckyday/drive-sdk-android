@@ -38,8 +38,6 @@ class Scores : AppCompatActivity() {
 
                     error.text = it.scoreError.toString()
                     error.visibility = android.view.View.VISIBLE
-
-
                 }
 
             }

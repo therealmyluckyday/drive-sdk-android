@@ -1,7 +1,6 @@
 package axa.tex.drive.sdk.automode.internal.states
 
 import axa.tex.drive.sdk.automode.AutomodeHandler
-import axa.tex.drive.sdk.automode.internal.AUTOMODE_SIMULATE_DRIVING
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.SPEED_MOVEMENT_THRESHOLD
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
@@ -32,10 +31,14 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
         LOGGER.info("\"Tracking Activity state ACTIVATE", "next")
         val tracker = automode.activityTracker
         //automode.activityTracker.passivelyScanSpeed()
-        val testing = AUTOMODE_SIMULATE_DRIVING
+        val testing = automode.isSimulateDriving
         if (testing) {
-            tracker.activelyScanSpeed()
-            goNext()
+            try {
+                tracker.activelyScanSpeed()
+                goNext()
+            }catch (e : Exception){
+                e.printStackTrace()
+            }
         } else {
             var activitySubscription: Disposable? = null
             activitySubscription = filterer.activityStream.filter {it.type == DetectedActivity.IN_VEHICLE }.subscribe( {

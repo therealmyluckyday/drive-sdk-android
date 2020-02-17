@@ -17,6 +17,8 @@ import axa.tex.drive.sdk.automode.internal.states.DrivingState
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 private const val NOTIFICATION_ID = 7071
@@ -50,9 +52,16 @@ internal class AutomodeService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
 
-        activateAutomode()
+        var isForeground = false
+        if (intent != null && intent.hasExtra("isForeground")) {
+            isForeground =intent.getBooleanExtra("isForeground", false)
+        }
+        var isSimulatedDriving = false
+        if (intent != null && intent.hasExtra("isSimulatedDriving")) {
+            isSimulatedDriving =intent.getBooleanExtra("isSimulatedDriving", false)
+        }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isForeground) {
             val channelId = createNotificationChannel()
             val notification: Notification
             if (intent != null && intent.hasExtra("notif")) {
@@ -69,11 +78,12 @@ internal class AutomodeService : Service() {
         this.automodeHandler = automodeHandler
         this.automodeHandler!!.running = true
 
+        activateAutomode(isSimulatedDriving, isForeground)
         return START_STICKY
     }
 
 
-    private fun activateAutomode() {
+    private fun activateAutomode(isSimulatedDriving: Boolean, isForeground: Boolean) {
 
         // Get a handler that can be used to post to the main thread
         val mainHandler = Handler(Looper.getMainLooper())
@@ -90,14 +100,39 @@ internal class AutomodeService : Service() {
             if (tripRecorder.isRecording()) {
                 automode.setCurrentState(DrivingState(automode))
             } else {
-                automode.next()
+                automode.isSimulateDriving = isSimulatedDriving
+                automode.isForeground = isForeground
+                if (isSimulatedDriving) {
+
+                    Timer("IdleState Timer").schedule(15000) {
+                        // Get a handler that can be used to post to the main thread
+                        val mainHandler = Handler(Looper.getMainLooper())
+                        val myRunnable = Runnable() {
+                            automode.next()
+                        }
+                        mainHandler.post(myRunnable);
+                    }
+                }
+                else {
+                    automode.next()
+                }
             }
         }
         mainHandler.post(myRunnable);
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        val automode: Automode by inject()
+        if (automode.getCurrentState().state() != AutomodeHandler.State.IDLE) {
+            val idleState = automode.states[AutomodeHandler.State.IDLE]
+            idleState?.let {
+                it.disable(true)
+                automode.setCurrentState(it)
+            }
+        }
         super.onTaskRemoved(rootIntent)
-        stopSelf()
+        if (!automode.isForeground) {
+            stopSelf()
+        }
     }
 }

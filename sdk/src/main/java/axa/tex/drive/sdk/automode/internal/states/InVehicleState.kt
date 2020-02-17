@@ -1,7 +1,6 @@
 package axa.tex.drive.sdk.automode.internal.states
 
 import axa.tex.drive.sdk.automode.AutomodeHandler
-import axa.tex.drive.sdk.automode.internal.AUTOMODE_SIMULATE_DRIVING
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.LOCATION_ACCURACY_THRESHOLD
 import axa.tex.drive.sdk.automode.internal.tracker.SPEED_MOVEMENT_THRESHOLD
@@ -25,7 +24,7 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
     }
 
     override fun next() {
-        val testing = AUTOMODE_SIMULATE_DRIVING
+        val testing = automode.isSimulateDriving
         if (testing) {
             goNext()
         } else {
