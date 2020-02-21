@@ -53,6 +53,7 @@ class TexConfig {
                 single { ScoreRetriever(context ) }
                 single { CollectionDb(context) }
                 single { FixProcessor(context) }
+                single { CertificateAuthority(context) }
                 single {
                     LocationTracker(
                             LocationSensor(
@@ -165,12 +166,7 @@ class TexConfig {
             if (context?.resources?.openRawResource(R.raw.tex_elb_ssl) == null) {
                 LOGGER.error("No tex_elb_ssl error", "build")
             }
-            try {
-                context?.resources?.openRawResource(R.raw.tex_elb_ssl)?.let { CertificateAuthority.configureDefaultSSLSocketFactory(it) }
-            } catch (e: Exception) {
 
-                LOGGER.error("Exception"+e.toString(), "build")
-            }
             LOGGER.info("Done configuring ssl certificate", "init")
 
             val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform)

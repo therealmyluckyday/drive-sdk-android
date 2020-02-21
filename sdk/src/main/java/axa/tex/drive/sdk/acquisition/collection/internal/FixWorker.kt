@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import axa.tex.drive.sdk.core.CertificateAuthority
 import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
@@ -13,9 +14,11 @@ import axa.tex.drive.sdk.core.internal.utils.PlatformToHostConverter
 import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import axa.tex.drive.sdk.internal.compress
+import org.koin.android.ext.android.inject
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 internal open class FixWorker(appContext: Context, workerParams: WorkerParameters)
     : Worker(appContext, workerParams), KoinComponentCallbacks {
@@ -54,7 +57,9 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
             val url = URL(platformToHostConverter.getHost() + "/data")
             LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = $data", funcName)
             val urlConnection: HttpURLConnection
-            urlConnection = url.openConnection() as HttpURLConnection
+            val certificate: CertificateAuthority by inject()
+            urlConnection = url.openConnection() as HttpsURLConnection
+            certificate.configureSSLSocketFactory(urlConnection)
             urlConnection.doOutput = true
             urlConnection.requestMethod = "PUT"
             urlConnection.setRequestProperty("Content-Type", "application/json")

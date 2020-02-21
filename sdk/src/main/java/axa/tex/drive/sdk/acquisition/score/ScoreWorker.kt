@@ -8,6 +8,7 @@ import axa.tex.drive.sdk.acquisition.score.model.ScoreError
 import axa.tex.drive.sdk.acquisition.score.model.ScoreResult
 import axa.tex.drive.sdk.acquisition.score.model.ScoreStatus
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
+import axa.tex.drive.sdk.core.CertificateAuthority
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
@@ -22,7 +23,7 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
-
+import javax.net.ssl.HttpsURLConnection
 
 
 internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
@@ -82,7 +83,9 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
         } else {
             url = URL("$serverUrl/score?trip_id=$tripId&lang=$theLocal&final=true")
         }
-        val connection = url.openConnection() as HttpURLConnection
+        val certificate: CertificateAuthority by inject()
+        val connection = url.openConnection() as HttpsURLConnection
+        certificate.configureSSLSocketFactory(connection)
         connection.requestMethod = "GET"
 
         connection.addRequestProperty("X-AppKey", appName)

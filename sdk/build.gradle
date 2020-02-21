@@ -6,7 +6,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'org.sonarqube'
 
-def currentVersionName = "3.0.4-alpha-69a2221"
+def currentVersionName = "3.0.4--alpha-CertPathValidatorExceptionFix"
 def getVersionName = { ->
     return currentVersionName
 }

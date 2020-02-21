@@ -1,6 +1,10 @@
 package axa.tex.drive.sdk.core
 
 
+import android.content.Context
+import androidx.work.WorkManager
+import axa.tex.drive.sdk.R
+import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import java.io.BufferedInputStream
 import java.io.InputStream
@@ -14,12 +18,20 @@ import java.security.cert.X509Certificate
 import java.util.*
 import javax.net.ssl.*
 
-class CertificateAuthority {
+class CertificateAuthority: KoinComponentCallbacks {
+    var certAuthInputStream: InputStream? = null
+    var sslSocketFactory: SSLSocketFactory? = null
+    constructor(appContext: Context) {
+        try {
+            certAuthInputStream = appContext?.resources?.openRawResource(R.raw.tex_elb_ssl)
+            sslSocketFactory = createSSLSocketFactory(this.certAuthInputStream!!)
+        } catch (e: Exception) {
 
+            LOGGER.error("Exception"+e.toString(), "build")
+        }
+    }
     companion object {
-
         internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
-
         private class UnifiedTrustManager @Throws(KeyStoreException::class)
         constructor(localKeyStore: KeyStore) : X509TrustManager {
             private var defaultTrustManager: X509TrustManager? = null
@@ -74,7 +86,7 @@ class CertificateAuthority {
         }
 
         fun createSSLSocketFactory(certAuthInputStream: InputStream): SSLSocketFactory? {
-            try {
+           try {
                 // Load CAs from an InputStream
                 // (could be from a resource or ByteArrayInputStream or ...)
                 val cf = CertificateFactory.getInstance("X.509")
@@ -107,21 +119,13 @@ class CertificateAuthority {
                 LOGGER.error("Error ${e.message}", "createSSLSocketFactory")
                 return null
             }
-
         }
-
-        fun configureDefaultSSLSocketFactory(certAuthInputStream: InputStream) {
-
-            try {
-                val sslSocketFactory = createSSLSocketFactory(certAuthInputStream)
-                if (sslSocketFactory != null) {
-                    HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory)
-                }
-
-            } catch (e: Exception) {
-                LOGGER.error("Error ${e.message}", "createSSLSocketFactory")
-            }
-
+    }
+    fun configureSSLSocketFactory(httpsURLConnection: HttpsURLConnection) {
+        try {
+            httpsURLConnection.setSSLSocketFactory(sslSocketFactory)
+        } catch (e: Exception) {
+            LOGGER.error("Error ${e.message}", "createSSLSocketFactory")
         }
     }
 }
