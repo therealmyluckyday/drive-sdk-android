@@ -142,20 +142,23 @@ class TexConfig {
         @JsonProperty
         private var clientId: String
         val logger = LoggerFactory().getLogger(this::class.java.name)
+        private val scheduler: Scheduler
 
-        constructor(user: TexUser?, context: Context?, clientId: String) {
+        constructor(user: TexUser?, context: Context?, clientId: String, rxScheduler: Scheduler = Schedulers.single()) {
             LOGGER.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
             this.user = user
             this.context = context
             TexConfig.user = user
             this.clientId = clientId
+            this.scheduler = rxScheduler
         }
 
-        constructor(context: Context?, appName: String, clientId: String) {
+        constructor(context: Context?, appName: String, clientId: String, rxScheduler: Scheduler = Schedulers.single()) {
             LOGGER.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
             this.context = context
             this.appName = appName
             this.clientId = clientId
+            this.scheduler = rxScheduler
         }
 
         fun build(): TexConfig {
@@ -172,8 +175,7 @@ class TexConfig {
 
             LOGGER.info("Done configuring ssl certificate", "init")
 
-            val scheduler = Schedulers.io()
-            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform, scheduler)
+            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform, this.scheduler)
             TexConfig.config = config
             LOGGER.info("Create koin module", "build")
             context?.let { setupKoin(it, scheduler) }

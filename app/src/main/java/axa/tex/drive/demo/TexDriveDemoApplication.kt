@@ -6,19 +6,24 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import axa.tex.drive.sdk.acquisition.PermissionException
+import axa.tex.drive.sdk.acquisition.TripProgress
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
+import io.reactivex.Scheduler
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.concurrent.schedule
 
 
 class TexDriveDemoApplication : Application() {
@@ -61,7 +66,7 @@ class TexDriveDemoApplication : Application() {
     }
 
     fun configure() {
-        val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000").enableTrackers().platformHost(Platform.PRODUCTION).build()
+        val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", rxScheduler = Schedulers.single()).enableTrackers().platformHost(Platform.PRODUCTION).build()
         config = newConfig
         val newService = TexService.configure(newConfig)
         service = newService
