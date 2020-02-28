@@ -9,6 +9,7 @@ import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
@@ -30,12 +31,14 @@ internal class Collector : KoinComponentCallbacks {
     var fixData: Observable<List<Fix>>? = null
 
     val locations: PublishSubject<LocationFix> = PublishSubject.create()
+    val rxScheduler: Scheduler
 
-    constructor(context: Context, trackers: MutableList<Tracker>?) {
+    constructor(context: Context, trackers: MutableList<Tracker>?, scheduler: Scheduler) {
         this.trackers = trackers
         this.context = context
         val fixProcessor: FixProcessor by inject()
         this.fixProcessor = fixProcessor
+        this.rxScheduler = scheduler
     }
 
 
@@ -43,7 +46,8 @@ internal class Collector : KoinComponentCallbacks {
 
         if (trackers != null) {
             for (tracker in trackers) {
-                if (tracker.isEnabled()) {
+                logger.logger.info("Tracker ${tracker.javaClass.simpleName}", "startCollecting")
+                if (tracker.canBeEnabled()) {
                     logger.logger.info("Enabling tracker ${tracker.javaClass.simpleName}", "startCollecting")
 
                     tracker.enableTracking()
@@ -60,8 +64,8 @@ internal class Collector : KoinComponentCallbacks {
         tracker.enableTracking()
         fixData = tracker.provideFixProducer()
 
-        fixData?.subscribeOn(Schedulers.single())?.subscribe( { fixes ->
-            fixProcessor.addFixes(fixes)
+        fixData?.subscribeOn(rxScheduler)?.subscribe( { fixes ->
+                fixProcessor.addFixes(fixes)
             if (fixes.size == 1 && fixes[0] is LocationFix) {
                 locations.onNext(fixes[0] as LocationFix)
             }

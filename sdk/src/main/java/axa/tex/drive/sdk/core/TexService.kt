@@ -4,7 +4,6 @@ import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
-import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LogMessage
 import axa.tex.drive.sdk.core.logger.LoggerFactory

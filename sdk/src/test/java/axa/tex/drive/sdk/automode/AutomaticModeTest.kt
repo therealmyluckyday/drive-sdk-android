@@ -8,10 +8,6 @@ import axa.tex.drive.sdk.automode.tracker.FromIdleTrackingState
 import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import axa.tex.drive.sdk.automode.tracker.FromDrivingToLongStop
 import axa.tex.drive.sdk.automode.internal.Automode
-import axa.tex.drive.sdk.automode.internal.states.DrivingState
-import axa.tex.drive.sdk.automode.internal.states.IdleState
-import axa.tex.drive.sdk.automode.internal.states.InVehicleState
-import axa.tex.drive.sdk.automode.internal.states.TrackingState
 import org.junit.Assert
 import org.junit.Test
 import org.koin.core.context.startKoin
@@ -19,8 +15,6 @@ import org.koin.core.context.stopKoin
 import org.koin.core.inject
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 class AutomaticModeTest : KoinTest {
 
@@ -31,7 +25,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleToInVehicleState() as TexActivityTracker }
-            single { Automode(get()) }
+            single { Automode(get(), scheduler) }
         }
         startKoin {
             // module list
@@ -48,7 +42,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleTrackingState() as TexActivityTracker }
-            single { Automode(get()) }
+            single { Automode(get(), scheduler) }
         }
         startKoin {
             // module list
@@ -66,7 +60,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleDrivingState() as TexActivityTracker }
-            single { Automode(get()) }
+            single { Automode(get(), scheduler) }
         }
         startKoin {
             // module list
@@ -84,7 +78,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleDrivingState() as TexActivityTracker }
-            single { Automode(get()) }
+            single { Automode(get(), scheduler) }
         }
         startKoin {
             // module list
@@ -103,7 +97,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { FromDrivingToLongStop() as TexActivityTracker }
             single { AutomodeHandler() }
-            single { Automode(get()) }
+            single { Automode(get(), scheduler) }
         }
         startKoin {
             // module list

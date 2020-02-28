@@ -27,15 +27,17 @@ import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
 import org.koin.core.context.startKoin
 import org.koin.dsl.bind
 import org.koin.dsl.module
-
+import java.util.concurrent.Executors
 
 class TexConfig {
 
     internal var context: Context? = null
-
+    var texSDKRXScheduler: Scheduler? = null
 
     internal companion object {
         var config: Config? = null
@@ -43,12 +45,12 @@ class TexConfig {
         
         private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
         
-        internal fun setupKoin(context: Context) {
+        internal fun setupKoin(context: Context, scheduler: Scheduler = Schedulers.single()) {
             val myModule = module {
                 single { AutomodeHandler() }
                 single { SpeedFilter() }
-                single { AutoModeTracker(context) as TexActivityTracker }
-                single { Automode(get()) }
+                single { AutoModeTracker(context, scheduler) as TexActivityTracker }
+                single { Automode(get(), scheduler) }
                 single { TripManager() }
                 single { ScoreRetriever(context ) }
                 single { CollectionDb(context) }
@@ -78,9 +80,10 @@ class TexConfig {
                     Collector(context,
                             mutableListOf<Tracker>(
                             get<LocationTracker>(),
-                            get<BatteryTracker>())
+                            get<BatteryTracker>()),
+                            scheduler
                     ) }
-                single { TripRecorderImpl(context) as TripRecorder } bind TripRecorder::class
+                single { TripRecorderImpl(context, scheduler) as TripRecorder } bind TripRecorder::class
             }
             try {
                 startKoin {
@@ -93,12 +96,12 @@ class TexConfig {
         }
 
         fun loadAutoModeModule(context: Context) {
-
+            val scheduler = Schedulers.single()
             val myModule = module {
                 single { AutomodeHandler() }
                 single { SpeedFilter() }
-                single { AutoModeTracker(context) as TexActivityTracker }
-                single { Automode(get()) }
+                single { AutoModeTracker(context, scheduler) as TexActivityTracker }
+                single { Automode(get(), scheduler) }
             }
 
             try {
@@ -169,15 +172,16 @@ class TexConfig {
 
             LOGGER.info("Done configuring ssl certificate", "init")
 
-            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform)
+            val scheduler = Schedulers.io()
+            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform, scheduler)
             TexConfig.config = config
-
             LOGGER.info("Create koin module", "build")
-            context?.let { setupKoin(it) }
+            context?.let { setupKoin(it, scheduler) }
 
             LOGGER.info("Done building configuration", "build")
             val texconfig = TexConfig(context)
             TexConfig.config = config
+            texconfig.texSDKRXScheduler = scheduler
             return texconfig
         }
 

@@ -10,5 +10,8 @@ import io.reactivex.Observable
 
     fun disableSensor()
 
-    fun isEnabled(): Boolean
+     fun isEnabled(): Boolean
+
+     fun canBeEnabled(): Boolean
+
 }

@@ -1,6 +1,5 @@
 package axa.tex.drive.sdk.acquisition
 
-import android.Manifest
 import android.app.Notification
 import android.content.ComponentName
 import android.content.Context
@@ -10,7 +9,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.IBinder
-import androidx.core.app.ActivityCompat
 import axa.tex.drive.sdk.acquisition.collection.internal.Collector
 import axa.tex.drive.sdk.acquisition.collection.internal.CollectorService
 import axa.tex.drive.sdk.acquisition.collection.internal.FixProcessor
@@ -19,12 +17,11 @@ import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.Config
-import axa.tex.drive.sdk.core.Platform
-import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
@@ -53,10 +50,9 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
         return fixProcessor.currentTripChunk?.tripInfos?.tripId
     }
 
-    constructor(context: Context) {
+    constructor(context: Context, scheduler: Scheduler) {
         this.context = context
-
-        disposable = automodeHandler.speedListener.locations.subscribe( {
+        disposable = automodeHandler.speedListener.locations.subscribeOn(scheduler).subscribe( {
             var deltaDistance = 0.0
             if (mCurrentLocation != null) { // this is not the first point GPS received
                 deltaDistance = (mCurrentLocation!!.distanceTo(it) / 1000).toDouble() // Km

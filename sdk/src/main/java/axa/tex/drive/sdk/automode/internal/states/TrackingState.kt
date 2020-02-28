@@ -1,5 +1,7 @@
 package axa.tex.drive.sdk.automode.internal.states
 
+import android.os.Handler
+import android.os.Looper
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.SPEED_MOVEMENT_THRESHOLD
@@ -34,23 +36,27 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
         val testing = automode.isSimulateDriving
         if (testing) {
             try {
-                tracker.activelyScanSpeed()
-                goNext()
+                val mainHandler = Handler(Looper.getMainLooper())
+                val myRunnable = Runnable() {
+                    tracker.activelyScanSpeed()
+                    goNext()
+                }
+                mainHandler.post(myRunnable);
             }catch (e : Exception){
                 e.printStackTrace()
             }
         } else {
+
             var activitySubscription: Disposable? = null
-            activitySubscription = filterer.activityStream.filter {it.type == DetectedActivity.IN_VEHICLE }.subscribe( {
+            activitySubscription = filterer.activityStream.subscribeOn(automode.rxScheduler).filter {it.type == DetectedActivity.IN_VEHICLE }.subscribe( {
                 if (!disabled) {
                     activitySubscription?.dispose()
                     tracker.stopActivityScanning()
                     var subscription: Disposable? = null
                     LOGGER.info(Date().toString() + " : In vehicle according to Activity Recognition Client", function = "fun next()")
-                    subscription = filterer.gpsStream.filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
-                        LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun next()")
+                    subscription = filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
+                            LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun next()")
                         subscription?.dispose()
-
 
                         goNext()
                     }

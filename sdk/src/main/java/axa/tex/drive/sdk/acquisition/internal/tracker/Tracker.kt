@@ -21,7 +21,12 @@ interface Tracker {
     fun disableTracking()
 
     /**
-     * States if a tracker can be enable
+     * States if a tracker is enabled
      */
     fun isEnabled(): Boolean
+
+    /**
+     * States if a tracker can be enable
+     */
+    fun canBeEnabled(): Boolean
 }

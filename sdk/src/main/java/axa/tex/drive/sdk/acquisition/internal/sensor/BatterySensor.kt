@@ -59,6 +59,10 @@ internal class BatterySensor : TexSensor, BroadcastReceiver {
         return enabled
     }
 
+    override fun canBeEnabled(): Boolean {
+        return canBeEnabled
+    }
+
 
     override fun onReceive(context: Context?, intent: Intent?) {
         // Battery level

@@ -29,8 +29,8 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
             goNext()
         } else {
             var locationSubscription: Disposable? = null
-            locationSubscription = filterer.gpsStream.filter { it.speed >= SPEED_MOVEMENT_THRESHOLD && it.accuracy < LOCATION_ACCURACY_THRESHOLD  }.subscribe( {
-                if (!disabled) {
+            locationSubscription = filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { it.speed >= SPEED_MOVEMENT_THRESHOLD && it.accuracy < LOCATION_ACCURACY_THRESHOLD  }.subscribe( {
+                    if (!disabled) {
                     LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached with ${it.accuracy} of accuracy", function = "next")
                     locationSubscription?.dispose()
                     goNext()

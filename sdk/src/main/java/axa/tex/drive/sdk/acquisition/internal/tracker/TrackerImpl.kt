@@ -27,4 +27,8 @@ open class TrackerImpl : Tracker {
     override fun isEnabled(): Boolean {
         return sensor.isEnabled()
     }
+
+    override fun canBeEnabled(): Boolean {
+        return sensor.canBeEnabled()
+    }
 }

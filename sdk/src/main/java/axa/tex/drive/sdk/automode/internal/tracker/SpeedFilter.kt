@@ -6,6 +6,7 @@ import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.google.android.gms.location.DetectedActivity
+import io.reactivex.Scheduler
 import io.reactivex.subjects.PublishSubject
 
 // 2.8 m/s 10km/h
@@ -18,6 +19,7 @@ private const val SPEED_START_THRESHOLD = 20 * 0.28f
 internal const val LOCATION_ACCURACY_THRESHOLD = 20
 
 class SpeedFilter {
+    var rxScheduler: Scheduler? = null
     internal val activityStream: PublishSubject<DetectedActivity> = PublishSubject.create()
     public val gpsStream: PublishSubject<TexLocation> = PublishSubject.create()
     internal val locations: PublishSubject<Location> = PublishSubject.create()

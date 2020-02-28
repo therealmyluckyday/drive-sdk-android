@@ -112,6 +112,10 @@ internal class MotionSensor : TexSensor, SensorEventListener {
         return enabled
     }
 
+    override fun canBeEnabled(): Boolean {
+        return canBeEnabled
+    }
+
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         if (sensor != null) {

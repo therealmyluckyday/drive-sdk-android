@@ -16,6 +16,7 @@ import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.states.DrivingState
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.logger.LoggerFactory
+import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 import java.util.*
 import kotlin.concurrent.schedule
@@ -90,7 +91,7 @@ internal class AutomodeService : Service() {
         val myRunnable = Runnable() {
 
             try {
-                TexConfig.setupKoin(applicationContext)
+                TexConfig.setupKoin(applicationContext, Schedulers.single())
             } catch (e: Exception) {
                 LOGGER.error("${e.printStackTrace().toString()}", "activateAutomode")
             }

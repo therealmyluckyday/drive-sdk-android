@@ -10,15 +10,14 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
-import android.widget.Toast
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.ActivityRecognitionResult
-import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import io.reactivex.Scheduler
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
@@ -41,13 +40,14 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
     private var context: Context
 
 
-    constructor(context: Context) {
+    constructor(context: Context, scheduler: Scheduler) {
         this.context = context
         this.locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
     override fun onLocationChanged(location: Location) {
-        //LOGGER.info("\"Location $location", "onLocationChanged")
+        print("trip location changed")
+        LOGGER.info("\"Location $location", "onLocationChanged")
         val texLocation = TexLocation(location.latitude.toFloat(), location.longitude.toFloat(), location.accuracy, location.speed, location.bearing, location.altitude.toFloat(), location.time)
 
         speedFilter.gpsStream.onNext(texLocation)
@@ -58,12 +58,15 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
         LOGGER.info("\"Status $status", "onStatusChanged")
+        print("AutoModeTracker"+ "\"Status $status")
     }
     override fun onProviderEnabled(provider: String?) {
         LOGGER.info("", "onProviderEnabled")
+        print("AutoModeTracker"+ "\"provider $provider")
     }
     override fun onProviderDisabled(provider: String?) {
         LOGGER.info("", "onProviderDisabled")
+        print("AutoModeTracker"+ "\"provider $provider")
     }
 
     override fun passivelyScanSpeed() {
@@ -109,7 +112,7 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
             LOGGER.info("\"Connection succeeded!", "addOnSuccessListener")
             })
         task.addOnFailureListener(OnFailureListener {
-            LOGGER.info("\"Connection Failed!", "addOnFailureListener") })
+            LOGGER.info("\"Connection Failed! " + it, "addOnFailureListener") })
 
     }
 
