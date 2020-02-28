@@ -77,6 +77,7 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
         try {
             // Request location updates
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0.0f, this)
+            //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0.0f, this)
         } catch(ex: SecurityException) {
             LOGGER.error("Security Exception, no location available", "activelyScanSpeed")
         }
