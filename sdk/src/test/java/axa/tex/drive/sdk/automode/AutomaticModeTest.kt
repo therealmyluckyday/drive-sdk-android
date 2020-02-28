@@ -8,6 +8,7 @@ import axa.tex.drive.sdk.automode.tracker.FromIdleTrackingState
 import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import axa.tex.drive.sdk.automode.tracker.FromDrivingToLongStop
 import axa.tex.drive.sdk.automode.internal.Automode
+import io.reactivex.schedulers.Schedulers
 import org.junit.Assert
 import org.junit.Test
 import org.koin.core.context.startKoin
@@ -25,7 +26,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleToInVehicleState() as TexActivityTracker }
-            single { Automode(get(), scheduler) }
+            single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
             // module list
@@ -42,7 +43,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleTrackingState() as TexActivityTracker }
-            single { Automode(get(), scheduler) }
+            single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
             // module list
@@ -60,7 +61,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleDrivingState() as TexActivityTracker }
-            single { Automode(get(), scheduler) }
+            single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
             // module list
@@ -78,7 +79,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { AutomodeHandler() }
             single { FromIdleDrivingState() as TexActivityTracker }
-            single { Automode(get(), scheduler) }
+            single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
             // module list
@@ -97,7 +98,7 @@ class AutomaticModeTest : KoinTest {
             single { SpeedFilter() }
             single { FromDrivingToLongStop() as TexActivityTracker }
             single { AutomodeHandler() }
-            single { Automode(get(), scheduler) }
+            single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
             // module list

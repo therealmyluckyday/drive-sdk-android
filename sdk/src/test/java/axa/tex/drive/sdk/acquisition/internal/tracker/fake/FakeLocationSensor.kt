@@ -30,6 +30,10 @@ class FakeLocationSensor : TexSensor {
         return enabled
     }
 
+    override fun canBeEnabled(): Boolean {
+        return true
+    }
+
     private fun produceFixes() {
         var time: Long = Date().time
 

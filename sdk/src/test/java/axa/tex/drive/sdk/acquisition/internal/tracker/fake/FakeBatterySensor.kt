@@ -32,4 +32,8 @@ class FakeBatterySensor(private val level: Int = 0, private val state: BatterySt
         return enabled
     }
 
+    override fun canBeEnabled(): Boolean {
+        return true
+    }
+
 }

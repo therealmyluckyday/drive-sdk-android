@@ -27,6 +27,10 @@ class FakeMotionSensor : TexSensor {
         return enabled
     }
 
+    override fun canBeEnabled(): Boolean {
+        return true
+    }
+
     private fun produceFixes() {
     /*
     Fake Classe
