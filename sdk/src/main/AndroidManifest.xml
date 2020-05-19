@@ -8,7 +8,9 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <!-- For Auto-mode module -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+
 
     <!-- For Auto-mode module -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

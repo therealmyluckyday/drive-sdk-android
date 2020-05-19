@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this,
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
                         android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), 123)
+                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION, android.Manifest.permission.ACTIVITY_RECOGNITION), 123)
         if (Build.VERSION.SDK_INT >= 23 ) {
             val hasForegroundLocationPermission = ActivityCompat.checkSelfPermission(this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
