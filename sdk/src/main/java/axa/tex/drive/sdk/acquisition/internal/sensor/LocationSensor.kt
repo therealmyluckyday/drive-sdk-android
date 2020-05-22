@@ -26,7 +26,7 @@ import io.reactivex.subjects.PublishSubject
 import java.util.*
 
 
-internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallbacks {
+internal class LocationSensor : TexSensor, KoinComponentCallbacks {
 
     private var lastLocation: Location? = null
     internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
@@ -74,37 +74,6 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
 
     override fun producer(): Observable<List<Fix>> {
         return fixProducer
-    }
-
-    override fun onLocationChanged(location: Location) {
-        LOGGER.info("Sending location", "onLocationChanged")
-        this.lastLocation = location
-
-
-        var speed = location.speed
-        if (!location.hasSpeed()) {
-            speed = (-1.0).toFloat()
-        }
-        val locationFix = LocationFix(location.latitude,
-                location.longitude,
-                location.accuracy,
-                speed,
-                location.bearing,
-                location.altitude,
-                location.time)
-        fixProducer.onNext(listOf(locationFix))
-    }
-
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-        LOGGER.info("status: $status", "onStatusChanged")
-    }
-
-    override fun onProviderEnabled(provider: String?) {
-        LOGGER.info("provider $provider", "onProviderEnabled")
-    }
-
-    override fun onProviderDisabled(provider: String?) {
-        LOGGER.info("$provider", "onProviderDisabled")
     }
 
     private fun enableTracking(track: Boolean) {
