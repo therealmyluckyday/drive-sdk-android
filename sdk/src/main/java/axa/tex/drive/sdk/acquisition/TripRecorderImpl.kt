@@ -52,7 +52,6 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
     constructor(context: Context, scheduler: Scheduler) {
         this.context = context
-        disposable = automodeHandler.speedListener.locations.subscribeOn(scheduler).subscribe( {
 
         disposable = automodeHandler.speedListener.locations.subscribe({
             if (start > 0) {
@@ -70,6 +69,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             }
         }, {throwable ->
             print(throwable)
+            logger.error("TripRecorderImpl  error"+throwable, "automodeHandler.speedListener.locations")
         })
     }
 

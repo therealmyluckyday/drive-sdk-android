@@ -10,8 +10,8 @@ import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 
-public class AutomodeHandler : KoinComponentCallbacks {
-    public val state: PublishSubject<Boolean> = PublishSubject.create()
+class AutomodeHandler : KoinComponentCallbacks {
+    val state: PublishSubject<Boolean> = PublishSubject.create()
     var running = false
     val speedListener: SpeedFilter by inject()
 

@@ -47,7 +47,6 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
         watchSpeed()
         watchGPS()
 
-        disposables.add(filterer.gpsStream.filter { t: TexLocation ->  t.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
         disposables.add(filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { t: TexLocation ->  t.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
             LOGGER.info("\"location speed ${it.speed} activate watchspeed", "watchspeed")
             lastMvtTime = it.time
