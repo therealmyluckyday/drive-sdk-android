@@ -82,7 +82,11 @@ class TexDriveDemoApplication : Application() {
         })
 
 
-
+        newService.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
+            Thread{
+                println("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]")
+            }.start()
+        })
         if(!autoModeHandler.running!!) {
             Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
             autoModeHandler.activateAutomode(applicationContext,true, isSimulatedDriving = false)
@@ -124,7 +128,7 @@ class TexDriveDemoApplication : Application() {
         }
     }
 
-    private fun  saveTripForScore(tripId : String){
+    fun saveTripForScore(tripId : String){
         try {
             val rootPath = applicationContext?.getExternalFilesDir("AUTOMODE")
             val root = File(rootPath?.toURI())
@@ -145,23 +149,27 @@ class TexDriveDemoApplication : Application() {
     }
 
 
-
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(): String {
+    fun createNotificationChannel(): String {
         val channelId = CHANNEL_ID
         val channelName = CHANNEL_NAME
-        val chan = NotificationChannel(channelId,
-                channelName, NotificationManager.IMPORTANCE_NONE)
-        chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-        val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        service.createNotificationChannel(chan)
-        return channelId
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val chan = NotificationChannel(channelId,
+                        channelName, NotificationManager.IMPORTANCE_NONE)
+
+
+            chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            service.createNotificationChannel(chan)
+            return channelId
+        }
+        return "ERROR"
     }
 
 
 
     @SuppressLint("NewApi")
-    private fun notifyStart(message : String, notifId : Int){
+    fun notifyStart(message : String, notifId : Int){
         val nm = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val currentApiVersion = android.os.Build.VERSION.SDK_INT
         val notification : Notification

@@ -83,7 +83,6 @@ internal class AutomodeService : Service() {
         return START_STICKY
     }
 
-
     private fun activateAutomode(isSimulatedDriving: Boolean, isForeground: Boolean) {
 
         // Get a handler that can be used to post to the main thread
@@ -99,12 +98,13 @@ internal class AutomodeService : Service() {
             val automode: Automode by inject()
             val tripRecorder: TripRecorder by inject()
             if (tripRecorder.isRecording()) {
+                LOGGER.info("tripRecorder.isRecording", function = "activateAutomode")
                 automode.setCurrentState(DrivingState(automode))
             } else {
                 automode.isSimulateDriving = isSimulatedDriving
                 automode.isForeground = isForeground
                 if (isSimulatedDriving) {
-
+                    LOGGER.info("isSimulatedDriving", function = "activateAutomode")
                     Timer("IdleState Timer").schedule(15000) {
                         // Get a handler that can be used to post to the main thread
                         val mainHandler = Handler(Looper.getMainLooper())

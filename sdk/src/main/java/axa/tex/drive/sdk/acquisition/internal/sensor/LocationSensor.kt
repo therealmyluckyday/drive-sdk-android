@@ -127,7 +127,7 @@ internal class LocationSensor : TexSensor, LocationListener, KoinComponentCallba
     fun subscribeGPSSTream() {
         val funcName = "subscribeGPSSTream"
         LOGGER.info("subscribeGPSSTream ", funcName)
-        val scheduler: Scheduler = if (autoModeTracker?.speedFilter?.rxScheduler != null) autoModeTracker!!.speedFilter!!.rxScheduler!! else Schedulers.single()
+        val scheduler: Scheduler = if (autoModeTracker?.speedFilter?.rxScheduler != null) autoModeTracker!!.speedFilter.rxScheduler!! else Schedulers.io()
         autoModeTracker?.speedFilter?.gpsStream?.subscribeOn(scheduler)?.subscribe ({
             if (autoModeTracker?.speedFilter!!.collectionEnabled) {
                 val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),

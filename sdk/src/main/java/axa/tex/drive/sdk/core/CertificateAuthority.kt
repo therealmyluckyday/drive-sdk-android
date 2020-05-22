@@ -23,7 +23,7 @@ class CertificateAuthority: KoinComponentCallbacks {
     var sslSocketFactory: SSLSocketFactory? = null
     constructor(appContext: Context) {
         try {
-            certAuthInputStream = appContext?.resources?.openRawResource(R.raw.tex_elb_ssl)
+            certAuthInputStream = appContext.resources?.openRawResource(R.raw.tex_elb_ssl)
             sslSocketFactory = createSSLSocketFactory(this.certAuthInputStream!!)
         } catch (e: Exception) {
 

@@ -104,6 +104,7 @@ internal class AutoModeTracker : LocationListener, TexActivityTracker, KoinCompo
                 val result = ActivityRecognitionResult.extractResult(intent)
                 val activity = result.mostProbableActivity
                 //Toast.makeText(context, result.mostProbableActivity.toString(), Toast.LENGTH_LONG).show()
+                LOGGER.info("\"ActivityRecognition: "+result.mostProbableActivity.toString(), "addOnSuccessListener")
                 speedFilter.activityStream.onNext(activity)
             }
         }

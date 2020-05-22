@@ -53,17 +53,21 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     constructor(context: Context, scheduler: Scheduler) {
         this.context = context
         disposable = automodeHandler.speedListener.locations.subscribeOn(scheduler).subscribe( {
-            var deltaDistance = 0.0
-            if (mCurrentLocation != null) { // this is not the first point GPS received
-                deltaDistance = (mCurrentLocation!!.distanceTo(it) / 1000).toDouble() // Km
-            }else{
+
+        disposable = automodeHandler.speedListener.locations.subscribe({
+            if (start > 0) {
+                var deltaDistance = 0.0
+                if (mCurrentLocation != null) { // this is not the first point GPS received
+                    val distance = mCurrentLocation!!.distanceTo(it)
+                    deltaDistance = (distance / 1000).toDouble() // Km
+                }
                 mCurrentLocation = it
+                mCurrentDistance += deltaDistance
+                mCurrentSpeed = (it.speed * 3.6).toInt() // km/h
+                val duration = System.currentTimeMillis() - start
+                val progress = TripProgress(getCurrentTripId()!!,it,mCurrentSpeed,mCurrentDistance,duration)
+                tripProgress.onNext(progress)
             }
-            mCurrentDistance += deltaDistance
-            mCurrentSpeed = (it.speed * 3.6).toInt() // km/h
-            val duration = System.currentTimeMillis() - start
-            val progress = TripProgress(getCurrentTripId()!!,it,mCurrentSpeed,mCurrentDistance,duration)
-            tripProgress.onNext(progress)
         }, {throwable ->
             print(throwable)
         })
@@ -95,6 +99,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
         if (mConfig != null) {
             val config = mConfig!!
             start = startTime
+            mCurrentDistance = 0.toDouble()
             logger.info("${Date()} TripRecorder : Start tracking.", function = "startTrip")
             requestForLocationPermission()
             val serviceIntent = Intent(context, CollectorService::class.java)

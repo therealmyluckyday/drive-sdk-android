@@ -35,6 +35,7 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
         //automode.activityTracker.passivelyScanSpeed()
         val testing = automode.isSimulateDriving
         if (testing) {
+            LOGGER.info("isSimulatedDriving", function = "next")
             try {
                 val mainHandler = Handler(Looper.getMainLooper())
                 val myRunnable = Runnable() {
@@ -50,10 +51,10 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
             var activitySubscription: Disposable? = null
             activitySubscription = filterer.activityStream.subscribeOn(automode.rxScheduler).filter {it.type == DetectedActivity.IN_VEHICLE }.subscribe( {
                 if (!disabled) {
+                    LOGGER.info(Date().toString() + " : In "+ it.type +" according to Activity Recognition Client", function = "fun next()")
                     activitySubscription?.dispose()
                     tracker.stopActivityScanning()
                     var subscription: Disposable? = null
-                    LOGGER.info(Date().toString() + " : In vehicle according to Activity Recognition Client", function = "fun next()")
                     subscription = filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
                             LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun next()")
                         subscription?.dispose()

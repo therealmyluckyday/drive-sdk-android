@@ -47,9 +47,9 @@ class TexConfig {
         
         internal fun setupKoin(context: Context, scheduler: Scheduler = Schedulers.single()) {
             val myModule = module {
-                single { AutomodeHandler() }
                 single { SpeedFilter() }
                 single { AutoModeTracker(context, scheduler) as TexActivityTracker }
+                single { AutomodeHandler() }
                 single { Automode(get(), scheduler) }
                 single { TripManager() }
                 single { ScoreRetriever(context ) }

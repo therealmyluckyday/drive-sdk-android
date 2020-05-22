@@ -26,6 +26,7 @@ internal class IdleState : AutomodeState, KoinComponentCallbacks {
 
     override fun next() {
         if (automode.isSimulateDriving) {
+            LOGGER.info("isSimulatedDriving", function = "next")
              Timer("IdleState Timer").schedule(15000) {
                  // Get a handler that can be used to post to the main thread
                  val mainHandler = Handler(Looper.getMainLooper())

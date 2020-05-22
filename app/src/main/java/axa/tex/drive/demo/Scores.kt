@@ -45,7 +45,7 @@ class Scores : AppCompatActivity() {
         val appName = "APP-TEST"
         val platform = Platform.PRODUCTION
 
-        Thread { scoreRetriever.retrieveScore(tripId, appName, platform, true) }.start()
+        Thread { scoreRetriever.retrieveScore(tripId!!, appName, platform, true) }.start()
 
     }
 }
