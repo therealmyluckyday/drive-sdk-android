@@ -16,7 +16,9 @@ import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
+import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
+import axa.tex.drive.sdk.core.SensorService
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
@@ -33,11 +35,12 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
     private var context: Context? = null
     private var locationManager: LocationManager? = null
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
+    private val speedFilter: SpeedFilter
 
     var isEnable: Boolean = false
     var canBeEnabled: Boolean = true
 
-    private var autoModeTracker: AutoModeTracker? = null
+    private val sensorService: SensorService
     var automode: Automode
 
     override fun disableSensor() {
@@ -63,13 +66,14 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
     }
 
 
-    constructor(automode: Automode, autoModeTracker: TexActivityTracker, context: Context?, canBeEnabled: Boolean = true) {
+    constructor(automode: Automode, sensorService: SensorService, context: Context?, canBeEnabled: Boolean = true) {
         LOGGER.info("context "+context, "constructor")
         locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         this.context = context
         this.canBeEnabled = canBeEnabled
         this.automode = automode
-        this.autoModeTracker = autoModeTracker as AutoModeTracker
+        this.sensorService = sensorService
+        this.speedFilter = sensorService.locationSensorService.speedFilter
     }
 
     override fun producer(): Observable<List<Fix>> {
@@ -84,11 +88,11 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
             if (track) {
                 subscribeGPSSTream()
                 checkPermission()
-                autoModeTracker?.activelyScanSpeed()
+                sensorService.activelyScanSpeed()
             } else {
-                autoModeTracker?.stopSpeedScanning()
+                sensorService.stopSpeedScanning()
             }
-            autoModeTracker?.speedFilter?.collectionEnabled = track
+            sensorService.locationSensorService.speedFilter.collectionEnabled = track
             LOGGER.info("location Tracker enabled: $track", funcName)
         }
     }
@@ -96,9 +100,9 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
     fun subscribeGPSSTream() {
         val funcName = "subscribeGPSSTream"
         LOGGER.info("subscribeGPSSTream ", funcName)
-        val scheduler: Scheduler = if (autoModeTracker?.speedFilter?.rxScheduler != null) autoModeTracker!!.speedFilter.rxScheduler!! else Schedulers.io()
-        autoModeTracker?.speedFilter?.gpsStream?.subscribeOn(scheduler)?.subscribe ({
-            if (autoModeTracker?.speedFilter!!.collectionEnabled) {
+        val scheduler: Scheduler = if (sensorService.locationSensorService.speedFilter.rxScheduler != null) sensorService.locationSensorService.speedFilter.rxScheduler!! else Schedulers.io()
+        sensorService.locationSensorService.speedFilter.gpsStream.subscribeOn(scheduler)?.subscribe ({
+            if (sensorService.locationSensorService.speedFilter.collectionEnabled) {
                 val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),
                         it.longitude.toDouble(),
                         it.accuracy,

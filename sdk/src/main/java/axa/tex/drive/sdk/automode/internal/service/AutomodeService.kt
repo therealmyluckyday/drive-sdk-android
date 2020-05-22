@@ -14,6 +14,7 @@ import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.states.DrivingState
+import axa.tex.drive.sdk.core.SensorService
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.schedulers.Schedulers
@@ -90,7 +91,7 @@ internal class AutomodeService : Service() {
         val myRunnable = Runnable() {
 
             try {
-                TexConfig.setupKoin(applicationContext, Schedulers.single())
+                TexConfig.setupKoin(applicationContext, Schedulers.single(), SensorService(applicationContext, Schedulers.single()))
             } catch (e: Exception) {
                 LOGGER.error("${e.printStackTrace().toString()}", "activateAutomode")
             }

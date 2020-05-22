@@ -45,10 +45,10 @@ class TexConfig {
         
         private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
         
-        internal fun setupKoin(context: Context, scheduler: Scheduler = Schedulers.single()) {
+        internal fun setupKoin(context: Context, scheduler: Scheduler = Schedulers.single(), sensorService: SensorService) {
             val myModule = module {
                 single { SpeedFilter() }
-                single { AutoModeTracker(context, scheduler) as TexActivityTracker }
+                single { AutoModeTracker(context, sensorService, scheduler) as TexActivityTracker }
                 single { AutomodeHandler() }
                 single { Automode(get(), scheduler) }
                 single { TripManager() }
@@ -60,7 +60,7 @@ class TexConfig {
                     LocationTracker(
                             LocationSensor(
                                     get(),
-                                    get(),
+                                    sensorService,
                                     context,
                                     config?.locationTrackerEnabled!!)
                     )}
@@ -97,10 +97,11 @@ class TexConfig {
 
         fun loadAutoModeModule(context: Context) {
             val scheduler = Schedulers.single()
+            val sensorService = SensorService(context, scheduler)
             val myModule = module {
                 single { AutomodeHandler() }
                 single { SpeedFilter() }
-                single { AutoModeTracker(context, scheduler) as TexActivityTracker }
+                single { AutoModeTracker(context, sensorService, scheduler) as TexActivityTracker }
                 single { Automode(get(), scheduler) }
             }
 
@@ -178,7 +179,11 @@ class TexConfig {
             val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform, this.scheduler)
             TexConfig.config = config
             LOGGER.info("Create koin module", "build")
-            context?.let { setupKoin(it, scheduler) }
+
+            context?.let {
+                val sensorService = SensorService(it, scheduler)
+                setupKoin(it, scheduler, sensorService)
+            }
 
             LOGGER.info("Done building configuration", "build")
             val texconfig = TexConfig(context)
