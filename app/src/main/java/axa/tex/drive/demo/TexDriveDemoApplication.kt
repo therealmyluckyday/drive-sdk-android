@@ -48,12 +48,8 @@ class TexDriveDemoApplication : Application() {
     fun driving(myTripId: TripId) {
         val tripRecorder = tripRecorder ?: return
         if (!tripRecorder.isRecording()) {
-            notifyStart(if (myTripId != null) {
-                "Start trip : ${myTripId!!.value}"
-            } else {
-                ""
-            }, 7)
-            saveTripForScore(myTripId!!.value)
+            notifyStart("Start trip : ${myTripId.value}", 7)
+            saveTripForScore(myTripId.value)
             log( "=====================================================================\n")
             log( "New trip at ${Date().toString()}\n")
             log( "${Date().toString()}Trip Id =  at $myTripId\n")
@@ -78,7 +74,7 @@ class TexDriveDemoApplication : Application() {
         service = newService
         val autoModeHandler = newService.automodeHandler()
 
-        newService.logStream()?.subscribeOn(Schedulers.io())?.subscribe({ it ->
+        newService.logStream().subscribeOn(Schedulers.io()).subscribe({ it ->
             log( "[" + it.file + "][" + it.function + "]" + it.description + "\n")
             Thread{
                 println("["+it.file +"]["+ it.function + "]"+ it.description )
@@ -86,7 +82,6 @@ class TexDriveDemoApplication : Application() {
         })
 
         newService.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
-            val newLocation = it.location
             var timeDelay: Long = 0
             if (oldLocation == null) {
             } else {
@@ -94,15 +89,15 @@ class TexDriveDemoApplication : Application() {
                 timeDelay = it.location.time - oldLocation!!.time
             }
 
-            oldLocation = newLocation
+            oldLocation = it.location
             // Save trip for reuse
-            //saveLocation(newLocation, timeDelay)
+            //saveLocation(it.location, timeDelay)
             //log("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]\n")
             Thread{
                 println("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]")
             }.start()
         })
-        if(!autoModeHandler.running!!) {
+        if(!autoModeHandler.running) {
             Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
             autoModeHandler.activateAutomode(applicationContext,true, isSimulatedDriving = false)
         }else{
@@ -131,14 +126,10 @@ class TexDriveDemoApplication : Application() {
 
 
 
-    fun loadTrip(speedFilter: SpeedFilter) {
+    fun loadTrip() {
         println("loadTrip")
-        var logsText = ""
-
         val logFile: File? = this.getLogFile(applicationContext, tripLogFileName)
-
-        if (logFile !== null && logFile!!.exists()) {
-            //val queue: LinkedHashMap<Int, String?> = LinkedHashMap(500)
+        if (logFile !== null && logFile.exists()) {
             Thread {
                 var newTime = System.currentTimeMillis() - 86400000
                 try {
@@ -146,9 +137,7 @@ class TexDriveDemoApplication : Application() {
                     var lineIndex = 0
                     var line = bufferedReader.readLine()
                     while (line != null) {
-                        //println("[TripLine]" + line)
-                        newTime = sendLocationLineStringToSpeedFilter(line, speedFilter, newTime)
-                        //queue[lineIndex] = line
+                        newTime = sendLocationLineStringToSpeedFilter(line, newTime)
                         line = bufferedReader.readLine()
                         lineIndex++
                     }
@@ -157,11 +146,10 @@ class TexDriveDemoApplication : Application() {
                     //You'll need to add proper error handling here
                 }
             }.start()
-
         }
     }
 
-    private fun sendLocationLineStringToSpeedFilter(line: String, speedFilter: SpeedFilter, time: Long) : Long {
+    private fun sendLocationLineStringToSpeedFilter(line: String, time: Long) : Long {
         val locationDetails = line.split(",")
         var newLocation = Location("")
         val latitude = locationDetails[0].toDouble()
@@ -210,9 +198,8 @@ class TexDriveDemoApplication : Application() {
                     e.printStackTrace()
                 }
             }
-            var out: FileOutputStream? = null
             try {
-                out = FileOutputStream(f, true)
+                val out = FileOutputStream(f, true)
                 out.write(data.toByteArray())
                 out.flush()
                 out.close()
@@ -240,8 +227,7 @@ class TexDriveDemoApplication : Application() {
     }
 
     private fun getLogFile(context: Context, fileName: String = "axa-dil-tex.txt"): File? {
-        var logDirectory: File? = null
-        logDirectory = if (isExternalStorageWritable()) {
+        var logDirectory = if (isExternalStorageWritable()) {
             context.getExternalFilesDir(null)
         } else {
             context.filesDir
@@ -250,11 +236,8 @@ class TexDriveDemoApplication : Application() {
     }
 
     private fun updateLogsText() {
-        var logsText = ""
-
         val logFile: File? = this.getLogFile(applicationContext)
-
-        if (logFile !== null && logFile!!.exists()) {
+        if (logFile !== null && logFile.exists()) {
             val queue: LinkedHashMap<Int, String?> = LinkedHashMap(500)
             try {
                 val bufferedReader = BufferedReader(FileReader(logFile))
@@ -282,12 +265,12 @@ class TexDriveDemoApplication : Application() {
 
     fun saveTripForScore(tripId : String){
         try {
-            val rootPath = applicationContext?.getExternalFilesDir("AUTOMODE")
-            val root = File(rootPath?.toURI())
+            val rootPath = applicationContext!!.getExternalFilesDir("AUTOMODE")!!
+            val root = File(rootPath.toURI())
             if (!root.exists()) {
                 root.mkdirs()
             }
-            val f = File(rootPath?.path + "/trips.txt")
+            val f = File(rootPath.path + "/trips.txt")
             if (!f.exists()) {
                 f.createNewFile()
             }

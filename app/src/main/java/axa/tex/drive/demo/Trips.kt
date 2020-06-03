@@ -45,12 +45,12 @@ class Trips : AppCompatActivity() {
 
     fun  getTripsForScore(): String{
         try {
-            val rootPath = applicationContext?.getExternalFilesDir("AUTOMODE")
-            val root = File(rootPath?.toURI())
+            val rootPath = applicationContext!!.getExternalFilesDir("AUTOMODE")!!
+            val root = File(rootPath.toURI())
             if (!root.exists()) {
                 root.mkdirs()
             }
-            val f = File(rootPath?.path + "/trips.txt")
+            val f = File(rootPath.path + "/trips.txt")
             return  f.readText()
 
         } catch (e: Exception) {
