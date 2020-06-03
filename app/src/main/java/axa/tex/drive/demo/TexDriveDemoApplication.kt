@@ -54,9 +54,9 @@ class TexDriveDemoApplication : Application() {
                 ""
             }, 7)
             saveTripForScore(myTripId!!.value)
-            log(applicationContext, "=====================================================================\n")
-            log(applicationContext, "New trip at ${Date().toString()}\n")
-            log(applicationContext, "${Date().toString()}Trip Id =  at $myTripId\n")
+            log( "=====================================================================\n")
+            log( "New trip at ${Date().toString()}\n")
+            log( "${Date().toString()}Trip Id =  at $myTripId\n")
         }
     }
 
@@ -64,8 +64,8 @@ class TexDriveDemoApplication : Application() {
         val tripRecorder = tripRecorder ?: return
         if (tripRecorder.isRecording()) {
             notifyStart("End of trip :", 8)
-            log(applicationContext, "Enf of trip at ${Date().toString()}\n")
-            log(applicationContext, "=====================================================================\n")
+            log( "Enf of trip at ${Date().toString()}\n")
+            log( "=====================================================================\n")
 
         }
     }
@@ -79,12 +79,11 @@ class TexDriveDemoApplication : Application() {
         val autoModeHandler = newService.automodeHandler()
 
         newService.logStream()?.subscribeOn(Schedulers.io())?.subscribe({ it ->
-            log(applicationContext, "[" + java.util.Calendar.getInstance() + "][" + it.file + "][" + it.function + "]" + it.description + "\n")
+            log( "[" + it.file + "][" + it.function + "]" + it.description + "\n")
             Thread{
                 println("["+it.file +"]["+ it.function + "]"+ it.description )
             }.start()
         })
-
 
         newService.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
             val newLocation = it.location
