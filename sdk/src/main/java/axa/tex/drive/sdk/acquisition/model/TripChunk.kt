@@ -29,12 +29,13 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
 
     fun canUpload() : Boolean {
         val funcName = "canUpload"
-        if ( this.toJson() == Constants.EMPTY_PACKET) {
+        val json = this.toJson()
+        if ( json == Constants.EMPTY_PACKET) {
             LOGGER.info("this.toJson() == Constants.EMPTY_PACKET TRUE", function = funcName)
             return false
         }
 
-        if ( this.toJson().count() > DEFAULT_JSON_SIZE) {
+        if ( json.count() > DEFAULT_JSON_SIZE) {
             LOGGER.info("this.toJson().count() > 10000 TRUE", function = funcName)
             return true
         }
@@ -54,7 +55,8 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
     // Private Method
     // MARK: Serialize
     fun toJson() : String {
-        val packet = FixPacket(fixes, tripInfos.model, tripInfos.os, tripInfos.timezone, tripInfos.uid, tripInfos.version, tripInfos.tripId.value, tripInfos.appName, tripInfos.clientId)
+        val currentFixes = fixes
+        val packet = FixPacket(currentFixes, tripInfos.model, tripInfos.os, tripInfos.timezone, tripInfos.uid, tripInfos.version, tripInfos.tripId.value, tripInfos.appName, tripInfos.clientId)
         return packet.toJson()
     }
 

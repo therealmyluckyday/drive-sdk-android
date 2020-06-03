@@ -19,11 +19,12 @@ class FixPacket(@JsonIgnore val fixes: List<Fix>,
 
     fun toJson(): String {
         return try {
+            val currentFixes = fixes.toList()
             val mapper = ObjectMapper()
             mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false)
             val jsonNode = mapper.readTree(mapper.writeValueAsString(this))
             val fixesNode: ArrayNode = mapper.readTree("[]") as ArrayNode
-            for (fix in fixes) {
+            for (fix in currentFixes) {
                 fixesNode.add(mapper.readTree(fix.toJson()))
             }
 
