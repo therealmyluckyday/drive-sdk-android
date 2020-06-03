@@ -61,6 +61,7 @@ class TexConfig {
                             LocationSensor(
                                     get(),
                                     sensorService,
+                                    sensorService.speedFilter(),
                                     context,
                                     config?.locationTrackerEnabled!!)
                     )}
@@ -145,21 +146,44 @@ class TexConfig {
         val logger = LoggerFactory().getLogger(this::class.java.name)
         private val scheduler: Scheduler
 
-        constructor(user: TexUser?, context: Context?, clientId: String, rxScheduler: Scheduler = Schedulers.single()) {
+        private val sensorService: SensorService
+
+        constructor(user: TexUser?, context: Context, clientId: String, sensor: SensorService, rxScheduler: Scheduler = Schedulers.single()) {
             LOGGER.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
             this.user = user
             this.context = context
             TexConfig.user = user
             this.clientId = clientId
             this.scheduler = rxScheduler
+            this.sensorService = sensor
         }
 
-        constructor(context: Context?, appName: String, clientId: String, rxScheduler: Scheduler = Schedulers.single()) {
+        constructor(user: TexUser?, context: Context, clientId: String, rxScheduler: Scheduler = Schedulers.single()) {
+            LOGGER.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
+            this.user = user
+            this.context = context
+            TexConfig.user = user
+            this.clientId = clientId
+            this.scheduler = rxScheduler
+            this.sensorService = SensorService(context, rxScheduler)
+        }
+
+        constructor(context: Context, appName: String, clientId: String, sensor: SensorService, rxScheduler: Scheduler = Schedulers.single()) {
             LOGGER.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
             this.context = context
             this.appName = appName
             this.clientId = clientId
             this.scheduler = rxScheduler
+            this.sensorService = sensor
+        }
+
+        constructor(context: Context, appName: String, clientId: String, rxScheduler: Scheduler = Schedulers.single()) {
+            LOGGER.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
+            this.context = context
+            this.appName = appName
+            this.clientId = clientId
+            this.scheduler = rxScheduler
+            this.sensorService = SensorService(context, rxScheduler)
         }
 
         fun build(): TexConfig {

@@ -30,12 +30,7 @@ class ActivityRecognitionService {
 
     fun startActivityScanning(activityStream: PublishSubject<DetectedActivity>) {
 
-        var isSimulateDriving = true    
-        if (isSimulateDriving) {
-            val confidence = 100
-            activityStream.onNext(DetectedActivity(DetectedActivity.IN_VEHICLE, confidence))
-            return
-        }
+        LOGGER.info("\"Create activityRecognitionClient", "startActivityScanning")
         activityRecognitionClient = ActivityRecognitionClient(context)
         val activityIntent = Intent(ACTIVITY_INTENT_ACTION)
         pendingIntent = PendingIntent.getBroadcast(
@@ -49,10 +44,16 @@ class ActivityRecognitionService {
             override fun onReceive(context: Context, intent: Intent) {
                 val result = ActivityRecognitionResult.extractResult(intent)
                 val activity: DetectedActivity = result.mostProbableActivity
-                val testActivity = DetectedActivity.IN_VEHICLE
-                //Toast.makeText(context, result.mostProbableActivity.toString(), Toast.LENGTH_LONG).show()
                 LOGGER.info("\"ActivityRecognition: "+result.mostProbableActivity.toString(), "addOnSuccessListener")
-                activityStream.onNext(activity)
+                var isSimulateDriving = true
+                if (isSimulateDriving) {
+                    LOGGER.info("\"isSimulateDriving", "startActivityScanning")
+                    val confidence = 100
+                    activityStream.onNext(DetectedActivity(DetectedActivity.IN_VEHICLE, confidence))
+                }
+                else {
+                    activityStream.onNext(activity)
+                }
             }
         }
         context.registerReceiver(activityReceiver, IntentFilter(ACTIVITY_INTENT_ACTION))

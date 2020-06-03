@@ -28,7 +28,6 @@ import org.koin.android.ext.android.inject
 @SuppressLint("MissingPermission")
 internal class AutoModeTracker : TexActivityTracker, KoinComponentCallbacks {
 
-    val locationSensorService: LocationSensorService
     val sensorService: SensorService
 
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
@@ -38,20 +37,19 @@ internal class AutoModeTracker : TexActivityTracker, KoinComponentCallbacks {
     constructor(context: Context, sensorService: SensorService, scheduler: Scheduler) {
         this.context = context
         this.sensorService = sensorService
-        this.locationSensorService = sensorService.locationSensorService
     }
 
     override fun passivelyScanSpeed() {
-        this.locationSensorService.passivelyScanSpeed()
+        this.sensorService.passivelyScanSpeed()
     }
 
     override fun activelyScanSpeed() {
-        this.locationSensorService.activelyScanSpeed()
+        this.sensorService.activelyScanSpeed()
     }
 
     @SuppressLint("MissingPermission")
     override fun stopSpeedScanning() {
-        this.locationSensorService.stopSpeedScanning()
+        this.sensorService.stopSpeedScanning()
     }
 
     override fun checkWhereAmI() {

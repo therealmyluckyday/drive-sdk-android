@@ -1,6 +1,8 @@
 package axa.tex.drive.sdk.core
 
 import android.content.Context
+import android.location.Location
+import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
@@ -9,13 +11,21 @@ import io.reactivex.Scheduler
 class SensorService: TexActivityTracker, KoinComponentCallbacks {
     internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private var context: Context
-    var locationSensorService: LocationSensorService
-    var activityRecognitionService: ActivityRecognitionService
+    private var locationSensorService: LocationSensorService
+    private var activityRecognitionService: ActivityRecognitionService
 
     constructor(context: Context, scheduler: Scheduler) {
         this.context = context
         this.locationSensorService = LocationSensorService(context, scheduler)
         this.activityRecognitionService = ActivityRecognitionService(context, scheduler)
+    }
+
+    fun forceLocationChanged(location: Location) {
+        locationSensorService.onLocationChanged(location)
+    }
+
+    fun speedFilter() : SpeedFilter {
+        return this.locationSensorService.speedFilter
     }
 
     override fun passivelyScanSpeed() {

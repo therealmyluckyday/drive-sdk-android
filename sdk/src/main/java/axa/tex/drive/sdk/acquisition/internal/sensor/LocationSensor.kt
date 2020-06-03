@@ -66,14 +66,14 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
     }
 
 
-    constructor(automode: Automode, sensorService: SensorService, context: Context?, canBeEnabled: Boolean = true) {
+    constructor(automode: Automode, sensorService: SensorService, speedFilter: SpeedFilter, context: Context?, canBeEnabled: Boolean = true) {
         LOGGER.info("context "+context, "constructor")
         locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         this.context = context
         this.canBeEnabled = canBeEnabled
         this.automode = automode
         this.sensorService = sensorService
-        this.speedFilter = sensorService.locationSensorService.speedFilter
+        this.speedFilter = speedFilter
     }
 
     override fun producer(): Observable<List<Fix>> {
@@ -92,7 +92,7 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
             } else {
                 sensorService.stopSpeedScanning()
             }
-            sensorService.locationSensorService.speedFilter.collectionEnabled = track
+            speedFilter.collectionEnabled = track
             LOGGER.info("location Tracker enabled: $track", funcName)
         }
     }
@@ -100,9 +100,9 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
     fun subscribeGPSSTream() {
         val funcName = "subscribeGPSSTream"
         LOGGER.info("subscribeGPSSTream ", funcName)
-        val scheduler: Scheduler = if (sensorService.locationSensorService.speedFilter.rxScheduler != null) sensorService.locationSensorService.speedFilter.rxScheduler!! else Schedulers.io()
-        sensorService.locationSensorService.speedFilter.gpsStream.subscribeOn(scheduler)?.subscribe ({
-            if (sensorService.locationSensorService.speedFilter.collectionEnabled) {
+        val scheduler: Scheduler = if (speedFilter.rxScheduler != null) speedFilter.rxScheduler!! else Schedulers.io()
+        speedFilter.gpsStream.subscribeOn(scheduler)?.subscribe ({
+            if (speedFilter.collectionEnabled) {
                 val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),
                         it.longitude.toDouble(),
                         it.accuracy,

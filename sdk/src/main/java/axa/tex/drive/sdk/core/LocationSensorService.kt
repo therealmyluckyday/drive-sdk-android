@@ -17,11 +17,11 @@ import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 class LocationSensorService: LocationListener, KoinComponentCallbacks {
-    private lateinit var context: Context
-    public val locationManager: LocationManager
+    val locationManager: LocationManager
     internal val speedFilter: SpeedFilter by inject()
-    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     internal val locations: PublishSubject<Location> = PublishSubject.create()
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+    private var context: Context
 
     constructor(context: Context, scheduler: Scheduler) {
         this.context = context
@@ -61,11 +61,9 @@ class LocationSensorService: LocationListener, KoinComponentCallbacks {
         print("trip location changed \n")
         //LOGGER.info("\"Location ", "onLocationChanged")
         val texLocation = TexLocation(location.latitude.toFloat(), location.longitude.toFloat(), location.accuracy, location.speed, location.bearing, location.altitude.toFloat(), location.time)
-
         speedFilter.gpsStream.onNext(texLocation)
         speedFilter.locations.onNext(location)
         locations.onNext(location)
-
     }
     //LocationListener,
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
