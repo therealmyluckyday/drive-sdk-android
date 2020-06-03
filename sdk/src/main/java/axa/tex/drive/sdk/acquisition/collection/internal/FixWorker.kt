@@ -44,7 +44,7 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
             else -> platform = Platform.PRODUCTION
         }
         val data = inputData.getString(Constants.DATA_KEY) ?: ""
-        LOGGER.info("COLLECTOR_WORKER SIZE :$inputData.keyValueMap.size.toString()", "private fun sendFixes(inputData : Data) : Boolean")
+        LOGGER.info("COLLECTOR_WORKER SIZE :$inputData.keyValueMap.size", "private fun sendFixes(inputData : Data) : Boolean")
         return sendData(data, appName, platform)
     }
 
