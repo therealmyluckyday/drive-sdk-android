@@ -3,16 +3,12 @@ package axa.tex.drive.sdk.core
 import android.content.Context
 import android.location.Location
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Scheduler
 
-interface SensorService {
 
-}
-
-class SensorServiceImpl: TexActivityTracker, KoinComponentCallbacks {
+class SensorServiceImpl: SensorService {
     internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private var context: Context
     private var locationSensorService: LocationSensorService
@@ -28,7 +24,7 @@ class SensorServiceImpl: TexActivityTracker, KoinComponentCallbacks {
         locationSensorService.onLocationChanged(location)
     }
 
-    fun speedFilter() : SpeedFilter {
+    override fun speedFilter() : SpeedFilter {
         return this.locationSensorService.speedFilter
     }
 
