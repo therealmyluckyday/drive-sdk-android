@@ -8,17 +8,21 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Observer
-import androidx.work.WorkManager
+import androidx.core.content.FileProvider
 import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
-import io.reactivex.schedulers.Schedulers
+import axa.tex.drive.sdk.core.tools.FileManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
+import java.io.IOException
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -122,6 +126,19 @@ class MainActivity : AppCompatActivity() {
         return channelId
     }
 
+
+    private fun shareLogsFile() {
+        val tripLogFileName = "trip_location_test.csv"
+        val uri = FileManager.getUriFromFilename(this, this.packageName, tripLogFileName)
+        val logFile: File? = FileManager.getLogFile(applicationContext, tripLogFileName)
+
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.type = "*/*"
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+        //shareIntent.putExtra(Intent.EXTRA_TEXT, message)
+        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(shareIntent, "Choose a destination"))
+    }
 
     private fun startService() {
             var notification : Notification? = null

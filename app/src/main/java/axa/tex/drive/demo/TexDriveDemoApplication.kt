@@ -11,16 +11,13 @@ import android.os.Environment
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.content.FileProvider
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.TripId
-import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
-import axa.tex.drive.sdk.core.Platform
-import axa.tex.drive.sdk.core.SensorService
-import axa.tex.drive.sdk.core.TexConfig
-import axa.tex.drive.sdk.core.TexService
+import axa.tex.drive.sdk.core.*
+import axa.tex.drive.sdk.core.tools.FileManager
+import axa.tex.drive.sdk.core.tools.FileManager.Companion.getLogFile
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import java.io.*
 import java.util.*
 import kotlin.concurrent.schedule
@@ -31,8 +28,10 @@ class TexDriveDemoApplication : Application() {
     private val ID = 1234
     // Trip recorder
     private var oldLocation: Location? = null
-    private val tripLogFileName = "axa-dil-tex-trip-1.csv"
+    private val tripLogFileName = "trip_location_test.csv"
     var sensorService: SensorService? = null
+
+    val logFileName = "axa-dil-tex.txt"
 
     val rxScheduler = Schedulers.single()
     private var myTripId : TripId? = null
@@ -50,9 +49,9 @@ class TexDriveDemoApplication : Application() {
         if (!tripRecorder.isRecording()) {
             notifyStart("Start trip : ${myTripId.value}", 7)
             saveTripForScore(myTripId.value)
-            log( "=====================================================================\n")
-            log( "New trip at ${Date().toString()}\n")
-            log( "${Date().toString()}Trip Id =  at $myTripId\n")
+            FileManager.log( "=====================================================================\n", logFileName, applicationContext)
+            FileManager.log( "New trip at ${Date().toString()}\n", logFileName, applicationContext)
+            FileManager.log( "${Date().toString()}Trip Id =  at $myTripId\n", logFileName, applicationContext)
         }
     }
 
@@ -60,14 +59,14 @@ class TexDriveDemoApplication : Application() {
         val tripRecorder = tripRecorder ?: return
         if (tripRecorder.isRecording()) {
             notifyStart("End of trip :", 8)
-            log( "Enf of trip at ${Date().toString()}\n")
-            log( "=====================================================================\n")
+            FileManager.log( "Enf of trip at ${Date().toString()}\n", logFileName, applicationContext)
+            FileManager.log( "=====================================================================\n", logFileName, applicationContext)
 
         }
     }
 
     fun configure() {
-        sensorService = SensorService(applicationContext, rxScheduler)
+        sensorService = SensorServiceImpl(applicationContext, rxScheduler)
         val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000",sensorService!!, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
         config = newConfig
         val newService = TexService.configure(newConfig)
@@ -75,7 +74,7 @@ class TexDriveDemoApplication : Application() {
         val autoModeHandler = newService.automodeHandler()
 
         newService.logStream().subscribeOn(Schedulers.io()).subscribe({ it ->
-            log( "[" + it.file + "][" + it.function + "]" + it.description + "\n")
+            FileManager.log( "[" + it.file + "][" + it.function + "]" + it.description + "\n", logFileName, applicationContext)
             Thread{
                 println("["+it.file +"]["+ it.function + "]"+ it.description )
             }.start()
@@ -91,8 +90,8 @@ class TexDriveDemoApplication : Application() {
 
             oldLocation = it.location
             // Save trip for reuse
-            //saveLocation(it.location, timeDelay)
-            //log("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]\n")
+            saveLocation(it.location, timeDelay)
+            FileManager.log("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]\n", logFileName, applicationContext)
             Thread{
                 println("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]")
             }.start()
@@ -104,49 +103,50 @@ class TexDriveDemoApplication : Application() {
             Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
         }
         // Show all log text
-        //updateLogsText()
+        updateLogsText()
 
         // Delete log file
-        //deleteLogsFile()
+        //FileManager.getLogFile(applicationContext, logFileName)
 
         // Delete Trip Log file
-        //deleteLogsFile(tripLogFileName)
+        //FileManager.getLogFile(applicationContext, tripLogFileName)
 
         // Launch recorded trip
         Timer("SettingUp", false).schedule(10000) {
-            //loadTrip(sensorService!!.speedFilter())
+            loadTrip()
         }
-    }
 
+    }
     fun saveLocation(location: Location, delay:Long) {
         var message = "${location.latitude},${location.longitude},${location.accuracy},${location.speed},${location.bearing},${location.altitude},${delay}\n"
         println(message)
-        log(message, tripLogFileName)
+        FileManager.log(message, tripLogFileName, applicationContext)
     }
 
 
 
     fun loadTrip() {
-        println("loadTrip")
-        val logFile: File? = this.getLogFile(applicationContext, tripLogFileName)
-        if (logFile !== null && logFile.exists()) {
-            Thread {
-                var newTime = System.currentTimeMillis() - 86400000
-                try {
-                    val bufferedReader = BufferedReader(FileReader(logFile))
-                    var lineIndex = 0
-                    var line = bufferedReader.readLine()
-                    while (line != null) {
-                        newTime = sendLocationLineStringToSpeedFilter(line, newTime)
-                        line = bufferedReader.readLine()
-                        lineIndex++
+            println("loadTrip")
+            val logFile: File? = getLogFile(applicationContext, tripLogFileName)
+            if (logFile !== null && logFile.exists()) {
+                Thread {
+                    var newTime = System.currentTimeMillis() - 86400000
+                    try {
+                        val bufferedReader = BufferedReader(FileReader(logFile))
+                        var lineIndex = 0
+                        var line = bufferedReader.readLine()
+                        while (line != null) {
+                            //println(line)
+                            //newTime = sendLocationLineStringToSpeedFilter(line, newTime)
+                            line = bufferedReader.readLine()
+                            lineIndex++
+                        }
+                        bufferedReader.close()
+                    } catch (e: IOException) {
+                        //You'll need to add proper error handling here
                     }
-                    bufferedReader.close()
-                } catch (e: IOException) {
-                    //You'll need to add proper error handling here
-                }
-            }.start()
-        }
+                }.start()
+            }
     }
 
     private fun sendLocationLineStringToSpeedFilter(line: String, time: Long) : Long {
@@ -168,7 +168,7 @@ class TexDriveDemoApplication : Application() {
         newLocation.time = time + delay
         //if (speed > 0) {
             //println("sendLocationLineStringToSpeedFilter"+newLocation.latitude+" "+newLocation.longitude+" "+newLocation.accuracy+" "+newLocation.speed+" "+newLocation.bearing+ " "+newLocation.altitude+" "+newLocation.time)
-            this.sensorService!!.forceLocationChanged(newLocation)
+            //this.sensorService!!.forceLocationChanged(newLocation)
             Thread.sleep(100L)
         //}
         return newLocation.time
@@ -183,60 +183,13 @@ class TexDriveDemoApplication : Application() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
-    private fun log(data: String, fileName:String = "axa-dil-tex.txt") {
-        try {
-            val rootPath = applicationContext.getExternalFilesDir("AUTOMODE")
-            val root = File(rootPath!!.toURI())
-            if (!root.exists()) {
-                root.mkdirs()
-            }
-            val f = File(rootPath.path + "/" + fileName)
-            if (!f.exists()) {
-                try {
-                    f.createNewFile()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-            try {
-                val out = FileOutputStream(f, true)
-                out.write(data.toByteArray())
-                out.flush()
-                out.close()
-            } catch (e: FileNotFoundException) {
-                e.printStackTrace()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-    }
-    private fun isExternalStorageWritable(): Boolean {
-        val state = Environment.getExternalStorageState()
-        return if (Environment.MEDIA_MOUNTED == state) {
-            true
-        } else false
-    }
 
-    private fun deleteLogsFile(fileName:String = "axa-dil-tex.txt") {
-        val file: File = getLogFile(applicationContext!!, fileName)!!
-        if (file.exists()) {
-            file.delete()
-        }
-    }
 
-    private fun getLogFile(context: Context, fileName: String = "axa-dil-tex.txt"): File? {
-        var logDirectory = if (isExternalStorageWritable()) {
-            context.getExternalFilesDir(null)
-        } else {
-            context.filesDir
-        }
-        return File(logDirectory!!.absolutePath + "/AUTOMODE", fileName)
-    }
+
+
 
     private fun updateLogsText() {
-        val logFile: File? = this.getLogFile(applicationContext)
+        val logFile: File? = getLogFile(applicationContext, logFileName)
         if (logFile !== null && logFile.exists()) {
             val queue: LinkedHashMap<Int, String?> = LinkedHashMap(500)
             try {
@@ -264,23 +217,8 @@ class TexDriveDemoApplication : Application() {
 
 
     fun saveTripForScore(tripId : String){
-        try {
-            val rootPath = applicationContext!!.getExternalFilesDir("AUTOMODE")!!
-            val root = File(rootPath.toURI())
-            if (!root.exists()) {
-                root.mkdirs()
-            }
-            val f = File(rootPath.path + "/trips.txt")
-            if (!f.exists()) {
-                f.createNewFile()
-            }
-            val out = FileOutputStream(f, true)
-            out.write("$tripId\n".toByteArray())
-            out.flush()
-            out.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val tripFileName = "trips.txt"
+        FileManager.log("$tripId\n", tripFileName, applicationContext)
     }
 
 

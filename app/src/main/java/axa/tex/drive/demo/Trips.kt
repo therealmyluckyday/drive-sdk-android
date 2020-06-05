@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import axa.tex.drive.sdk.core.tools.FileManager
 import com.example.android.recyclerview.TripAdapter
 import java.io.File
 
@@ -43,19 +44,13 @@ class Trips : AppCompatActivity() {
     }
 
 
-    fun  getTripsForScore(): String{
-        try {
-            val rootPath = applicationContext!!.getExternalFilesDir("AUTOMODE")!!
-            val root = File(rootPath.toURI())
-            if (!root.exists()) {
-                root.mkdirs()
-            }
-            val f = File(rootPath.path + "/trips.txt")
-            return  f.readText()
-
-        } catch (e: Exception) {
-            e.printStackTrace()
+    fun  getTripsForScore(): String {
+        val tripFileName = "trips.txt"
+        val fileTrips = FileManager.getLogFile(applicationContext, tripFileName)
+        return if (fileTrips != null) {
+            fileTrips.readText()
+        } else {
+            ""
         }
-        return ""
     }
 }
