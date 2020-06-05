@@ -15,9 +15,7 @@ import axa.tex.drive.sdk.acquisition.TripProgress
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
 import axa.tex.drive.sdk.automode.internal.Automode
-import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import axa.tex.drive.sdk.core.SensorService
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory

@@ -19,7 +19,6 @@ import org.koin.android.ext.android.inject
 class LocationSensorService: LocationListener, KoinComponentCallbacks {
     val locationManager: LocationManager
     internal val speedFilter: SpeedFilter by inject()
-    internal val locations: PublishSubject<Location> = PublishSubject.create()
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private var context: Context
 
@@ -58,12 +57,11 @@ class LocationSensorService: LocationListener, KoinComponentCallbacks {
 
     // LocationListener,
     override fun onLocationChanged(location: Location) {
-        print("trip location changed \n")
+        //  mc hdf fprint("trip location changed \n")
         //LOGGER.info("\"Location ", "onLocationChanged")
         val texLocation = TexLocation(location.latitude.toFloat(), location.longitude.toFloat(), location.accuracy, location.speed, location.bearing, location.altitude.toFloat(), location.time)
         speedFilter.gpsStream.onNext(texLocation)
         speedFilter.locations.onNext(location)
-        locations.onNext(location)
     }
     //LocationListener,
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {

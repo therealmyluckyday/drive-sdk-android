@@ -6,7 +6,6 @@ import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.SPEED_MOVEMENT_THRESHOLD
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.google.android.gms.location.DetectedActivity
@@ -31,7 +30,7 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
 
     override fun next() {
         LOGGER.info("\"Tracking Activity state ACTIVATE", "next")
-        val tracker = automode.activityTracker
+        val tracker = automode.sensorService
         //automode.activityTracker.passivelyScanSpeed()
         val testing = automode.isSimulateDriving
         if (testing) {

@@ -3,11 +3,11 @@ package axa.tex.drive.sdk.automode.tracker
 import android.app.Activity
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
+import axa.tex.drive.sdk.core.SensorService
 import org.koin.android.ext.android.inject
 
-abstract class FakeTracker : TexActivityTracker, KoinComponentCallbacks {
+open class FakeTracker : SensorService, KoinComponentCallbacks {
     private val activities = mutableListOf<Activity>()
     private val speeds = mutableListOf<TexLocation>()
     var stopScanning = false
@@ -40,6 +40,10 @@ abstract class FakeTracker : TexActivityTracker, KoinComponentCallbacks {
     Fake Classe
     // this is a Fake method
     */
+    }
+
+    override fun speedFilter(): SpeedFilter {
+        return filterer
     }
 
     override fun checkWhereAmI() {

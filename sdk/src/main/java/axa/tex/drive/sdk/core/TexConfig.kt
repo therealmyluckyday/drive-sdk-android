@@ -19,9 +19,7 @@ import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
-import axa.tex.drive.sdk.automode.internal.tracker.AutoModeTracker
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.automode.internal.tracker.TexActivityTracker
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
@@ -48,9 +46,8 @@ class TexConfig {
         internal fun setupKoin(context: Context, scheduler: Scheduler = Schedulers.single(), sensorService: SensorService) {
             val myModule = module {
                 single { SpeedFilter() }
-                single { AutoModeTracker(context, sensorService, scheduler) as TexActivityTracker }
                 single { AutomodeHandler() }
-                single { Automode(get(), scheduler) }
+                single { Automode(sensorService, scheduler) }
                 single { TripManager() }
                 single { ScoreRetriever(context ) }
                 single { CollectionDb(context) }
@@ -63,19 +60,19 @@ class TexConfig {
                                     sensorService,
                                     sensorService.speedFilter(),
                                     context,
-                                    config?.locationTrackerEnabled!!)
+                                    if (config!=null) {config!!.locationTrackerEnabled} else {false})
                     )}
                 single {
                     BatteryTracker(
                             BatterySensor(
                             context,
-                            config?.batteryTrackerEnabled!!)
+                                    if (config!=null) {config!!.batteryTrackerEnabled} else {false} )
                     )}
                 single {
                     MotionTracker(
                             MotionSensor(
                             context,
-                            config?.motionTrackerEnabled!!)
+                                    if (config!=null) {config!!.motionTrackerEnabled} else {false})
                     )}
                 single {
                     Collector(context,
@@ -98,11 +95,10 @@ class TexConfig {
 
         fun loadAutoModeModule(context: Context) {
             val scheduler = Schedulers.single()
-            val sensorService = SensorService(context, scheduler)
+            val sensorService = SensorServiceImpl(context, scheduler)
             val myModule = module {
                 single { AutomodeHandler() }
                 single { SpeedFilter() }
-                single { AutoModeTracker(context, sensorService, scheduler) as TexActivityTracker }
                 single { Automode(get(), scheduler) }
             }
 
@@ -165,7 +161,7 @@ class TexConfig {
             TexConfig.user = user
             this.clientId = clientId
             this.scheduler = rxScheduler
-            this.sensorService = SensorService(context, rxScheduler)
+            this.sensorService = SensorServiceImpl(context, rxScheduler)
         }
 
         constructor(context: Context, appName: String, clientId: String, sensor: SensorService, rxScheduler: Scheduler = Schedulers.single()) {
@@ -183,7 +179,7 @@ class TexConfig {
             this.appName = appName
             this.clientId = clientId
             this.scheduler = rxScheduler
-            this.sensorService = SensorService(context, rxScheduler)
+            this.sensorService = SensorServiceImpl(context, rxScheduler)
         }
 
         fun build(): TexConfig {
@@ -205,7 +201,7 @@ class TexConfig {
             LOGGER.info("Create koin module", "build")
 
             context?.let {
-                val sensorService = SensorService(it, scheduler)
+                val sensorService = SensorServiceImpl(it, scheduler)
                 setupKoin(it, scheduler, sensorService)
             }
 

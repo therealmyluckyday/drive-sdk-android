@@ -1,6 +1,5 @@
 package axa.tex.drive.sdk.automode.internal.states
 
-import android.app.Activity
 import android.os.Handler
 import android.os.Looper
 import axa.tex.drive.sdk.automode.AutomodeHandler
@@ -104,7 +103,7 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
             LOGGER.info(" $message", function = "stop")
             automodeHandler.state.onNext(false)
             automode.getCurrentState().disable(false)
-            automode.activityTracker.stopSpeedScanning()
+            automode.sensorService.stopSpeedScanning()
 
 
             LOGGER.info("\"Driving state End", "stop")
