@@ -14,8 +14,7 @@ import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.states.DrivingState
-import axa.tex.drive.sdk.core.SensorService
-import axa.tex.drive.sdk.core.SensorServiceImpl
+import axa.tex.drive.sdk.acquisition.SensorServiceImpl
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.schedulers.Schedulers

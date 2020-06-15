@@ -8,21 +8,16 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.FileProvider
 import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.core.tools.FileManager
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
-import java.io.IOException
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -104,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             print(throwable)
         })
 
-        autoModeHandler?.speedListener?.gpsStream?.subscribe({
+        service?.getSensorService()!!.speedFilter()?.gpsStream?.subscribe({
             speedView.speedTo(it.speed*3.6f, 50)
         }, {throwable ->
             print(throwable)

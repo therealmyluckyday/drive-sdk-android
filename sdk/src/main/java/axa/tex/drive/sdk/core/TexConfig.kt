@@ -3,6 +3,8 @@ package axa.tex.drive.sdk.core
 
 import android.content.Context
 import axa.tex.drive.sdk.R
+import axa.tex.drive.sdk.acquisition.SensorService
+import axa.tex.drive.sdk.acquisition.SensorServiceImpl
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.collection.internal.Collector
@@ -30,12 +32,12 @@ import io.reactivex.schedulers.Schedulers
 import org.koin.core.context.startKoin
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import java.util.concurrent.Executors
 
 class TexConfig {
 
     internal var context: Context? = null
     var texSDKRXScheduler: Scheduler? = null
+    var sensorService: SensorService? = null
 
     internal companion object {
         var config: Config? = null
@@ -44,6 +46,7 @@ class TexConfig {
         private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
         
         internal fun setupKoin(context: Context, scheduler: Scheduler = Schedulers.single(), sensorService: SensorService) {
+
             val myModule = module {
                 single { SpeedFilter() }
                 single { AutomodeHandler() }
@@ -81,7 +84,7 @@ class TexConfig {
                             get<BatteryTracker>()),
                             scheduler
                     ) }
-                single { TripRecorderImpl(context, scheduler) as TripRecorder } bind TripRecorder::class
+                single { TripRecorderImpl(context, sensorService, scheduler) as TripRecorder } bind TripRecorder::class
             }
             try {
                 startKoin {
@@ -201,14 +204,14 @@ class TexConfig {
             LOGGER.info("Create koin module", "build")
 
             context?.let {
-                val sensorService = SensorServiceImpl(it, scheduler)
-                setupKoin(it, scheduler, sensorService)
+                setupKoin(it, scheduler, this.sensorService!!)
             }
 
             LOGGER.info("Done building configuration", "build")
             val texconfig = TexConfig(context)
             TexConfig.config = config
             texconfig.texSDKRXScheduler = scheduler
+            texconfig.sensorService = this.sensorService
             return texconfig
         }
 

@@ -1,11 +1,9 @@
-package axa.tex.drive.sdk
+package axa.tex.drive.sdk.acquisition
 
 import android.content.Context
 import android.location.Location
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.core.ActivityRecognitionService
-import axa.tex.drive.sdk.core.LocationSensorService
-import axa.tex.drive.sdk.core.SensorService
+import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import io.reactivex.Scheduler
 
 class SensorServiceFake : SensorService {
@@ -15,7 +13,9 @@ class SensorServiceFake : SensorService {
     }
 
     fun forceLocationChanged(location: Location) {
-        //locationSensorService.onLocationChanged(location)
+        val texLocation = TexLocation(location.latitude.toFloat(), location.longitude.toFloat(), location.accuracy, location.speed, location.bearing, location.altitude.toFloat(), location.time)
+        speedFilter.gpsStream.onNext(texLocation)
+        speedFilter.locations.onNext(location)
     }
 
     override fun speedFilter() : SpeedFilter {
@@ -35,5 +35,9 @@ class SensorServiceFake : SensorService {
     }
 
     override fun stopActivityScanning() {
+    }
+
+    override fun requestForLocationPermission() {
+
     }
 }

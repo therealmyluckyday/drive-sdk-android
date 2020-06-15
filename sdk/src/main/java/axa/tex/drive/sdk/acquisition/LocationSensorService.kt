@@ -1,4 +1,4 @@
-package axa.tex.drive.sdk.core
+package axa.tex.drive.sdk.acquisition
 
 import android.Manifest
 import android.content.Context
@@ -13,7 +13,6 @@ import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Scheduler
-import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 class LocationSensorService: LocationListener, KoinComponentCallbacks {

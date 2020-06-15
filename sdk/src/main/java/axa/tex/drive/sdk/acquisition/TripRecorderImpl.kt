@@ -40,6 +40,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private var mConfig: Config? = null
     private var start : Long  = 0
     private var disposable : Disposable
+    private val sensorService: SensorService
     private val tripProgress = PublishSubject.create<TripProgress>()
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
     override fun setCustomNotification(notification: Notification?) {
@@ -50,10 +51,10 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
         return fixProcessor.currentTripChunk?.tripInfos?.tripId
     }
 
-    constructor(context: Context, scheduler: Scheduler) {
+    constructor(context: Context, sensorService:SensorService, scheduler: Scheduler) {
         this.context = context
-
-        disposable = automodeHandler.speedListener.locations.subscribe({
+        this.sensorService = sensorService
+        disposable = sensorService.speedFilter().locations.subscribe({
             if (start > 0) {
                 var deltaDistance = 0.0
                 if (mCurrentLocation != null) { // this is not the first point GPS received
@@ -69,30 +70,11 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             }
         }, {throwable ->
             print(throwable)
-            logger.error("TripRecorderImpl  error"+throwable, "automodeHandler.speedListener.locations")
+            logger.error("TripRecorderImpl  error"+throwable, "speedFilter.locations")
         })
     }
 
-    @Throws(PermissionException::class)
-    private fun requestForLocationPermission() {
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                val exception = PermissionException("need permission.ACCESS_FINE_LOCATION")
-                throw exception
-            }
-
-            if (context.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                val exception = PermissionException("need permission.ACCESS_COARSE_LOCATION")
-                throw exception
-            }
-
-            if ((Build.VERSION.SDK_INT >= 29) && (context.checkSelfPermission(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-                    val exception = PermissionException("need permission.ACCESS_BACKGROUND_LOCATION")
-                    throw exception
-            }
-        }
-    }
 
 
     override fun startTrip(startTime: Long) : TripId?{
@@ -101,7 +83,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             start = startTime
             mCurrentDistance = 0.toDouble()
             logger.info("${Date()} TripRecorder : Start tracking.", function = "startTrip")
-            requestForLocationPermission()
+            this.sensorService.requestForLocationPermission()
             val serviceIntent = Intent(context, CollectorService::class.java)
             if(myCustomNotification != null) {
                 serviceIntent.putExtra("notif", myCustomNotification)
@@ -123,7 +105,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
     override fun stopTrip(endTime: Long) {
         logger.info("TripRecorder : Stop tracking.", function = "fun stopTrip(startTime: Long) : TripId?")
-        requestForLocationPermission()
+        this.sensorService.requestForLocationPermission()
         fixProcessor.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
         context.bindService(serviceIntent, object : ServiceConnection {

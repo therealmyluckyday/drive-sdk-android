@@ -7,7 +7,7 @@ import axa.tex.drive.sdk.automode.tracker.FromIdleToInVehicleState
 import axa.tex.drive.sdk.automode.tracker.FromIdleTrackingState
 import axa.tex.drive.sdk.automode.tracker.FromDrivingToLongStop
 import axa.tex.drive.sdk.automode.internal.Automode
-import axa.tex.drive.sdk.core.SensorService
+import axa.tex.drive.sdk.acquisition.SensorService
 import io.reactivex.schedulers.Schedulers
 import org.junit.Assert
 import org.junit.Test

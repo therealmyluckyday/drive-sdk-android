@@ -4,7 +4,7 @@ import android.app.Activity
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
-import axa.tex.drive.sdk.core.SensorService
+import axa.tex.drive.sdk.acquisition.SensorService
 import org.koin.android.ext.android.inject
 
 open class FakeTracker : SensorService, KoinComponentCallbacks {

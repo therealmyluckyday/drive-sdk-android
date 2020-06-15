@@ -7,11 +7,11 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Build
-import android.os.Environment
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.content.FileProvider
+import axa.tex.drive.sdk.acquisition.SensorService
+import axa.tex.drive.sdk.acquisition.SensorServiceImpl
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.*

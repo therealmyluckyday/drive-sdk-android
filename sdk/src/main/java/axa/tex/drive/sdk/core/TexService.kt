@@ -1,5 +1,6 @@
 package axa.tex.drive.sdk.core
 
+import axa.tex.drive.sdk.acquisition.SensorService
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
@@ -30,6 +31,10 @@ class TexService : KoinComponentCallbacks {
     fun getTripRecorder(): TripRecorder {
         val tripRecorder: TripRecorder by inject()
         return tripRecorder
+    }
+
+    fun getSensorService(): SensorService? {
+        return config!!.sensorService
     }
 
     fun scoreRetriever(): ScoreRetriever {

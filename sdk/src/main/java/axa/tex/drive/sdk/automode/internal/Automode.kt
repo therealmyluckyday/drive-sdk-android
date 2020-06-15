@@ -4,7 +4,7 @@ import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.automode.internal.states.AutomodeState
 import axa.tex.drive.sdk.automode.internal.states.IdleState
-import axa.tex.drive.sdk.core.SensorService
+import axa.tex.drive.sdk.acquisition.SensorService
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Scheduler
 import org.koin.android.ext.android.inject

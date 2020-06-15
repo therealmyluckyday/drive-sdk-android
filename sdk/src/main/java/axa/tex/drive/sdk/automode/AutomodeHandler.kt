@@ -13,7 +13,6 @@ import org.koin.android.ext.android.inject
 class AutomodeHandler : KoinComponentCallbacks {
     val state: PublishSubject<Boolean> = PublishSubject.create()
     var running = false
-    val speedListener: SpeedFilter by inject()
 
     internal constructor()
 
