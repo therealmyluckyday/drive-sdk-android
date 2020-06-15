@@ -6,10 +6,14 @@ import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import io.reactivex.Scheduler
 
-class SensorServiceFake : SensorService {
+open class SensorServiceFake : SensorService {
     private var speedFilter = SpeedFilter()
 
     constructor(context: Context, scheduler: Scheduler) {
+    }
+
+    constructor() {
+
     }
 
     fun forceLocationChanged(location: Location) {

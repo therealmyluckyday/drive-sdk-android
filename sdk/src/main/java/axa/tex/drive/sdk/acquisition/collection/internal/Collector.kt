@@ -75,7 +75,7 @@ internal class Collector : KoinComponentCallbacks {
     }
 
     fun stopCollecting() {
-        fixData?.unsubscribeOn(Schedulers.computation())
+        fixData?.unsubscribeOn(rxScheduler)
         if (trackers != null) {
             for (tracker in trackers) {
                 tracker.disableTracking()

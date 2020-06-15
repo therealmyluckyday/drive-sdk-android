@@ -14,9 +14,10 @@ import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
+import axa.tex.drive.sdk.core.logger.LogType
 import axa.tex.drive.sdk.core.tools.FileManager
 import io.reactivex.schedulers.Schedulers
-import junit.framework.Assert.fail
+import junit.framework.Assert.*
 import org.junit.Test
 import java.io.*
 import java.util.*
@@ -40,38 +41,40 @@ class TextInstrumented2Test  {
 
         val context = ApplicationProvider.getApplicationContext<Context>()
         sensorService = SensorServiceFake(context, rxScheduler)
+        assertNotNull(sensorService)
+
         config = TexConfig.Builder(context, "APP-TEST", "22910000",sensorService!!, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
+        assertNotNull(config)
 
         service = TexService.configure(config!!)
+        assertNotNull(service)
+
         service!!.logStream().subscribeOn(rxScheduler).subscribe({ it ->
-            Thread {
-                println("["+it.file +"]["+ it.function + "]"+ it.description )
-            }.start()
+            assert(it.type!= LogType.ERROR)
         })
 
-        val tripId =  service!!.getTripRecorder().startTrip(Date().time);
-        SystemClock.sleep(1000);
-        val endTrip = loadTrip(sensorService!!)
-        SystemClock.sleep(7000);
-        service!!.getTripRecorder().stopTrip(endTrip)
-        SystemClock.sleep(7000);
-        assert(true)
+        val tripId =  service!!.getTripRecorder().startTrip(Date().time)
+        assert(tripId != null)
+        SystemClock.sleep(1000)
+        val endTripTime = loadTrip(sensorService!!)
+        SystemClock.sleep(7000)
+        service!!.getTripRecorder().stopTrip(endTripTime)
+        SystemClock.sleep(7000)
     }
 
     fun loadTrip(sensorService: SensorServiceFake): Long {
-        println("loadTrip")
         val inputStream: InputStream = InstrumentationRegistry.getInstrumentation().getContext().getAssets().open(tripLogFileName)
-        println(inputStream)
         assert(inputStream!=null)
-        var newTime = System.currentTimeMillis() - 86400000
-        val context = ApplicationProvider.getApplicationContext<Context>()
+        val noTime: Long = 0
+        var newTime: Long = noTime
         if (inputStream !== null ) {
             Thread {
-
                 try {
                     val bufferedReader = inputStream.bufferedReader()
                     var lineIndex = 0
                     var line = bufferedReader.readLine()
+                    newTime = System.currentTimeMillis() - 86400000
+                    assertNotNull(line)
                     while (line != null) {
                         newTime = sendLocationLineStringToSpeedFilter(line, newTime, sensorService)
                         line = bufferedReader.readLine()
@@ -79,13 +82,13 @@ class TextInstrumented2Test  {
                     }
                     bufferedReader.close()
                 } catch (e: IOException) {
-                    //You'll need to add proper error handling here
                     fail("Fail : "+e);
                 }
             }.start()
         } else {
             fail("File not found")
         }
+        assertFalse(newTime == noTime)
         return newTime
     }
     private fun sendLocationLineStringToSpeedFilter(line: String, time: Long, sensorService: SensorServiceFake) : Long {
@@ -102,14 +105,10 @@ class TextInstrumented2Test  {
         val bearing = locationDetails[4].toFloat()
         newLocation.bearing = bearing
         val altitude = locationDetails[5].toDouble()
-        newLocation.altitude =altitude
+        newLocation.altitude = altitude
         val delay = locationDetails[6].toLong()
-        newLocation.time = time + delay
-        //if (speed > 0) {
-        //println("sendLocationLineStringToSpeedFilter"+newLocation.latitude+" "+newLocation.longitude+" "+newLocation.accuracy+" "+newLocation.speed+" "+newLocation.bearing+ " "+newLocation.altitude+" "+newLocation.time)
+        newLocation.time = 1 + time
         sensorService.forceLocationChanged(newLocation)
-        //Thread.sleep(100L)
-        //}
         return newLocation.time
     }
 

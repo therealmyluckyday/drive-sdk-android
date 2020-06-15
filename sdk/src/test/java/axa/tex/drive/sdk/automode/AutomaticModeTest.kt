@@ -2,12 +2,9 @@ package axa.tex.drive.sdk.automode
 
 
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.automode.tracker.FromIdleDrivingState
-import axa.tex.drive.sdk.automode.tracker.FromIdleToInVehicleState
-import axa.tex.drive.sdk.automode.tracker.FromIdleTrackingState
-import axa.tex.drive.sdk.automode.tracker.FromDrivingToLongStop
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.acquisition.SensorService
+import axa.tex.drive.sdk.acquisition.SensorServiceFake
 import io.reactivex.schedulers.Schedulers
 import org.junit.Assert
 import org.junit.Test
@@ -25,7 +22,7 @@ class AutomaticModeTest : KoinTest {
         val myModule = module {
             single { SpeedFilter() }
             single { AutomodeHandler() }
-            single { FromIdleToInVehicleState() as SensorService }
+            single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
@@ -42,7 +39,7 @@ class AutomaticModeTest : KoinTest {
         val myModule = module{
             single { SpeedFilter() }
             single { AutomodeHandler() }
-            single { FromIdleTrackingState() as SensorService }
+            single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
@@ -60,7 +57,7 @@ class AutomaticModeTest : KoinTest {
         val idleToDrivingModule = module {
             single { SpeedFilter() }
             single { AutomodeHandler() }
-            single { FromIdleDrivingState() as SensorService }
+            single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
@@ -78,7 +75,7 @@ class AutomaticModeTest : KoinTest {
         val drivingToIdleAfterNoGps = module {
             single { SpeedFilter() }
             single { AutomodeHandler() }
-            single { FromIdleDrivingState() as SensorService }
+            single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
         startKoin {
@@ -96,7 +93,7 @@ class AutomaticModeTest : KoinTest {
     fun testFromDrivingToIdleAfterLongStop() {
         val idleToDrivingModule =  module {
             single { SpeedFilter() }
-            single { FromDrivingToLongStop() as SensorService }
+            single { SensorServiceFake()     as SensorService }
             single { AutomodeHandler() }
             single { Automode(get(), Schedulers.single()) }
         }
