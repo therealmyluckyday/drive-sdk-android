@@ -1,4 +1,4 @@
-package axa.tex.drive.sdk.automode.internal.states
+    package axa.tex.drive.sdk.automode.internal.states
 
 import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
@@ -11,15 +11,16 @@ import io.reactivex.disposables.Disposable
 import org.koin.android.ext.android.inject
 import java.util.*
 
-internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
+internal class InVehicleState : AutoModeDetectionState {
 
     private var automode: Automode
-    private val filterer: SpeedFilter by inject()
+    private val filterer: SpeedFilter
     private var disabled = false
     internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     constructor(automode: Automode) {
         this.automode = automode
+        this.filterer = automode.getSpeedFilter()
         LOGGER.info("InVehicleState", "Constructor")
     }
 
@@ -51,22 +52,13 @@ internal class InVehicleState : AutomodeState, KoinComponentCallbacks {
     }
 
     fun goNext() {
-
-        if (!automode.states.containsKey(AutomodeHandler.State.DRIVING)) {
-            automode.setCurrentState(DrivingState(automode))
-        } else {
-            val drivingState = automode.states[AutomodeHandler.State.DRIVING]
-            drivingState?.let { automode.setCurrentState(it) }
-        }
+        automode.setCurrentState(DrivingState(automode))
         LOGGER.info("In vehicule state next", "next")
         this@InVehicleState.disable(true)
         automode.getCurrentState().disable(false)
         automode.next()
     }
 
-    override fun state(): AutomodeHandler.State {
-        return AutomodeHandler.State.IN_VEHICLE
-    }
 
     override fun disable(disabled: Boolean) {
         this.disabled = disabled

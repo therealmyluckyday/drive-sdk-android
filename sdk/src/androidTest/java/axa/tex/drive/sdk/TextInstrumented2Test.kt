@@ -68,23 +68,21 @@ class TextInstrumented2Test  {
         val noTime: Long = 0
         var newTime: Long = noTime
         if (inputStream !== null ) {
-            Thread {
-                try {
-                    val bufferedReader = inputStream.bufferedReader()
-                    var lineIndex = 0
-                    var line = bufferedReader.readLine()
-                    newTime = System.currentTimeMillis() - 86400000
-                    assertNotNull(line)
-                    while (line != null) {
-                        newTime = sendLocationLineStringToSpeedFilter(line, newTime, sensorService)
-                        line = bufferedReader.readLine()
-                        lineIndex++
-                    }
-                    bufferedReader.close()
-                } catch (e: IOException) {
-                    fail("Fail : "+e);
+            try {
+                val bufferedReader = inputStream.bufferedReader()
+                var lineIndex = 0
+                var line = bufferedReader.readLine()
+                newTime = System.currentTimeMillis() - 86400000
+                assertNotNull(line)
+                while (line != null) {
+                    newTime = sendLocationLineStringToSpeedFilter(line, newTime, sensorService)
+                    line = bufferedReader.readLine()
+                    lineIndex++
                 }
-            }.start()
+                bufferedReader.close()
+            } catch (e: IOException) {
+                fail("Fail : "+e);
+            }
         } else {
             fail("File not found")
         }

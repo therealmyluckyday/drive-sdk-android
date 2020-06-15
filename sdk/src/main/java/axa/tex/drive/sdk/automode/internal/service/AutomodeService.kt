@@ -15,6 +15,7 @@ import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.states.DrivingState
 import axa.tex.drive.sdk.acquisition.SensorServiceImpl
+import axa.tex.drive.sdk.automode.internal.states.IdleState
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.schedulers.Schedulers
@@ -26,7 +27,6 @@ import kotlin.concurrent.schedule
 private const val NOTIFICATION_ID = 7071
 
 internal class AutomodeService : Service() {
-    private var automodeHandler: AutomodeHandler? = null
     private val binder = LocalBinder()
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
@@ -76,9 +76,6 @@ internal class AutomodeService : Service() {
             }
             this.startForeground(NOTIFICATION_ID, notification)
         }
-        val automodeHandler : AutomodeHandler by inject()
-        this.automodeHandler = automodeHandler
-        this.automodeHandler!!.running = true
 
         activateAutomode(isSimulatedDriving, isForeground)
         return START_STICKY
@@ -97,6 +94,7 @@ internal class AutomodeService : Service() {
             }
 
             val automode: Automode by inject()
+            automode.running = true
             val tripRecorder: TripRecorder by inject()
             if (tripRecorder.isRecording()) {
                 LOGGER.info("tripRecorder.isRecording", function = "activateAutomode")
@@ -125,13 +123,8 @@ internal class AutomodeService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         val automode: Automode by inject()
-        if (automode.getCurrentState().state() != AutomodeHandler.State.IDLE) {
-            val idleState = automode.states[AutomodeHandler.State.IDLE]
-            idleState?.let {
-                it.disable(true)
-                automode.setCurrentState(it)
-            }
-        }
+        automode.goToIdleState()
+
         super.onTaskRemoved(rootIntent)
         if (!automode.isForeground) {
             stopSelf()

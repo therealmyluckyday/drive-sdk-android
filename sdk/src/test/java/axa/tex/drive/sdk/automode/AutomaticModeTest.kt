@@ -21,7 +21,6 @@ class AutomaticModeTest : KoinTest {
     fun testFromIdleToInVehicleState() {
         val myModule = module {
             single { SpeedFilter() }
-            single { AutomodeHandler() }
             single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
@@ -38,7 +37,6 @@ class AutomaticModeTest : KoinTest {
     fun testFromIdleToTrackingState() {
         val myModule = module{
             single { SpeedFilter() }
-            single { AutomodeHandler() }
             single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
@@ -56,7 +54,6 @@ class AutomaticModeTest : KoinTest {
     fun testFromIdleDriving() {
         val idleToDrivingModule = module {
             single { SpeedFilter() }
-            single { AutomodeHandler() }
             single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
@@ -74,7 +71,6 @@ class AutomaticModeTest : KoinTest {
     fun testFromDrivingToIdleAfterNoGps() {
         val drivingToIdleAfterNoGps = module {
             single { SpeedFilter() }
-            single { AutomodeHandler() }
             single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
@@ -93,8 +89,7 @@ class AutomaticModeTest : KoinTest {
     fun testFromDrivingToIdleAfterLongStop() {
         val idleToDrivingModule =  module {
             single { SpeedFilter() }
-            single { SensorServiceFake()     as SensorService }
-            single { AutomodeHandler() }
+            single { SensorServiceFake() as SensorService }
             single { Automode(get(), Schedulers.single()) }
         }
         startKoin {

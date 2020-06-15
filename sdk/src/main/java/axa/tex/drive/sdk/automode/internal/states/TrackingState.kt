@@ -6,18 +6,15 @@ import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.SPEED_MOVEMENT_THRESHOLD
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.google.android.gms.location.DetectedActivity
 import io.reactivex.disposables.Disposable
-import org.koin.android.ext.android.inject
 import java.util.*
 
 
-internal class TrackingState : AutomodeState, KoinComponentCallbacks {
+internal class TrackingState : AutoModeDetectionState {
 
-    private val filterer: SpeedFilter by inject()
-
+    private val filterer: SpeedFilter
     internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private var automode: Automode
     private var disabled = false
@@ -25,12 +22,13 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
 
     constructor(automode: Automode) {
         this.automode = automode
+        this.filterer = automode.getSpeedFilter()
         LOGGER.info( ":Tracking state", "Constructor")
     }
 
     override fun next() {
         LOGGER.info("\"Tracking Activity state ACTIVATE", "next")
-        val tracker = automode.sensorService
+        val sensorService = automode.sensorService
         //automode.activityTracker.passivelyScanSpeed()
         val testing = automode.isSimulateDriving
         if (testing) {
@@ -38,7 +36,7 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
             try {
                 val mainHandler = Handler(Looper.getMainLooper())
                 val myRunnable = Runnable() {
-                    tracker.activelyScanSpeed()
+                    sensorService.activelyScanSpeed()
                     goNext()
                 }
                 mainHandler.post(myRunnable);
@@ -46,13 +44,12 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
                 e.printStackTrace()
             }
         } else {
-
             var activitySubscription: Disposable? = null
             activitySubscription = filterer.activityStream.subscribeOn(automode.rxScheduler).filter {it.type == DetectedActivity.IN_VEHICLE }.subscribe( {
                 if (!disabled) {
                     LOGGER.info(Date().toString() + " : In "+ it.type +" according to Activity Recognition Client", function = "fun next()")
                     activitySubscription?.dispose()
-                    tracker.stopActivityScanning()
+                    sensorService.stopActivityScanning()
                     var subscription: Disposable? = null
                     subscription = filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
                             LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun next()")
@@ -61,7 +58,7 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
                         goNext()
                     }
                     //scanning speed
-                    tracker.activelyScanSpeed()
+                    sensorService.activelyScanSpeed()
                 }
             }, {throwable ->
                 print(throwable)
@@ -69,26 +66,18 @@ internal class TrackingState : AutomodeState, KoinComponentCallbacks {
             })
             //Scanning activity
             LOGGER.info("\"Tracking Activity start checking activity", "next")
-            tracker.checkWhereAmI()
+            sensorService.checkWhereAmI()
         }
     }
 
     fun goNext() {
-        if (!automode.states.containsKey(AutomodeHandler.State.IN_VEHICLE)) {
-            automode.setCurrentState(InVehicleState(automode))
-        } else {
-            val vehicleState = automode.states[AutomodeHandler.State.IN_VEHICLE]
-            vehicleState?.let { automode.setCurrentState(it) }
-        }
+        this.disable(true)
+        automode.setCurrentState(InVehicleState(automode))
         LOGGER.info("\"Tracking Activity state next", "next")
-        this@TrackingState.disable(true)
         automode.getCurrentState().disable(false)
         automode.next()
     }
 
-    override fun state(): AutomodeHandler.State {
-        return AutomodeHandler.State.TRACKING_ACTIVITY
-    }
 
     override fun disable(disabled: Boolean) {
         this.disabled = disabled

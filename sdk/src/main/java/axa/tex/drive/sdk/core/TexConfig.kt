@@ -49,7 +49,6 @@ class TexConfig {
 
             val myModule = module {
                 single { SpeedFilter() }
-                single { AutomodeHandler() }
                 single { Automode(sensorService, scheduler) }
                 single { TripManager() }
                 single { ScoreRetriever(context ) }
@@ -100,7 +99,6 @@ class TexConfig {
             val scheduler = Schedulers.single()
             val sensorService = SensorServiceImpl(context, scheduler)
             val myModule = module {
-                single { AutomodeHandler() }
                 single { SpeedFilter() }
                 single { Automode(get(), scheduler) }
             }

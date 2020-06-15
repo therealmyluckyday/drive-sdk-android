@@ -9,35 +9,9 @@ import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
-
-class AutomodeHandler : KoinComponentCallbacks {
-    val state: PublishSubject<Boolean> = PublishSubject.create()
-    var running = false
-
-    internal constructor()
-
-    internal enum class State {
-        IDLE,
-        TRACKING_ACTIVITY,
-        SCANNING_SPEED,
-        IN_VEHICLE,
-        DRIVING
-    }
-
-
-    fun activateAutomode(context: Context, isForeground: Boolean = true, isSimulatedDriving: Boolean = false) {
-        val serviceIntent = Intent(context, AutomodeService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isForeground) {
-            serviceIntent.putExtra("isForeground", isForeground)
-            serviceIntent.putExtra("isSimulatedDriving", isSimulatedDriving)
-            context.startForegroundService(serviceIntent)
-        } else {
-            context.startService(serviceIntent)
-        }
-    }
-
-    fun disableAutoMode(context: Context) {
-        val serviceIntent = Intent(context, AutomodeService::class.java)
-        context.stopService(serviceIntent)
-    }
+interface AutomodeHandler {
+    val state: PublishSubject<Boolean>
+    var running: Boolean
+    fun activateAutomode(context: Context, isForeground: Boolean = true, isSimulatedDriving: Boolean = false)
+    fun disableAutoMode(context: Context)
 }

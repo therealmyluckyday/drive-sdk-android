@@ -15,10 +15,10 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 
-internal class DrivingState : AutomodeState, KoinComponentCallbacks {
+internal class DrivingState : AutoModeDetectionState {
 
     private var automode: Automode
-    private val filterer: SpeedFilter by inject()
+    private val filterer: SpeedFilter
     private var disabled = false
     private var lastMvtTime: Long
     private var lastGpsTime: Long
@@ -28,11 +28,11 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
     private var speedWatcher: TimerTask? = null
     private var gpsWatcher: TimerTask? = null
     private var timerGPSWatcher: Timer? = null
-    private val automodeHandler: AutomodeHandler by inject()
 
 
     constructor(automode: Automode) {
         this.automode = automode
+        this.filterer = automode.getSpeedFilter()
         LOGGER.info("${Date()} DrivingState : ${Date()} Now driving...")
         lastMvtTime = System.currentTimeMillis() - 180000
         lastGpsTime = System.currentTimeMillis()
@@ -40,7 +40,6 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
 
     override fun next() {
         LOGGER.info("\"Driving state ACTIVATE", "next")
-        automodeHandler.state.onNext(true)
         lastMvtTime = System.currentTimeMillis()
         lastGpsTime = lastMvtTime
         watchSpeed()
@@ -91,17 +90,9 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
         val mainHandler = Handler(Looper.getMainLooper())
 
         val myRunnable = Runnable() {
-            dispose()
-            stopAllTimers()
-
-            if (!automode.states.containsKey(AutomodeHandler.State.IDLE)) {
-                automode.setCurrentState(IdleState(automode))
-            } else {
-                val idleState = automode.states[AutomodeHandler.State.IDLE]
-                idleState?.let { automode.setCurrentState(it) }
-            }
+            this.disable(true)
+            automode.setCurrentState(IdleState(automode))
             LOGGER.info(" $message", function = "stop")
-            automodeHandler.state.onNext(false)
             automode.getCurrentState().disable(false)
             automode.sensorService.stopSpeedScanning()
 
@@ -143,9 +134,9 @@ internal class DrivingState : AutomodeState, KoinComponentCallbacks {
 
     override fun disable(disabled: Boolean) {
         this.disabled = disabled
-    }
-
-    override fun state(): AutomodeHandler.State {
-        return AutomodeHandler.State.DRIVING
+        if (disabled) {
+            dispose()
+            stopAllTimers()
+        }
     }
 }
