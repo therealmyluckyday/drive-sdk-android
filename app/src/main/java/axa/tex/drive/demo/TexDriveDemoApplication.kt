@@ -113,7 +113,7 @@ class TexDriveDemoApplication : Application() {
 
         // Launch recorded trip
         Timer("SettingUp", false).schedule(10000) {
-            loadTrip()
+            //loadTrip()
         }
 
     }
