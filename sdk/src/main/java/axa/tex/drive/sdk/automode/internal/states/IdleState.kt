@@ -42,7 +42,7 @@ internal class IdleState : AutoModeDetectionState {
         this.disabled = disabled
     }
 
-    fun goNext() {
+    override fun goNext() {
         this.disable(true)
         automode.setCurrentState(TrackingState(automode))
         LOGGER.info("\"Idle state next", "next")

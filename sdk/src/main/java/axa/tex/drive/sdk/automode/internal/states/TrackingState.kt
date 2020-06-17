@@ -23,7 +23,7 @@ internal class TrackingState : AutoModeDetectionState {
     constructor(automode: Automode) {
         this.automode = automode
         this.filterer = automode.getSpeedFilter()
-        LOGGER.info( ":Tracking state", "Constructor")
+        LOGGER.info( ":Tracking state created", "Constructor")
     }
 
     override fun next() {
@@ -46,20 +46,23 @@ internal class TrackingState : AutoModeDetectionState {
         } else {
             var activitySubscription: Disposable? = null
             activitySubscription = filterer.activityStream.subscribeOn(automode.rxScheduler).filter {it.type == DetectedActivity.IN_VEHICLE }.subscribe( {
-                if (!disabled) {
-                    LOGGER.info(Date().toString() + " : In "+ it.type +" according to Activity Recognition Client", function = "fun next()")
-                    activitySubscription?.dispose()
-                    sensorService.stopActivityScanning()
-                    var subscription: Disposable? = null
-                    subscription = filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
-                            LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun next()")
-                        subscription?.dispose()
 
-                        goNext()
-                    }
-                    //scanning speed
-                    sensorService.activelyScanSpeed()
-                }
+                        if (!disabled) {
+                            LOGGER.info(Date().toString() + " : In "+ it.type +" according to Activity Recognition Client", function = "fun activityStream.subscribe")
+                            activitySubscription?.dispose()
+                            sensorService.stopActivityScanning()
+                            var subscription: Disposable? = null
+                            subscription = filterer.gpsStream.subscribeOn(automode.rxScheduler)/*.filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }*/.subscribe {
+                                LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun gpsStream.subscribeOn()")
+                                println(  ":Speed of ${it.speed} reached"+Thread.currentThread().getName())
+
+                                subscription?.dispose()
+
+                                goNext()
+                            }
+                            //scanning speed
+                            sensorService.activelyScanSpeed()
+                        }
             }, {throwable ->
                 print(throwable)
                 LOGGER.error("\"Tracking Activity exception $throwable", "next")
@@ -70,7 +73,7 @@ internal class TrackingState : AutoModeDetectionState {
         }
     }
 
-    fun goNext() {
+    override fun goNext() {
         this.disable(true)
         automode.setCurrentState(InVehicleState(automode))
         LOGGER.info("\"Tracking Activity state next", "next")

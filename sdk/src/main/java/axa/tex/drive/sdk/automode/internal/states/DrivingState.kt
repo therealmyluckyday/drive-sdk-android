@@ -33,7 +33,7 @@ internal class DrivingState : AutoModeDetectionState {
     constructor(automode: Automode) {
         this.automode = automode
         this.filterer = automode.getSpeedFilter()
-        LOGGER.info("${Date()} DrivingState : ${Date()} Now driving...")
+        LOGGER.info("DrivingState", "Constructor")
         lastMvtTime = System.currentTimeMillis() - 180000
         lastGpsTime = System.currentTimeMillis()
     }
@@ -85,23 +85,23 @@ internal class DrivingState : AutoModeDetectionState {
     }
 
     private fun stop(message: String) {
+        LOGGER.info(" $message", function = "stop")
+        goNext()
 
+    }
+
+    override fun goNext() {
         // Get a handler that can be used to post to the main thread
         val mainHandler = Handler(Looper.getMainLooper())
 
         val myRunnable = Runnable() {
             this.disable(true)
             automode.setCurrentState(IdleState(automode))
-            LOGGER.info(" $message", function = "stop")
             automode.getCurrentState().disable(false)
-            automode.sensorService.stopSpeedScanning()
-
-
-            LOGGER.info("\"Driving state End", "stop")
+            LOGGER.info("\"Driving state End", "goNext")
             automode.next()
         }
         mainHandler.post(myRunnable);
-
     }
 
     private fun stopAllTimers() {
@@ -135,6 +135,7 @@ internal class DrivingState : AutoModeDetectionState {
     override fun disable(disabled: Boolean) {
         this.disabled = disabled
         if (disabled) {
+            automode.sensorService.stopSpeedScanning()
             dispose()
             stopAllTimers()
         }

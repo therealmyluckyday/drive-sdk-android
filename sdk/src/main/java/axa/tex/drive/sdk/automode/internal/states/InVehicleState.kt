@@ -51,7 +51,7 @@ internal class InVehicleState : AutoModeDetectionState {
         }
     }
 
-    fun goNext() {
+    override fun goNext() {
         automode.setCurrentState(DrivingState(automode))
         LOGGER.info("In vehicule state next", "next")
         this@InVehicleState.disable(true)

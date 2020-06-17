@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Location
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
+import axa.tex.drive.sdk.core.CertificateAuthority.Companion.LOGGER
 import io.reactivex.Scheduler
 
 open class SensorServiceFake : SensorService {
@@ -30,6 +31,7 @@ open class SensorServiceFake : SensorService {
     }
 
     override fun activelyScanSpeed() {
+        LOGGER.info("sensorFake", function = "activelyScanSpeed")
     }
 
     override fun stopSpeedScanning() {
