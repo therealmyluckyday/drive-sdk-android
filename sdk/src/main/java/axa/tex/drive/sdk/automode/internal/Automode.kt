@@ -56,13 +56,8 @@ internal class Automode : KoinComponentCallbacks, AutomodeHandler {
         this.currentState = currentState
     }
 
-    internal fun next() {
-        LOGGER.info("\"current state $currentState", "next")
-        currentState.next()
-    }
-
-    internal fun disable(disabled: Boolean) {
-        currentState.disable(disabled)
+    internal fun disable() {
+        currentState.disable()
         running = false
     }
 
@@ -75,7 +70,8 @@ internal class Automode : KoinComponentCallbacks, AutomodeHandler {
     }
 
     internal fun goToIdleState() {
-        if (!(getCurrentState() is IdleState)) {
+        if (!(this.currentState is IdleState)) {
+            this.currentState.disable()
             this.setCurrentState(IdleState(this))
         }
     }

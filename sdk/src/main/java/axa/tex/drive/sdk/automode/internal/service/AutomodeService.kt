@@ -98,7 +98,9 @@ internal class AutomodeService : Service() {
             val tripRecorder: TripRecorder by inject()
             if (tripRecorder.isRecording()) {
                 LOGGER.info("tripRecorder.isRecording", function = "activateAutomode")
-                automode.setCurrentState(DrivingState(automode))
+                val drivingState = DrivingState(automode)
+                automode.setCurrentState(drivingState)
+                drivingState.enable()
             } else {
                 automode.isSimulateDriving = isSimulatedDriving
                 automode.isForeground = isForeground
@@ -108,13 +110,15 @@ internal class AutomodeService : Service() {
                         // Get a handler that can be used to post to the main thread
                         val mainHandler = Handler(Looper.getMainLooper())
                         val myRunnable = Runnable() {
-                            automode.next()
+                            automode.goToIdleState()
+                            automode.getCurrentState().enable()
                         }
                         mainHandler.post(myRunnable);
                     }
                 }
                 else {
-                    automode.next()
+                    automode.goToIdleState()
+                    automode.getCurrentState().enable()
                 }
             }
         }

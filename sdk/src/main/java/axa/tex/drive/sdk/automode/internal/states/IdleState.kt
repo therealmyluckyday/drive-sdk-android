@@ -21,7 +21,7 @@ internal class IdleState : AutoModeDetectionState {
         LOGGER.info("\"Idle state created", "constructor")
     }
 
-    override fun next() {
+    override fun enable() {
         if (automode.isSimulateDriving) {
             LOGGER.info("isSimulatedDriving", function = "next")
              Timer("IdleState Timer").schedule(15000) {
@@ -32,21 +32,20 @@ internal class IdleState : AutoModeDetectionState {
                  }
                  mainHandler.post(myRunnable);
             }
-        } else if (!disabled) {
+        } else {
             goNext()
         }
 
     }
 
-    override fun disable(disabled: Boolean) {
-        this.disabled = disabled
+    override fun disable() {
     }
 
     override fun goNext() {
-        this.disable(true)
-        automode.setCurrentState(TrackingState(automode))
+        this.disable()
+        val nextState = TrackingState(automode)
+        automode.setCurrentState(nextState)
         LOGGER.info("\"Idle state next", "next")
-        automode.getCurrentState().disable(false)
-        automode.next()
+        nextState.enable()
     }
 }

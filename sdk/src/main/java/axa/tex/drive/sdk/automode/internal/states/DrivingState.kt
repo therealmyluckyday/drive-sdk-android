@@ -20,8 +20,8 @@ internal class DrivingState : AutoModeDetectionState {
     private var automode: Automode
     private val filterer: SpeedFilter
     private var disabled = false
-    private var lastMvtTime: Long
-    private var lastGpsTime: Long
+    internal var lastMvtTime: Long
+    internal var lastGpsTime: Long
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val disposables = mutableListOf<Disposable>()
     private var timerSpeedWatcher: Timer? = null
@@ -38,9 +38,9 @@ internal class DrivingState : AutoModeDetectionState {
         lastGpsTime = System.currentTimeMillis()
     }
 
-    override fun next() {
+    override fun enable() {
         LOGGER.info("\"Driving state ACTIVATE", "next")
-        lastMvtTime = System.currentTimeMillis()
+        lastMvtTime = getTime()
         lastGpsTime = lastMvtTime
         watchSpeed()
         watchGPS()
@@ -56,12 +56,16 @@ internal class DrivingState : AutoModeDetectionState {
         })
     }
 
+    internal fun getTime(): Long {
+        return System.currentTimeMillis()
+    }
+
 
     private fun watchSpeed() {
+        LOGGER.info("\"BEGIN "+automode.acceptableStopDuration, "watchSpeed")
         timerSpeedWatcher = Timer("Timer for speed")
         LOGGER.info("\"Timer for speed  ", "new")
-        val delayTimerSpeedWatcher: Long = (if (automode.isSimulateDriving) 80000 else 55000)
-        speedWatcher = timerSpeedWatcher!!.schedule(delayTimerSpeedWatcher, automode.acceptableStopDuration) {
+        speedWatcher = timerSpeedWatcher!!.schedule(automode.acceptableStopDuration, automode.acceptableStopDuration) {
             val timeInterval = (System.currentTimeMillis() - lastMvtTime)
             LOGGER.info("\"Timer for speed $timeInterval ", "called")
             if (timeInterval >= 50000) {
@@ -69,10 +73,11 @@ internal class DrivingState : AutoModeDetectionState {
                 stop("Speed = 0, We need to stop. from speedWatcher")
             }
         }
-
     }
 
     private fun watchGPS() {
+        LOGGER.info("\"BEGIN "+automode.timeToWaitForGps, "watchGPS")
+
         timerGPSWatcher = Timer("Timer for gps")
         gpsWatcher = timerGPSWatcher!!.schedule(automode.timeToWaitForGps, automode.timeToWaitForGps) {
             val timeInterval = (System.currentTimeMillis() - lastGpsTime)
@@ -85,23 +90,26 @@ internal class DrivingState : AutoModeDetectionState {
     }
 
     private fun stop(message: String) {
-        LOGGER.info(" $message", function = "stop")
-        goNext()
-
+        LOGGER.info(" $message"+"["+Thread.currentThread().getName()+"]", function = "stop")
+        if (Thread.currentThread().getName() == "main" ) {
+            goNext()
+        }
+        else {
+            // Get a handler that can be used to post to the main thread
+            val mainHandler = Handler(Looper.getMainLooper())
+            val myRunnable = Runnable() {
+                goNext()
+            }
+            mainHandler.post(myRunnable);
+        }
     }
 
     override fun goNext() {
-        // Get a handler that can be used to post to the main thread
-        val mainHandler = Handler(Looper.getMainLooper())
-
-        val myRunnable = Runnable() {
-            this.disable(true)
-            automode.setCurrentState(IdleState(automode))
-            automode.getCurrentState().disable(false)
+            this.disable()
+            val nextState = IdleState(automode)
+            automode.setCurrentState(nextState)
             LOGGER.info("\"Driving state End", "goNext")
-            automode.next()
-        }
-        mainHandler.post(myRunnable);
+            nextState.enable()
     }
 
     private fun stopAllTimers() {
@@ -132,12 +140,10 @@ internal class DrivingState : AutoModeDetectionState {
         disposables.clear()
     }
 
-    override fun disable(disabled: Boolean) {
-        this.disabled = disabled
-        if (disabled) {
-            automode.sensorService.stopSpeedScanning()
-            dispose()
-            stopAllTimers()
-        }
+    override fun disable() {
+        this.disabled = true
+        automode.sensorService.stopSpeedScanning()
+        dispose()
+        stopAllTimers()
     }
 }

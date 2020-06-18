@@ -24,43 +24,36 @@ internal class InVehicleState : AutoModeDetectionState {
         LOGGER.info("InVehicleState", "Constructor")
     }
 
-    override fun next() {
+    override fun enable() {
         val testing = automode.isSimulateDriving
         if (testing) {
-            LOGGER.info("isSimulatedDriving", function = "next")
+            LOGGER.info("isSimulatedDriving", function = "enable")
             goNext()
         } else {
             var locationSubscription: Disposable? = null
             locationSubscription = filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { it.speed >= SPEED_MOVEMENT_THRESHOLD && it.accuracy <= LOCATION_ACCURACY_THRESHOLD  }.subscribe( {
                     if (!disabled) {
-                        LOGGER.info(Date().toString() + ":Speed of ${it.speed} >= ${SPEED_MOVEMENT_THRESHOLD} reached with ${it.accuracy} <= ${LOCATION_ACCURACY_THRESHOLD} of accuracy", function = "next")
-                        if ( it.speed >= SPEED_MOVEMENT_THRESHOLD ) {
-                            LOGGER.info(Date().toString() + ":Speed GOOD ${it.speed} >= ${SPEED_MOVEMENT_THRESHOLD} reached with ${it.accuracy} <= ${LOCATION_ACCURACY_THRESHOLD} of accuracy", function = "next")
-                        }
-                        if ( it.accuracy < LOCATION_ACCURACY_THRESHOLD ) {
-                            LOGGER.info(Date().toString() + ":Speed  ${it.speed} >= ${SPEED_MOVEMENT_THRESHOLD} reached with ACCURACY GOOD ${it.accuracy} <= ${LOCATION_ACCURACY_THRESHOLD} of accuracy", function = "next")
-                        }
-
-                        LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached with ${it.accuracy} of accuracy", function = "next")
-                    locationSubscription?.dispose()
-                    goNext()
+                        LOGGER.info(Date().toString() + ":Speed of ${it.speed} >= ${SPEED_MOVEMENT_THRESHOLD} reached with ${it.accuracy} <= ${LOCATION_ACCURACY_THRESHOLD} of accuracy", function = "enable")
+                        locationSubscription?.dispose()
+                        goNext()
                 }
             }, {throwable ->
                 print(throwable)
+
+                LOGGER.warn(""+throwable, function = "enable")
             })
         }
     }
 
     override fun goNext() {
-        automode.setCurrentState(DrivingState(automode))
+        this.disable()
+        val nextState = DrivingState(automode)
+        automode.setCurrentState(nextState)
         LOGGER.info("In vehicule state next", "next")
-        this@InVehicleState.disable(true)
-        automode.getCurrentState().disable(false)
-        automode.next()
+        nextState.enable()
     }
 
-
-    override fun disable(disabled: Boolean) {
+    override fun disable() {
         this.disabled = disabled
     }
 }

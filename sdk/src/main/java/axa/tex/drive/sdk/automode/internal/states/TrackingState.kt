@@ -26,7 +26,7 @@ internal class TrackingState : AutoModeDetectionState {
         LOGGER.info( ":Tracking state created", "Constructor")
     }
 
-    override fun next() {
+    override fun enable() {
         LOGGER.info("\"Tracking Activity state ACTIVATE", "next")
         val sensorService = automode.sensorService
         //automode.activityTracker.passivelyScanSpeed()
@@ -46,18 +46,15 @@ internal class TrackingState : AutoModeDetectionState {
         } else {
             var activitySubscription: Disposable? = null
             activitySubscription = filterer.activityStream.subscribeOn(automode.rxScheduler).filter {it.type == DetectedActivity.IN_VEHICLE }.subscribe( {
-
                         if (!disabled) {
                             LOGGER.info(Date().toString() + " : In "+ it.type +" according to Activity Recognition Client", function = "fun activityStream.subscribe")
                             activitySubscription?.dispose()
                             sensorService.stopActivityScanning()
                             var subscription: Disposable? = null
-                            subscription = filterer.gpsStream.subscribeOn(automode.rxScheduler)/*.filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }*/.subscribe {
+                            subscription = filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
                                 LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun gpsStream.subscribeOn()")
                                 println(  ":Speed of ${it.speed} reached"+Thread.currentThread().getName())
-
                                 subscription?.dispose()
-
                                 goNext()
                             }
                             //scanning speed
@@ -74,15 +71,15 @@ internal class TrackingState : AutoModeDetectionState {
     }
 
     override fun goNext() {
-        this.disable(true)
-        automode.setCurrentState(InVehicleState(automode))
+        this.disable()
+        val nextState = InVehicleState(automode)
+        automode.setCurrentState(nextState)
         LOGGER.info("\"Tracking Activity state next", "next")
-        automode.getCurrentState().disable(false)
-        automode.next()
+        nextState.enable()
     }
 
 
-    override fun disable(disabled: Boolean) {
-        this.disabled = disabled
+    override fun disable() {
+        this.disabled = true
     }
 }
