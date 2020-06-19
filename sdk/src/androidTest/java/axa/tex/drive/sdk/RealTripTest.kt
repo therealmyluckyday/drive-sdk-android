@@ -7,7 +7,6 @@ import android.os.SystemClock
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import axa.tex.drive.sdk.acquisition.SensorService
 import axa.tex.drive.sdk.acquisition.SensorServiceFake
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.Fix
@@ -15,30 +14,24 @@ import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
 import axa.tex.drive.sdk.core.logger.LogType
-import axa.tex.drive.sdk.core.tools.FileManager
 import io.reactivex.schedulers.Schedulers
 import junit.framework.Assert.*
 import org.junit.Test
-import java.io.*
+import java.io.IOException
+import java.io.InputStream
 import java.util.*
 
 
-//@RunWith(AndroidJUnit4ClassRunner::class)
-class TextInstrumented2Test  {
-
+class RealTripTest  {
     private val tripLogFileName = "trip_location_test.csv"
     var sensorService: SensorServiceFake? = null
-    var tripRecorder: TripRecorder? = null
-    private var lastLocation: Fix? = null
     val rxScheduler = Schedulers.io()
-    val context = ApplicationProvider.getApplicationContext<Context>()
-
     var service: TexService? = null
     private var config: TexConfig? = null
+
     @Test
     @LargeTest
     fun testTexServiceInitialization() {
-
         val context = ApplicationProvider.getApplicationContext<Context>()
         sensorService = SensorServiceFake(context, rxScheduler)
         assertNotNull(sensorService)
@@ -52,14 +45,34 @@ class TextInstrumented2Test  {
         service!!.logStream().subscribeOn(rxScheduler).subscribe({ it ->
             assert(it.type!= LogType.ERROR)
         })
+/*
+        val scoreRetriever = service?.scoreRetriever()
+        scoreRetriever?.getScoreListener()?.subscribe ( {
+            it?.let { score ->
+                println("ScoreWorker result" + score) }
+        }, {throwable ->
+            print(throwable)
+        })
 
+        service!!.getTripRecorder().endedTripListener()?.subscribe ( {
+            print(it)
+        }, {throwable ->
+            print(throwable)
+        })
+*/
+
+        print("startTrip")
         val tripId =  service!!.getTripRecorder().startTrip(Date().time)
         assert(tripId != null)
-        SystemClock.sleep(1000)
+        SystemClock.sleep(100)
+
+        print("loadTrip")
         val endTripTime = loadTrip(sensorService!!)
-        SystemClock.sleep(7000)
+        SystemClock.sleep(6000)
+
+        print("stopTrip")
         service!!.getTripRecorder().stopTrip(endTripTime)
-        SystemClock.sleep(7000)
+        SystemClock.sleep(17000)
     }
 
     fun loadTrip(sensorService: SensorServiceFake): Long {

@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import axa.tex.drive.sdk.acquisition.SensorService
+import axa.tex.drive.sdk.acquisition.SensorServiceFake
 import axa.tex.drive.sdk.acquisition.SensorServiceImpl
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.TripId
@@ -29,7 +30,7 @@ class TexDriveDemoApplication : Application() {
     // Trip recorder
     private var oldLocation: Location? = null
     private val tripLogFileName = "trip_location_test.csv"
-    var sensorService: SensorService? = null
+    var sensorService: SensorServiceFake? = null
 
     val logFileName = "axa-dil-tex.txt"
 
@@ -66,7 +67,7 @@ class TexDriveDemoApplication : Application() {
     }
 
     fun configure() {
-        sensorService = SensorServiceImpl(applicationContext, rxScheduler)
+        sensorService = SensorServiceFake(applicationContext, rxScheduler)
         val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000",sensorService!!, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
         config = newConfig
         val newService = TexService.configure(newConfig)
@@ -113,13 +114,13 @@ class TexDriveDemoApplication : Application() {
 
         // Launch recorded trip
         Timer("SettingUp", false).schedule(10000) {
-            //loadTrip()
+            loadTrip()
         }
 
     }
     fun saveLocation(location: Location, delay:Long) {
         var message = "${location.latitude},${location.longitude},${location.accuracy},${location.speed},${location.bearing},${location.altitude},${delay}\n"
-        println(message)
+        //println(message)
         FileManager.log(message, tripLogFileName, applicationContext)
     }
 
@@ -137,7 +138,7 @@ class TexDriveDemoApplication : Application() {
                         var line = bufferedReader.readLine()
                         while (line != null) {
                             //println(line)
-                            //newTime = sendLocationLineStringToSpeedFilter(line, newTime)
+                            newTime = sendLocationLineStringToSpeedFilter(line, newTime)
                             line = bufferedReader.readLine()
                             lineIndex++
                         }
@@ -168,7 +169,7 @@ class TexDriveDemoApplication : Application() {
         newLocation.time = time + delay
         //if (speed > 0) {
             //println("sendLocationLineStringToSpeedFilter"+newLocation.latitude+" "+newLocation.longitude+" "+newLocation.accuracy+" "+newLocation.speed+" "+newLocation.bearing+ " "+newLocation.altitude+" "+newLocation.time)
-            //this.sensorService!!.forceLocationChanged(newLocation)
+            this.sensorService!!.forceLocationChanged(newLocation)
             Thread.sleep(100L)
         //}
         return newLocation.time
@@ -182,11 +183,6 @@ class TexDriveDemoApplication : Application() {
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
-
-
-
-
-
 
     private fun updateLogsText() {
         val logFile: File? = getLogFile(applicationContext, logFileName)

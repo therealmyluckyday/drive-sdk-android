@@ -5,6 +5,7 @@ import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.TripRecorderImpl
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
 import axa.tex.drive.sdk.automode.AutomodeHandler
+import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LogMessage
 import axa.tex.drive.sdk.core.logger.LoggerFactory
@@ -48,10 +49,9 @@ class TexService : KoinComponentCallbacks {
         return logger.getLogStream()
     }
 
-
     fun automodeHandler(): AutomodeHandler {
-        val automodeHandler: AutomodeHandler by inject()
-        return automodeHandler
+        val automode: Automode by inject()
+        return automode
     }
 
 }

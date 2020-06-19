@@ -2,15 +2,12 @@ package axa.tex.drive.sdk.automode.internal.states
 
 import android.os.Handler
 import android.os.Looper
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.SPEED_MOVEMENT_THRESHOLD
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
-import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.disposables.Disposable
-import org.koin.android.ext.android.inject
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -61,7 +58,7 @@ internal class DrivingState : AutoModeDetectionState {
     }
 
 
-    private fun watchSpeed() {
+    internal fun watchSpeed() {
         LOGGER.info("\"BEGIN "+automode.acceptableStopDuration, "watchSpeed")
         timerSpeedWatcher = Timer("Timer for speed")
         LOGGER.info("\"Timer for speed  ", "new")
@@ -75,7 +72,7 @@ internal class DrivingState : AutoModeDetectionState {
         }
     }
 
-    private fun watchGPS() {
+    internal fun watchGPS() {
         LOGGER.info("\"BEGIN "+automode.timeToWaitForGps, "watchGPS")
 
         timerGPSWatcher = Timer("Timer for gps")
@@ -89,27 +86,23 @@ internal class DrivingState : AutoModeDetectionState {
         }
     }
 
-    private fun stop(message: String) {
+    internal fun stop(message: String) {
         LOGGER.info(" $message"+"["+Thread.currentThread().getName()+"]", function = "stop")
-        if (Thread.currentThread().getName() == "main" ) {
+        // Get a handler that can be used to post to the main thread
+        val mainHandler = Handler(Looper.getMainLooper())
+        val myRunnable = Runnable() {
             goNext()
         }
-        else {
-            // Get a handler that can be used to post to the main thread
-            val mainHandler = Handler(Looper.getMainLooper())
-            val myRunnable = Runnable() {
-                goNext()
-            }
-            mainHandler.post(myRunnable);
-        }
+        mainHandler.post(myRunnable);
     }
 
     override fun goNext() {
-            this.disable()
-            val nextState = IdleState(automode)
-            automode.setCurrentState(nextState)
-            LOGGER.info("\"Driving state End", "goNext")
-            nextState.enable()
+        LOGGER.info("stop driving go to next state", "goNext")
+        this.disable()
+        val nextState = IdleState(automode)
+        automode.setCurrentState(nextState)
+        LOGGER.info("\"Driving state End", "goNext")
+        nextState.enable()
     }
 
     private fun stopAllTimers() {
