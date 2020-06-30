@@ -41,10 +41,6 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="f8f93617ece5adaba2dcd591cb5e013816d59c21" />
-
         <activity android:name=".Scores" />
         <activity android:name=".Trips" />
     </application>

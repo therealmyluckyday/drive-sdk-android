@@ -177,7 +177,6 @@ class TexDriveDemoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        // Fabric.with(this, Crashlytics())
 
         notifyStart("Tex drive next is running", 0)
 
