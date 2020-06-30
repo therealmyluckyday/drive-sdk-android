@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "522194832206",
+    "firebase_url": "https://simple-demo-app-tex.firebaseio.com",
+    "project_id": "simple-demo-app-tex",
+    "storage_bucket": "simple-demo-app-tex.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522194832206:android:3a11335141d7f042b4ac1f",
+        "android_client_info": {
+          "package_name": "axa.tex.drive.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "522194832206-586bv6hbh8hmbesd9rjm17qqvi3m5qo2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVdMkodwymTmlS_nNV8yKbUXjkn3iLiGA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "522194832206-586bv6hbh8hmbesd9rjm17qqvi3m5qo2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "522194832206-j6suuu5dqc5pnm3dlb5m8k5sc2m36jp9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.axa.dil.tex.app.drive"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,13 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.google.gms.google-services' // Google Services Gradle plugin
+apply plugin: 'com.google.firebase.crashlytics' // Apply the Crashlytics Gradle plugin
 
 
 android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "axa.tex.drive.demo"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 29
         versionCode 2
         versionName "1.0"
@@ -68,6 +70,12 @@ dependencies {
 
     implementation project(':sdk')
 
+    // Add the Firebase SDK for Google Analytics
+    implementation 'com.google.firebase:firebase-analytics:17.4.3'
+    // add SDKs for any other desired Firebase products
+    // https://firebase.google.com/docs/android/setup#available-libraries
+    // Add the Firebase Crashlytics SDK.
+    implementation 'com.google.firebase:firebase-crashlytics:17.1.0'
 
     // JUnit 4 framework
     testImplementation 'junit:junit:4.12'
