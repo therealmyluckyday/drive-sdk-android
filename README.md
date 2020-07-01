@@ -1,4 +1,4 @@
-# AXA DIL TEX Drive Library
+    # AXA DIL TEX Drive Library
 
 ### Table of Contents
 
@@ -37,16 +37,18 @@ artifactory_{username,password} must be set in $HOME/.gradle/gradle.properties.
 Then, open build.gradle inside the module where you want to use the library and simply add a dependency:
 
 dependencies {
-implementation 'drive-sdk-android-next:sdk:3.0.0'
+implementation 'drive-sdk-android-next:sdk:3.0.4--beta'
 }
 
 
 
 ## 2. Permission
-###### `Note :`  The following permissions are needed to use the library.
-android.Manifest.permission.ACCESS_FINE_LOCATION
-android.Manifest.permission.ACCESS_COARSE_LOCATION
+###### `Note :`  The following permissions are needed to use the library :
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 ## 3. TEX Services Configuration
 
 Before using the TEX Drive SDK, a configuration object must be created. 
@@ -123,7 +125,7 @@ scoreRetriever?.retrieveScore(tripId.value)
 ```
 ### 6. Logging
 The library provides a stream of log tha can be enabled by subcribing to the log flux.
-It will be up to the client to choose using or not the logging system
+It will be up to the client to choose using or not the logging system. For performance issue you should not use it on release.
 ```java
 service?.logStream()?.
 subscribeOn(Schedulers.computation())?.subscribe{log->
