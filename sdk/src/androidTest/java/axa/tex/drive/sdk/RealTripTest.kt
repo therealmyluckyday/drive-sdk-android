@@ -3,31 +3,49 @@ package axa.tex.drive.sdk
 
 import android.content.Context
 import android.location.Location
+import android.os.Build.VERSION_CODES.N
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
+import android.os.SystemClock.*
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import axa.tex.drive.sdk.acquisition.SensorServiceFake
-import axa.tex.drive.sdk.acquisition.TripRecorder
-import axa.tex.drive.sdk.acquisition.model.Fix
+import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
+import axa.tex.drive.sdk.core.CertificateAuthority
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
 import axa.tex.drive.sdk.core.logger.LogType
 import io.reactivex.schedulers.Schedulers
 import junit.framework.Assert.*
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
+import org.koin.core.context.stopKoin
 import java.io.IOException
 import java.io.InputStream
 import java.util.*
+import java.util.concurrent.CountDownLatch
 
 
 class RealTripTest  {
     private val tripLogFileName = "trip_location_test.csv"
     var sensorService: SensorServiceFake? = null
-    val rxScheduler = Schedulers.io()
+    val rxScheduler = Schedulers.io() //Schedulers.single() Schedulers.trampoline() io Schedulers.newThread()
     var service: TexService? = null
     private var config: TexConfig? = null
+
+    @Before
+    fun setup() {
+
+    }
+
+    @After
+    fun teardown() {
+        stopKoin()
+    }
 
     @Test
     @LargeTest
@@ -36,46 +54,72 @@ class RealTripTest  {
         sensorService = SensorServiceFake(context, rxScheduler)
         assertNotNull(sensorService)
 
-        config = TexConfig.Builder(context, "APP-TEST", "22910000",sensorService!!, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
+        val doneSignal = CountDownLatch(700)
+        val scoreSignal = CountDownLatch(1)
+
+        val appName = "APP-TEST"
+        config = TexConfig.Builder(context, appName, "22910000",sensorService!!, rxScheduler).enableTrackers().platformHost(Platform.PRODUCTION).build()
+        TexConfig.config!!.isRetrievingScoreAutomatically = false
         assertNotNull(config)
 
         service = TexService.configure(config!!)
         assertNotNull(service)
 
         service!!.logStream().subscribeOn(rxScheduler).subscribe({ it ->
+            //println(it.description)
             assert(it.type!= LogType.ERROR)
         })
-/*
-        val scoreRetriever = service?.scoreRetriever()
-        scoreRetriever?.getScoreListener()?.subscribe ( {
+
+        val scoreRetriever = service!!.scoreRetriever()
+        scoreRetriever!!.getScoreListener()!!.subscribe ( {
+            println("ScoreWorker result" )
             it?.let { score ->
-                println("ScoreWorker result" + score) }
+                println("ScoreWorker result" + score)
+                scoreSignal.countDown()
+            }
         }, {throwable ->
             print(throwable)
+        })
+
+        scoreRetriever?.getAvailableScoreListener()?.subscribe({
+            it?.let { score ->
+                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION, true, delay = 12)
+            }
         })
 
         service!!.getTripRecorder().endedTripListener()?.subscribe ( {
-            print(it)
+            println(it)
         }, {throwable ->
-            print(throwable)
+            println(throwable)
         })
-*/
+        service!!.getTripRecorder().tripProgress()?.subscribe({
+           println(doneSignal.count)
+            doneSignal.countDown()
+        })
 
-        print("startTrip")
+        println(Thread.currentThread().getName()+": startTrip")
         val tripId =  service!!.getTripRecorder().startTrip(Date().time)
         assert(tripId != null)
-        SystemClock.sleep(100)
 
-        print("loadTrip")
+       //print("activateAutomode")
+       //val autoModeHandler = service!!.automodeHandler()
+       //autoModeHandler.activateAutomode(context,false, isSimulatedDriving = false)
+
         val endTripTime = loadTrip(sensorService!!)
-        SystemClock.sleep(6000)
 
-        print("stopTrip")
+        println(Thread.currentThread().getName()+": await")
+        doneSignal.await()
+
+        // 6 seconds trip too short
+       // sleep(6000)
+
+        println(Thread.currentThread().getName()+": stopTrip")
         service!!.getTripRecorder().stopTrip(endTripTime)
-        SystemClock.sleep(17000)
+        scoreSignal.await()
     }
 
     fun loadTrip(sensorService: SensorServiceFake): Long {
+        println(Thread.currentThread().getName()+": loadTrip")
         val inputStream: InputStream = InstrumentationRegistry.getInstrumentation().getContext().getAssets().open(tripLogFileName)
         assert(inputStream!=null)
         val noTime: Long = 0
@@ -103,6 +147,7 @@ class RealTripTest  {
         return newTime
     }
     private fun sendLocationLineStringToSpeedFilter(line: String, time: Long, sensorService: SensorServiceFake) : Long {
+        //println(Thread.currentThread().getName()+": sendLocationLineStringToSpeedFilter: "+line)
         val locationDetails = line.split(",")
         var newLocation = Location("")
         val latitude = locationDetails[0].toDouble()

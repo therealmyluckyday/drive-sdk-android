@@ -10,7 +10,7 @@ internal class Config {
     var batteryTrackerEnabled: Boolean = false
     var locationTrackerEnabled: Boolean = false
     var motionTrackerEnabled: Boolean = false
-    var isRetrievingScoreAutomatically: Boolean = true
+    var isRetrievingScoreAutomatically: Boolean
     var appName: String//Constants.DEFAULT_APP_NAME
     var clientId: String
     var endPoint: Platform
@@ -23,7 +23,7 @@ internal class Config {
     constructor(batteryTrackerEnabled: Boolean,
                 locationTrackerEnabled: Boolean,
                 motionTrackerEnabled: Boolean,
-                appName: String, clientId: String, endPoint: Platform?, scheduler: Scheduler = Schedulers.single()) {
+                appName: String, clientId: String, endPoint: Platform?, scheduler: Scheduler = Schedulers.single(), retrieveScoreAutomatically: Boolean = true) {
         this.batteryTrackerEnabled = batteryTrackerEnabled
         this.locationTrackerEnabled = locationTrackerEnabled
         this.motionTrackerEnabled = motionTrackerEnabled
@@ -31,6 +31,7 @@ internal class Config {
         this.clientId = clientId
         this.endPoint = endPoint ?: Platform.PRODUCTION
         this.rxScheduler = scheduler
+        this.isRetrievingScoreAutomatically = retrieveScoreAutomatically
     }
 
     internal fun toJson(): String {

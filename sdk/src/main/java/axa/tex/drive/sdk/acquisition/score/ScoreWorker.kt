@@ -123,8 +123,12 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
             return Result.success()
         } catch (e: Exception) {
             LOGGER.error("RESPONSE CODES ${connection.responseCode}"+" Exception ${e}", "scoreRequest")
+            val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
+            scoreRetriever.getScoreListener().onNext(ScoreResult(scoreError = scoreError))
         } catch (err: Error) {
             LOGGER.error("RESPONSE CODES ${connection.responseCode}"+" Error ${err}", "scoreRequest")
+            val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
+            scoreRetriever.getScoreListener().onNext(ScoreResult(scoreError = scoreError))
         }
         return Result.failure()
     }
