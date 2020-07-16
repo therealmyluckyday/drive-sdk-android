@@ -37,11 +37,6 @@ class RealTripTest  {
     var service: TexService? = null
     private var config: TexConfig? = null
 
-    @Before
-    fun setup() {
-
-    }
-
     @After
     fun teardown() {
         stopKoin()
@@ -53,8 +48,7 @@ class RealTripTest  {
         val context = ApplicationProvider.getApplicationContext<Context>()
         sensorService = SensorServiceFake(context, rxScheduler)
         assertNotNull(sensorService)
-
-        val doneSignal = CountDownLatch(700)
+        val doneSignal = CountDownLatch(700) // Number of GPS point used for the trip
         val scoreSignal = CountDownLatch(1)
 
         val appName = "APP-TEST"
@@ -66,70 +60,68 @@ class RealTripTest  {
         assertNotNull(service)
 
         service!!.logStream().subscribeOn(rxScheduler).subscribe({ it ->
-            //println(it.description)
             assert(it.type!= LogType.ERROR)
         })
 
+        val tripId =  service!!.getTripRecorder().startTrip(Date().time)
+        assertNotNull(tripId)
+        assertNotNull(tripId!!.value)
+
         val scoreRetriever = service!!.scoreRetriever()
         scoreRetriever!!.getScoreListener()!!.subscribe ( {
-            println("ScoreWorker result" )
+            assertNotNull(it)
             it?.let { score ->
-                println("ScoreWorker result" + score)
+                assertNull("Error in Score: "+score.scoreError, score.scoreError)
+                assertNotNull("Score null: ", score.score)
+                assertNotNull("TripId null: ", score.score!!.tripId)
+                assert(score.score!!.tripId!!.value == tripId.value)
                 scoreSignal.countDown()
             }
         }, {throwable ->
-            print(throwable)
+            assertFalse("Exception: "+throwable,true)
+        })
+
+        service!!.getTripRecorder().tripProgress()?.subscribe({
+            assertNotNull(it)
+            assert(it!!.currentTripId.value == tripId!!.value)
+            doneSignal.countDown()
+        })
+
+        service!!.getTripRecorder().endedTripListener()?.subscribe ( {
+            assertNotNull(it)
+            assert(it!! == tripId!!.value)
+        }, {throwable ->
+            assertFalse("Exception: "+throwable,true)
         })
 
         scoreRetriever?.getAvailableScoreListener()?.subscribe({
+            assertNotNull(it)
+            assert(it!! == tripId!!.value)
             it?.let { score ->
                 scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION, true, delay = 12)
             }
         })
 
-        service!!.getTripRecorder().endedTripListener()?.subscribe ( {
-            println(it)
-        }, {throwable ->
-            println(throwable)
-        })
-        service!!.getTripRecorder().tripProgress()?.subscribe({
-           println(doneSignal.count)
-            doneSignal.countDown()
-        })
 
-        println(Thread.currentThread().getName()+": startTrip")
-        val tripId =  service!!.getTripRecorder().startTrip(Date().time)
-        assert(tripId != null)
-
-       //print("activateAutomode")
-       //val autoModeHandler = service!!.automodeHandler()
-       //autoModeHandler.activateAutomode(context,false, isSimulatedDriving = false)
-
-        val endTripTime = loadTrip(sensorService!!)
-
-        println(Thread.currentThread().getName()+": await")
+        val endTripTime = loadTrip(sensorService!!, System.currentTimeMillis() - 50000000)// 57 600 000 = 16 Hour  86400000 = 24 Hour
         doneSignal.await()
 
-        // 6 seconds trip too short
-       // sleep(6000)
-
-        println(Thread.currentThread().getName()+": stopTrip")
         service!!.getTripRecorder().stopTrip(endTripTime)
         scoreSignal.await()
     }
 
-    fun loadTrip(sensorService: SensorServiceFake): Long {
-        println(Thread.currentThread().getName()+": loadTrip")
+    fun loadTrip(sensorService: SensorServiceFake, timeStart: Long): Long {
         val inputStream: InputStream = InstrumentationRegistry.getInstrumentation().getContext().getAssets().open(tripLogFileName)
         assert(inputStream!=null)
         val noTime: Long = 0
         var newTime: Long = noTime
+
         if (inputStream !== null ) {
             try {
                 val bufferedReader = inputStream.bufferedReader()
                 var lineIndex = 0
                 var line = bufferedReader.readLine()
-                newTime = System.currentTimeMillis() - 86400000
+                newTime = timeStart
                 assertNotNull(line)
                 while (line != null) {
                     newTime = sendLocationLineStringToSpeedFilter(line, newTime, sensorService)
@@ -146,8 +138,8 @@ class RealTripTest  {
         assertFalse(newTime == noTime)
         return newTime
     }
+
     private fun sendLocationLineStringToSpeedFilter(line: String, time: Long, sensorService: SensorServiceFake) : Long {
-        //println(Thread.currentThread().getName()+": sendLocationLineStringToSpeedFilter: "+line)
         val locationDetails = line.split(",")
         var newLocation = Location("")
         val latitude = locationDetails[0].toDouble()
@@ -163,9 +155,8 @@ class RealTripTest  {
         val altitude = locationDetails[5].toDouble()
         newLocation.altitude = altitude
         val delay = locationDetails[6].toLong()
-        newLocation.time = 1 + time
+        newLocation.time = delay + time
         sensorService.forceLocationChanged(newLocation)
         return newLocation.time
     }
-
 }
