@@ -21,8 +21,6 @@ internal class DrivingState : AutoModeDetectionState {
     internal var lastGpsTime: Long
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private val disposables = mutableListOf<Disposable>()
-    private var timerSpeedWatcher: Timer? = null
-    private var speedWatcher: TimerTask? = null
     private var gpsWatcher: TimerTask? = null
     private var timerGPSWatcher: Timer? = null
 
@@ -39,7 +37,6 @@ internal class DrivingState : AutoModeDetectionState {
         LOGGER.info("\"Driving state ACTIVATE", "next")
         lastMvtTime = getTime()
         lastGpsTime = lastMvtTime
-        watchSpeed()
         watchGPS()
 
         disposables.add(filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { t: TexLocation ->  t.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
@@ -49,27 +46,20 @@ internal class DrivingState : AutoModeDetectionState {
 
         disposables.add(filterer.gpsStream.subscribeOn(automode.rxScheduler).subscribe {
             LOGGER.info("\"$it", "activate gpsWatcher")
-            lastGpsTime = it.time
+            val timeInterval = (it.time - lastMvtTime)
+            LOGGER.info("\"Timer for speed $timeInterval ", "called")
+            if (timeInterval >= 50000) {
+                LOGGER.info("\"Timer for speed", "stop")
+                stop("Speed = 0, We need to stop. from speed Watcher")
+            }
+            else {
+                lastGpsTime = it.time
+            }
         })
     }
 
     internal fun getTime(): Long {
         return System.currentTimeMillis()
-    }
-
-
-    internal fun watchSpeed() {
-        LOGGER.info("\"BEGIN "+automode.acceptableStopDuration, "watchSpeed")
-        timerSpeedWatcher = Timer("Timer for speed")
-        LOGGER.info("\"Timer for speed  ", "new")
-        speedWatcher = timerSpeedWatcher!!.schedule(automode.acceptableStopDuration, automode.acceptableStopDuration) {
-            val timeInterval = (System.currentTimeMillis() - lastMvtTime)
-            LOGGER.info("\"Timer for speed $timeInterval ", "called")
-            if (timeInterval >= 50000) {
-                LOGGER.info("\"Timer for speed", "stop")
-                stop("Speed = 0, We need to stop. from speedWatcher")
-            }
-        }
     }
 
     internal fun watchGPS() {
@@ -113,16 +103,8 @@ internal class DrivingState : AutoModeDetectionState {
         } catch (e: Exception) {
             LOGGER.error("${e.printStackTrace()}", funcName)
         }
-        try {
-            speedWatcher?.cancel()
-            timerSpeedWatcher?.cancel()
-        } catch (e: Exception) {
-            LOGGER.error("${e.printStackTrace()}", funcName)
-        }
         disposables.clear()
         gpsWatcher = null
-        speedWatcher = null
-        timerSpeedWatcher = null
         timerGPSWatcher = null
     }
 
