@@ -46,7 +46,6 @@ class TexConfig {
         private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
         
         internal fun setupKoin(context: Context, scheduler: Scheduler = Schedulers.single(), sensorService: SensorService) {
-
             val myModule = module {
                 single { SpeedFilter() }
                 single { Automode(sensorService, scheduler) }
@@ -91,7 +90,7 @@ class TexConfig {
                     modules(listOf(myModule))
                 }
             } catch (e: Exception) {
-                LOGGER.error("Exception during setup koin", "setupKoin")
+                LOGGER.error("Exception during setup koin: "+e, "setupKoin")
             }
         }
 

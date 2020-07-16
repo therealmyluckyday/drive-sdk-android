@@ -2,7 +2,6 @@ package axa.tex.drive.sdk.automode.internal.states
 
 import android.os.Handler
 import android.os.Looper
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.SPEED_MOVEMENT_THRESHOLD
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
@@ -27,12 +26,12 @@ internal class TrackingState : AutoModeDetectionState {
     }
 
     override fun enable() {
-        LOGGER.info("\"Tracking Activity state ACTIVATE", "next")
+        LOGGER.info("\"Tracking Activity state ACTIVATE", "enable")
         val sensorService = automode.sensorService
         //automode.activityTracker.passivelyScanSpeed()
         val testing = automode.isSimulateDriving
         if (testing) {
-            LOGGER.info("isSimulatedDriving", function = "next")
+            LOGGER.info("isSimulatedDriving", function = "enable")
             try {
                 val mainHandler = Handler(Looper.getMainLooper())
                 val myRunnable = Runnable() {
