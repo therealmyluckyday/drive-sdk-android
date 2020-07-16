@@ -4,11 +4,14 @@ import android.content.Context
 import android.location.Location
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
-import axa.tex.drive.sdk.core.CertificateAuthority.Companion.LOGGER
 import io.reactivex.Scheduler
+import axa.tex.drive.sdk.core.logger.LoggerFactory
+import io.reactivex.subjects.PublishSubject
 
 open class SensorServiceFake : SensorService {
     private var speedFilter = SpeedFilter()
+    internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
+    val infosMethodCalled: PublishSubject<String> = PublishSubject.create()
 
     constructor(context: Context, scheduler: Scheduler) {
     }
@@ -31,13 +34,15 @@ open class SensorServiceFake : SensorService {
     }
 
     override fun activelyScanSpeed() {
-        LOGGER.info("sensorFake", function = "activelyScanSpeed")
+        logger.info("sensorFake activelyScanSpeed", function = "activelyScanSpeed")
+        infosMethodCalled.onNext("activelyScanSpeed")
     }
 
     override fun stopSpeedScanning() {
     }
-
     override fun checkWhereAmI() {
+        logger.info("sensorFake checkWhereAmI", function = "checkWhereAmI")
+        infosMethodCalled.onNext("checkWhereAmI")
     }
 
     override fun stopActivityScanning() {
