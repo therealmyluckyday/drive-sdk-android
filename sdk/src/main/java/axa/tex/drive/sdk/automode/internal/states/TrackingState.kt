@@ -41,7 +41,7 @@ internal class TrackingState : AutoModeDetectionState {
                 }
                 mainHandler.post(myRunnable);
             }catch (e : Exception){
-                e.printStackTrace()
+                LOGGER.warn("Exception : "+e, function = "enable")
             }
         } else {
             var activitySubscription: Disposable? = null
@@ -61,7 +61,6 @@ internal class TrackingState : AutoModeDetectionState {
                             sensorService.activelyScanSpeed()
                         }
             }, {throwable ->
-                print(throwable)
                 LOGGER.error("\"Tracking Activity exception $throwable", "next")
             })
             //Scanning activity

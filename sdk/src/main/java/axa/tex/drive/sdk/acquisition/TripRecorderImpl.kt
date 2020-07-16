@@ -69,8 +69,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
                 tripProgress.onNext(progress)
             }
         }, {throwable ->
-            print(throwable)
-            logger.error("TripRecorderImpl  error"+throwable, "speedFilter.locations")
+            logger.error("TripRecorderImpl  error"+throwable, "subscribe")
         })
     }
 

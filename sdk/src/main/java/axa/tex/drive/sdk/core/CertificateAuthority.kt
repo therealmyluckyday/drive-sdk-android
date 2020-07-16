@@ -94,7 +94,6 @@ class CertificateAuthority: KoinComponentCallbacks {
                 val ca: Certificate
                 try {
                     ca = cf.generateCertificate(caInput)
-                    println("ca=" + (ca as X509Certificate).subjectDN)
                 } finally {
                     caInput.close()
                 }

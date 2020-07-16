@@ -91,7 +91,7 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
 
     fun subscribeGPSSTream() {
         val funcName = "subscribeGPSSTream"
-        LOGGER.info("subscribeGPSSTream ", funcName)
+        LOGGER.info("subscribeGPSSTream "+speedFilter.rxScheduler, funcName)
         val scheduler: Scheduler = if (speedFilter.rxScheduler != null) speedFilter.rxScheduler!! else Schedulers.io()
         speedFilter.gpsStream.subscribeOn(scheduler)?.subscribe ({
             if (speedFilter.collectionEnabled) {

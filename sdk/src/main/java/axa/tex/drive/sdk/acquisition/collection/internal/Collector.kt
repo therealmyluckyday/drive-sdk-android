@@ -17,21 +17,18 @@ import org.koin.android.ext.android.inject
 
 internal class Collector : KoinComponentCallbacks {
 
-    private val trackers: MutableList<Tracker>?
-    val logger = LoggerFactory().getLogger(this::class.java.name)
-
-    internal var fixProcessor: FixProcessor
-
-    private var context: Context
-
-    internal var currentTripId: TripId? = null
-
-    internal var recording: Boolean = false
-
     var fixData: Observable<List<Fix>>? = null
-
     val locations: PublishSubject<LocationFix> = PublishSubject.create()
     val rxScheduler: Scheduler
+    val logger = LoggerFactory().getLogger(this::class.java.name)
+
+    internal var currentTripId: TripId? = null
+    internal var recording: Boolean = false
+    internal var fixProcessor: FixProcessor
+
+    private val trackers: MutableList<Tracker>?
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+    private var context: Context
 
     constructor(context: Context, trackers: MutableList<Tracker>?, scheduler: Scheduler) {
         this.trackers = trackers
@@ -70,7 +67,7 @@ internal class Collector : KoinComponentCallbacks {
                 locations.onNext(fixes[0] as LocationFix)
             }
         }, {throwable ->
-            print(throwable)
+            LOGGER.warn("Exception : "+throwable, function = "enable")
         })
     }
 

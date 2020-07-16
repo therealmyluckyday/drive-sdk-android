@@ -2,6 +2,7 @@ package axa.tex.drive.sdk.acquisition.model
 
 
 import axa.tex.drive.sdk.core.internal.Constants
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -16,6 +17,7 @@ class FixPacket(@JsonIgnore val fixes: List<Fix>,
                 val uid: String,
                 val version: String, val trip_id: String?, val app_name: String, val client_id: String) {
 
+    private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     fun toJson(): String {
         return try {
@@ -32,7 +34,7 @@ class FixPacket(@JsonIgnore val fixes: List<Fix>,
             objectNode.set<ObjectNode>("fixes", fixesNode)
             jsonNode.toString()
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.warn("Exception : "+e, function = "enable")
             Constants.EMPTY_PACKET
         }
     }

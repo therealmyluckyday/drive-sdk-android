@@ -220,11 +220,12 @@ class AutomaticModeTest : KoinTest {
         automode!!.getCurrentState().enable()
 
         val newLocation = getFakeLocation()
-        LOGGER.info(Date().toString() + ":IS Speed of ${newLocation.speed} >= ${SPEED_MOVEMENT_THRESHOLD} reached with ${newLocation.accuracy} <= $LOCATION_ACCURACY_THRESHOLD of accuracy", function = "next")
+        LOGGER.info(":TEST Speed of ${newLocation.speed} >= ${SPEED_MOVEMENT_THRESHOLD} reached with ${newLocation.accuracy} <= $LOCATION_ACCURACY_THRESHOLD of accuracy", function = "TEST")
         sensorServiceFake.forceLocationChanged(newLocation)
         Thread.sleep(100)
         sensorServiceFake.forceLocationChanged(newLocation)
 
+        Thread.sleep(100)
         Assert.assertTrue("Current State Automode" + automode!!.getCurrentState() + "\n", automode!!.getCurrentState() is DrivingState)
     }
 

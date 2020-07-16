@@ -1,14 +1,11 @@
     package axa.tex.drive.sdk.automode.internal.states
 
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.LOCATION_ACCURACY_THRESHOLD
 import axa.tex.drive.sdk.automode.internal.tracker.SPEED_MOVEMENT_THRESHOLD
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
-import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.disposables.Disposable
-import org.koin.android.ext.android.inject
 import java.util.*
 
 internal class InVehicleState : AutoModeDetectionState {
@@ -38,9 +35,7 @@ internal class InVehicleState : AutoModeDetectionState {
                         goNext()
                 }
             }, {throwable ->
-                print(throwable)
-
-                LOGGER.warn(""+throwable, function = "enable")
+                LOGGER.warn("Exception : "+throwable, function = "enable")
             })
         }
     }

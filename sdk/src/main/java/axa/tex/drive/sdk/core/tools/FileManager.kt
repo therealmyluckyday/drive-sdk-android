@@ -4,12 +4,14 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import androidx.core.content.FileProvider
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.subjects.PublishSubject
 import java.io.*
-import java.net.URI
 
 final class FileManager {
+
     companion object {
+        internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
         fun loadFileMessage(messages: PublishSubject<String>, fileName:String, context: Context) {
             println("loadTrip")
@@ -22,15 +24,13 @@ final class FileManager {
                         var lineIndex = 0
                         var line = bufferedReader.readLine()
                         while (line != null) {
-                            //println(line)
-                            //newTime = sendLocationLineStringToSpeedFilter(line, newTime)
                             messages.onNext(line)
                             line = bufferedReader.readLine()
                             lineIndex++
                         }
                         bufferedReader.close()
                     } catch (e: IOException) {
-                        //You'll need to add proper error handling here
+                        LOGGER.warn("Exception : "+e, function = "enable")
                     }
                 }.start()
             }
@@ -47,7 +47,7 @@ final class FileManager {
                     try {
                         f.createNewFile()
                     } catch (e: IOException) {
-                        e.printStackTrace()
+                        LOGGER.warn("Exception : "+e, function = "enable")
                     }
                 }
                 try {
@@ -56,9 +56,9 @@ final class FileManager {
                     out.flush()
                     out.close()
                 } catch (e: FileNotFoundException) {
-                    e.printStackTrace()
+                    LOGGER.warn("Exception : "+e, function = "enable")
                 } catch (e: IOException) {
-                    e.printStackTrace()
+                    LOGGER.warn("Exception : "+e, function = "enable")
                 }
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
@@ -70,7 +70,6 @@ final class FileManager {
             } else {
                 context.filesDir
             }
-            //val files = getListFiles( File(logDirectory!!.absolutePath));
 
             return File(logDirectory!!.absolutePath + "/AUTOMODE", fileName)
         }
@@ -89,6 +88,7 @@ final class FileManager {
             }
             return inFiles;
         }
+
         fun isExternalStorageWritable(): Boolean {
             val state = Environment.getExternalStorageState()
             return if (Environment.MEDIA_MOUNTED == state) {
@@ -114,7 +114,4 @@ final class FileManager {
             }
         }
     }
-
-
-
 }

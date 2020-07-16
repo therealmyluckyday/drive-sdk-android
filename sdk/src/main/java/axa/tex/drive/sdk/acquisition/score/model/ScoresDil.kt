@@ -1,17 +1,19 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 
 class ScoresDil {
 
+    internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     internal fun toJson(): String {
         return try {
             val mapper = ObjectMapper()
             mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
             mapper.writeValueAsString(this)
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.warn("Exception : "+e, function = "enable")
             "{}"
         }
 

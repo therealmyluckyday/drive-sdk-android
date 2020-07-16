@@ -7,7 +7,7 @@ import axa.tex.drive.sdk.core.logger.LoggerFactory
 
 
 private const val DEFAULT_PACKET_SIZE = 50
-private const val DEFAULT_JSON_SIZE = 10000
+private const val DEFAULT_JSON_SIZE = 9000
 
 class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) {
     private var fixes = mutableListOf<Fix>()

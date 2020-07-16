@@ -16,7 +16,6 @@ open class Fix {
         return timestamp
     }
 
-
     open fun toJson(): String {
         return try {
             val mapper = ObjectMapper()

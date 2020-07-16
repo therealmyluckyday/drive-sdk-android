@@ -67,11 +67,6 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
     @Throws(Exception::class)
     private fun scoreRequest(tripId: String, finalScore: Boolean, platform: Platform, appName: String): Result {
         LOGGER.info("scoreRequest "+ tripId, "scoreRequest")
-        try {
-            Thread.sleep(5)
-        }catch (e : Exception){
-            e.printStackTrace()
-        }
         val scoreRetriever: ScoreRetriever by inject()
         val responseString = StringBuffer("")
         val locale = null
@@ -108,7 +103,6 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
         try {
             //{"flags":[],"score_type":"final","scoregw_version":"2.2.6","status":"trip_too_short","status_details":["not_enough_locations"],"trip_id":"7F05D5C6-D56E-4455-9A11-096CDC94CD75"}
             val fullScore = mapper.readValue(node.toString(), Score::class.java)
-            println("FULLSCORE "+fullScore.tripId?.value + " Score Status"+fullScore.status.name+" Score: "+fullScore.scores_dil!!.expert)
             LOGGER.info("FULLSCORE "+fullScore.tripId?.value + " Score Status"+fullScore.status.name, "scoreRequest")
             if (fullScore.status == ScoreStatus.pending) {
                 return Result.retry()

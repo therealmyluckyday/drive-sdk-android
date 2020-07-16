@@ -1,6 +1,7 @@
 package axa.tex.drive.sdk.acquisition.score.model
 
 import axa.tex.drive.sdk.acquisition.model.TripId
+import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -53,6 +54,7 @@ class ScoreError {
     @JsonProperty("status_details")
     var details: List<ExceptionScoreStatus>? = null
 
+    internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
     constructor(
                 status: ScoreStatus,
@@ -69,7 +71,7 @@ class ScoreError {
             mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true)
             mapper.writeValueAsString(this)
         } catch (e: Exception) {
-            e.printStackTrace()
+            LOGGER.warn("Exception : "+e, function = "toJson")
             "{}"
         }
 
