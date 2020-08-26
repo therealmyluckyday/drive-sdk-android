@@ -19,7 +19,7 @@ import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
 import axa.tex.drive.sdk.core.logger.LogType
 import io.reactivex.schedulers.Schedulers
-import junit.framework.Assert.*
+import org.junit.Assert.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -32,10 +32,8 @@ import java.util.concurrent.CountDownLatch
 
 class RealTripTest  {
     private val tripLogFileName = "trip_location_test.csv"
-    var sensorService: SensorServiceFake? = null
     val rxScheduler = Schedulers.io() //Schedulers.single() Schedulers.trampoline() io Schedulers.newThread()
-    var service: TexService? = null
-    private var config: TexConfig? = null
+
 
     @After
     fun teardown() {
@@ -46,24 +44,24 @@ class RealTripTest  {
     @LargeTest
     fun testTexServiceInitialization() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        sensorService = SensorServiceFake(context, rxScheduler)
+        val sensorService = SensorServiceFake(context, rxScheduler)
         assertNotNull(sensorService)
         val doneSignal = CountDownLatch(700) // Number of GPS point used for the trip
         val scoreSignal = CountDownLatch(1)
 
         val appName = "APP-TEST"
-        config = TexConfig.Builder(context, appName, "22910000",sensorService!!, rxScheduler).enableTrackers().platformHost(Platform.PRODUCTION).build()
+        var config = TexConfig.Builder(context, appName, "22910000",sensorService, rxScheduler).enableTrackers().platformHost(Platform.PRODUCTION).build()
         TexConfig.config!!.isRetrievingScoreAutomatically = false
         assertNotNull(config)
 
-        service = TexService.configure(config!!)
+        var service = TexService.configure(config)
         assertNotNull(service)
 
-        service!!.logStream().subscribeOn(rxScheduler).subscribe({ it ->
+        service.logStream().subscribeOn(rxScheduler).subscribe({ it ->
             assert(it.type!= LogType.ERROR)
         })
-
-        val tripId =  service!!.getTripRecorder().startTrip(Date().time)
+        val timeStart = System.currentTimeMillis() - 50000000
+        val tripId =  service!!.getTripRecorder().startTrip(timeStart)
         assertNotNull(tripId)
         assertNotNull(tripId!!.value)
 
@@ -103,7 +101,7 @@ class RealTripTest  {
         })
 
 
-        val endTripTime = loadTrip(sensorService!!, System.currentTimeMillis() - 50000000)// 57 600 000 = 16 Hour  86400000 = 24 Hour
+        val endTripTime = loadTrip(sensorService!!, timeStart)// 57 600 000 = 16 Hour  86400000 = 24 Hour
         doneSignal.await()
 
         service!!.getTripRecorder().stopTrip(endTripTime)

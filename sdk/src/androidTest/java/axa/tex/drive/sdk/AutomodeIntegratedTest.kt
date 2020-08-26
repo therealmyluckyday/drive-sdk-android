@@ -12,7 +12,7 @@ import axa.tex.drive.sdk.core.TexService
 import axa.tex.drive.sdk.core.logger.LogType
 import com.google.android.gms.location.DetectedActivity
 import io.reactivex.schedulers.Schedulers
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.After
 import org.junit.Test
 import org.koin.core.context.stopKoin
@@ -118,13 +118,23 @@ class AutomodeIntegratedTest {
             }
         })
 
-        sensorServiceFake.speedFilter().activityStream.onNext(DetectedActivity(DetectedActivity.IN_VEHICLE, confidence))
-        Thread.sleep(1000)
-         //doneSignal.await()
 
+        sensorServiceFake.speedFilter().activityStream.onNext(DetectedActivity(DetectedActivity.IN_VEHICLE, confidence))
+
+        println("Sleep")
+        Thread.sleep(1000)
+        println("doneSignal.await")
+        doneSignal.await()
+        Thread.sleep(1000)
+        println("scoreSignal.await")
         scoreSignal.await()
+        println("scoreSignal.done")
     }
 
+
+    /**
+     * Method use to load trip and send it to the fake sensor
+     */
     fun loadTrip(sensorService: SensorServiceFake, timeStart: Long): Long {
         val inputStream: InputStream = InstrumentationRegistry.getInstrumentation().getContext().getAssets().open(tripLogFileName)
         assert(inputStream!=null)
@@ -154,6 +164,9 @@ class AutomodeIntegratedTest {
         return newTime
     }
 
+    /**
+     * Method use to parse a line of a csv to grab a GPS point and send it to sensorfake
+     */
     private fun sendLocationLineStringToSpeedFilter(line: String, time: Long, sensorService: SensorServiceFake) : Long {
         val locationDetails = line.split(",")
         var newLocation = Location("")

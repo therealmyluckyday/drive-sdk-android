@@ -97,8 +97,13 @@ class AutomaticModeTest : KoinTest {
 
     @Test
     fun testFromTrackingStateToInVehicleStateUsingEnable_Fail_With_not_IN_VEHICLE_Activity() {
+        if (automode == null) {
+            assert(false)
+            return
+        }
+        if (automode != null) {
         val trackingState = TrackingState(automode!!)
-        automode?.setCurrentState(trackingState)
+        automode!!.setCurrentState(trackingState)
         Assert.assertTrue(automode!!.getCurrentState() is TrackingState)
         automode!!.getCurrentState().enable()
         val confidence = 100
@@ -138,6 +143,8 @@ class AutomaticModeTest : KoinTest {
         newLocation = getFakeLocation()
         sensorServiceFake.forceLocationChanged(newLocation)
         Assert.assertTrue("Current State Automode" + automode!!.getCurrentState() + "\n", automode!!.getCurrentState() == trackingState)
+
+        }
     }
 
     @Test
