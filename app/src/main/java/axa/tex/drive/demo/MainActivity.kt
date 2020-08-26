@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.core.tools.FileManager
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.*
@@ -103,6 +104,13 @@ class MainActivity : AppCompatActivity() {
             speedView.speedTo(it.speed*3.6f, 50)
         }, {throwable ->
             print(throwable)
+        })
+        service?.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
+            distanceTextView.text = "Distance : "+it.distance+"Km\nSpeed : "+it.speed+"Km/h\nDuration : "+it.duration/1000+"s"
+            Thread{
+                //distanceTextView.text = "Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]"
+                print("Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]")
+            }.start()
         })
     }
 

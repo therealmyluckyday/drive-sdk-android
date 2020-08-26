@@ -91,7 +91,7 @@ class TexDriveDemoApplication : Application() {
 
             oldLocation = it.location
             // Save trip for reuse
-            saveLocation(it.location, timeDelay)
+            //saveLocation(it.location, timeDelay)
             FileManager.log("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]\n", logFileName, applicationContext)
             Thread{
                 println("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]")
@@ -104,7 +104,7 @@ class TexDriveDemoApplication : Application() {
             Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
         }
         // Show all log text
-        updateLogsText()
+        //updateLogsText()
 
         // Delete log file
         //FileManager.getLogFile(applicationContext, logFileName)
@@ -113,7 +113,7 @@ class TexDriveDemoApplication : Application() {
         //FileManager.getLogFile(applicationContext, tripLogFileName)
 
         // Launch recorded trip
-        Timer("SettingUp", false).schedule(10000) {
+        Timer("SettingUp", false).schedule(1000) {
             loadTrip()
         }
 
@@ -127,23 +127,39 @@ class TexDriveDemoApplication : Application() {
 
 
     fun loadTrip() {
-            println("loadTrip")
-            val logFile: File? = getLogFile(applicationContext, tripLogFileName)
-            if (logFile !== null && logFile.exists()) {
+        println("loadTrip")
+        var logDirectory = getFilesDir()
+        val logFile = File(logDirectory.canonicalPath , tripLogFileName)
+        if (!logFile!!.exists()) {
+            print("ERROR File ?NOT FOUND")
+        }
+        if (logFile !== null && logFile.exists()) {
+
+            println("logFile !== null && logFile.exists()")
+            //if (inputStream !== null ) {
                 Thread {
+
+                    println("logFile read")
                     var newTime = System.currentTimeMillis() - 86400000
                     try {
                         val bufferedReader = BufferedReader(FileReader(logFile))
+
+                        println("bufferedReader read")
+                        //val bufferedReader = inputStream.bufferedReader()
                         var lineIndex = 0
                         var line = bufferedReader.readLine()
                         while (line != null) {
-                            //println(line)
+                            println(line)
                             newTime = sendLocationLineStringToSpeedFilter(line, newTime)
                             line = bufferedReader.readLine()
                             lineIndex++
                         }
+
+                        println("bufferedReader close")
                         bufferedReader.close()
                     } catch (e: IOException) {
+                        println(e.localizedMessage)
+                        println("IOException read")
                         //You'll need to add proper error handling here
                     }
                 }.start()
@@ -168,9 +184,9 @@ class TexDriveDemoApplication : Application() {
         val delay = locationDetails[6].toLong()
         newLocation.time = time + delay
         //if (speed > 0) {
-            //println("sendLocationLineStringToSpeedFilter"+newLocation.latitude+" "+newLocation.longitude+" "+newLocation.accuracy+" "+newLocation.speed+" "+newLocation.bearing+ " "+newLocation.altitude+" "+newLocation.time)
+            println("sendLocationLineStringToSpeedFilter"+newLocation.latitude+" "+newLocation.longitude+" "+newLocation.accuracy+" "+newLocation.speed+" "+newLocation.bearing+ " "+newLocation.altitude+" "+newLocation.time)
             this.sensorService!!.forceLocationChanged(newLocation)
-            Thread.sleep(100L)
+            Thread.sleep(1000L)
         //}
         return newLocation.time
     }

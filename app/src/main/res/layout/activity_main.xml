@@ -52,4 +52,10 @@
         android:textSize="20sp"
 
         android:layout_alignParentRight="true" />
+
+    <TextView
+        android:id="@+id/distanceTextView"
+        android:layout_width="match_parent"
+        android:layout_height="234dp"
+        android:text="TextView" />
 </RelativeLayout>
