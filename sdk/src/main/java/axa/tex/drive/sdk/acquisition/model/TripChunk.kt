@@ -36,7 +36,7 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
         }
 
         if ( json.count() > DEFAULT_JSON_SIZE) {
-            LOGGER.info("this.toJson().count() > 10000 TRUE", function = funcName)
+            LOGGER.info("this.toJson().count() > ${DEFAULT_JSON_SIZE} TRUE", function = funcName)
             return true
         }
 

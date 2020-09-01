@@ -44,7 +44,7 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
             else -> platform = Platform.PRODUCTION
         }
         val data = inputData.getString(Constants.DATA_KEY) ?: ""
-        LOGGER.info("COLLECTOR_WORKER SIZE :$inputData.keyValueMap.size", "private fun sendFixes(inputData : Data) : Boolean")
+        LOGGER.info("TRIPCHUNK SIZE :$inputData.keyValueMap.size", "private fun sendFixes(inputData : Data) : Boolean")
         return sendData(data, appName, platform)
     }
 
@@ -73,9 +73,11 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
                 LOGGER.error("SENDING : error CODE = ${urlConnection.responseCode}", funcName)
                 return when (urlConnection.responseCode) {
                     HttpURLConnection.HTTP_INTERNAL_ERROR -> {
+                        LOGGER.error("SENDING : error RETRY = ${urlConnection.responseCode}", funcName)
                         Result.retry()
                     }
                     else -> {
+                        LOGGER.error("SENDING : error FAILURE = ${urlConnection.responseCode}", funcName)
                         Result.failure()
                     }
                 }

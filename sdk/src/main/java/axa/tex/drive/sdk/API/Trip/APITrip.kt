@@ -18,7 +18,7 @@ internal class APITrip : KoinComponentCallbacks {
     var isRetrievingScoreAutomatically: Boolean = false
 
     fun sendTrip(tripChunk: TripChunk) {
-        LOGGER.info("SENDING PACKET DATA FOR WORKER MANAGER ${tripChunk.data(isRetrievingScoreAutomatically)}", function = "sendTrip")
+        LOGGER.info("SENDING PACKET DATA FOR WORKER MANAGER ${tripChunk.data(isRetrievingScoreAutomatically)} tripChunk.isLast: ${tripChunk.isLast} ", function = "sendTrip")
         val fixUploadWork: OneTimeWorkRequest = OneTimeWorkRequest
                 .Builder(if (tripChunk.isLast) LastFixWorker::class.java else FixWorker::class.java)
                 .setInputData(tripChunk.data(isRetrievingScoreAutomatically))

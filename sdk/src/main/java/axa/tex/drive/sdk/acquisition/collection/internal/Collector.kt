@@ -40,7 +40,7 @@ internal class Collector : KoinComponentCallbacks {
 
 
     fun startCollecting() {
-
+        LOGGER.info("startCollecting : ", function = "startCollecting")
         if (trackers != null) {
             for (tracker in trackers) {
                 logger.logger.info("Tracker ${tracker.javaClass.simpleName}", "startCollecting")
@@ -58,6 +58,7 @@ internal class Collector : KoinComponentCallbacks {
 
 
     private fun collect(tracker: Tracker) {
+        LOGGER.info("collect : "+tracker, function = "collect")
         tracker.enableTracking()
         fixData = tracker.provideFixProducer()
 
