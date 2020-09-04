@@ -67,8 +67,9 @@ class TexDriveDemoApplication : Application() {
     }
 
     fun configure() {
-        sensorService = SensorServiceFake(applicationContext, rxScheduler)
-        val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000",sensorService!!, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
+        val sensorServiceFake = SensorServiceFake(applicationContext, rxScheduler)
+        sensorService = sensorServiceFake
+        val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceFake, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
         config = newConfig
         val newService = TexService.configure(newConfig)
         service = newService
@@ -114,7 +115,7 @@ class TexDriveDemoApplication : Application() {
 
         // Launch recorded trip
         Timer("SettingUp", false).schedule(1000) {
-            loadTrip()
+            sensorServiceFake.loadTrip(applicationContext, 1000L)
         }
 
     }
@@ -122,73 +123,6 @@ class TexDriveDemoApplication : Application() {
         var message = "${location.latitude},${location.longitude},${location.accuracy},${location.speed},${location.bearing},${location.altitude},${delay}\n"
         //println(message)
         FileManager.log(message, tripLogFileName, applicationContext)
-    }
-
-
-
-    fun loadTrip() {
-        println("loadTrip")
-        var logDirectory = getFilesDir()
-        val logFile = File(logDirectory.canonicalPath , tripLogFileName)
-        if (!logFile!!.exists()) {
-            print("ERROR File ?NOT FOUND")
-        }
-        if (logFile !== null && logFile.exists()) {
-
-            println("logFile !== null && logFile.exists()")
-            //if (inputStream !== null ) {
-                Thread {
-
-                    println("logFile read")
-                    var newTime = System.currentTimeMillis() - 86400000
-                    try {
-                        val bufferedReader = BufferedReader(FileReader(logFile))
-
-                        println("bufferedReader read")
-                        //val bufferedReader = inputStream.bufferedReader()
-                        var lineIndex = 0
-                        var line = bufferedReader.readLine()
-                        while (line != null) {
-                            println(line)
-                            newTime = sendLocationLineStringToSpeedFilter(line, newTime)
-                            line = bufferedReader.readLine()
-                            lineIndex++
-                        }
-
-                        println("bufferedReader close")
-                        bufferedReader.close()
-                    } catch (e: IOException) {
-                        println(e.localizedMessage)
-                        println("IOException read")
-                        //You'll need to add proper error handling here
-                    }
-                }.start()
-            }
-    }
-
-    private fun sendLocationLineStringToSpeedFilter(line: String, time: Long) : Long {
-        val locationDetails = line.split(",")
-        var newLocation = Location("")
-        val latitude = locationDetails[0].toDouble()
-        newLocation.latitude = latitude
-        val longitude = locationDetails[1].toDouble()
-        newLocation.longitude = longitude
-        val accuracy = locationDetails[2].toFloat()
-        newLocation.accuracy = accuracy
-        val speed = locationDetails[3].toFloat()
-        newLocation.speed = speed // 20.F
-        val bearing = locationDetails[4].toFloat()
-        newLocation.bearing = bearing
-        val altitude = locationDetails[5].toDouble()
-        newLocation.altitude =altitude
-        val delay = locationDetails[6].toLong()
-        newLocation.time = time + delay
-        //if (speed > 0) {
-            println("sendLocationLineStringToSpeedFilter"+newLocation.latitude+" "+newLocation.longitude+" "+newLocation.accuracy+" "+newLocation.speed+" "+newLocation.bearing+ " "+newLocation.altitude+" "+newLocation.time)
-            this.sensorService!!.forceLocationChanged(newLocation)
-            Thread.sleep(1000L)
-        //}
-        return newLocation.time
     }
 
     override fun onCreate() {

@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         service?.getSensorService()!!.speedFilter()?.gpsStream?.subscribe({
-            speedView.speedTo(it.speed*3.6f, 50)
+            speedView.speedTo(it.speed*1f, 50)
         }, {throwable ->
             print(throwable)
         })
