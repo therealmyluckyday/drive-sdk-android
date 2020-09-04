@@ -169,8 +169,10 @@ artifactory {
     publish {
         repository {
             repoKey = 'android-tex'
-            username = System.getenv("ARTIFACTORY_USERNAME") //artifactory_username
-            password = System.getenv("ARTIFACTORY_PASSWORD") //artifactory_password
+            //username = System.getenv("ARTIFACTORY_USERNAME") //artifactory_username
+            //password = System.getenv("ARTIFACTORY_PASSWORD") //artifactory_password
+            username = 'emasson'
+            password = 'crocodil'
             maven = true
         }
         defaults {

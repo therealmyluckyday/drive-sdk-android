@@ -14,7 +14,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.13.0"
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
         classpath "org.codehaus.groovy:groovy-all:2.4.15"
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8")
         classpath 'com.google.gms:google-services:4.3.3'
@@ -33,12 +33,12 @@ allprojects {
         maven {
             url 'https://axadil.jfrog.io/axadil/android-tex'
             credentials {
-                username = System.getenv("ARTIFACTORY_USERNAME") //artifactory_username
-                password = System.getenv("ARTIFACTORY_PASSWORD") //
+                //username = System.getenv("ARTIFACTORY_USERNAME") //artifactory_username
+                //password = System.getenv("ARTIFACTORY_PASSWORD") //
                 //username = artifactory_username
                 //password = artifactory_password
-                //username = 'emasson'
-                //password = 'crocodil'
+                username = 'emasson'
+                password = 'crocodil'
             }
         }
     }
