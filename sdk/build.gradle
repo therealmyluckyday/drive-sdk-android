@@ -6,7 +6,7 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'org.sonarqube'
 
-def currentVersionName = "3.0.4--beta--28082020"
+def currentVersionName = "3.0.4--beta--08092020"
 def getVersionName = { ->
     return currentVersionName
 }
@@ -94,6 +94,7 @@ dependencies {
     def work_version = "2.2.0"
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$work_version"
+
 
     //Rx
     def rx_kotlin_version = '2.4.0'

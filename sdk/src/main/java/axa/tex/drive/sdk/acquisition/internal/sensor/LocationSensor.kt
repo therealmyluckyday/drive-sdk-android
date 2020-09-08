@@ -66,6 +66,7 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
         this.automode = automode
         this.sensorService = sensorService
         this.speedFilter = speedFilter
+        LOGGER.info(" rxScheduler"+speedFilter.rxScheduler, "constructor")
     }
 
     override fun producer(): Observable<List<Fix>> {
@@ -78,6 +79,7 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
         if (isEnable != track) {
             isEnable = track
             if (track) {
+                LOGGER.info("location Tracker enabled", funcName)
                 subscribeGPSSTream()
                 checkPermission()
                 sensorService.activelyScanSpeed()
@@ -86,14 +88,18 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
             }
             speedFilter.collectionEnabled = track
             LOGGER.info("location Tracker enabled: $track", funcName)
+        } else {
+            LOGGER.error("Already done: $track", funcName)
         }
     }
 
     fun subscribeGPSSTream() {
         val funcName = "subscribeGPSSTream"
         LOGGER.info("subscribeGPSSTream "+speedFilter.rxScheduler, funcName)
+        LOGGER.info("speedFilter "+speedFilter, funcName)
         val scheduler: Scheduler = if (speedFilter.rxScheduler != null) speedFilter.rxScheduler!! else Schedulers.io()
-        speedFilter.gpsStream.subscribeOn(scheduler)?.subscribe ({
+        speedFilter.gpsStream.subscribeOn(scheduler).observeOn(Schedulers.io())!!.subscribe ({
+            LOGGER.info("Got new location fix ", funcName)
             if (speedFilter.collectionEnabled) {
                 val locationFix: LocationFix = LocationFix(it.latitude.toDouble(),
                         it.longitude.toDouble(),

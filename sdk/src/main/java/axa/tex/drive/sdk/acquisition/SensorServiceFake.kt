@@ -8,9 +8,6 @@ import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
 import io.reactivex.Scheduler
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.subjects.PublishSubject
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileReader
 import java.io.IOException
 
 open class SensorServiceFake : SensorService {
