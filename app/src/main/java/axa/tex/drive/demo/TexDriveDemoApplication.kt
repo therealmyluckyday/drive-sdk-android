@@ -18,8 +18,10 @@ import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.*
 import axa.tex.drive.sdk.core.tools.FileManager
 import axa.tex.drive.sdk.core.tools.FileManager.Companion.getLogFile
+import com.google.android.gms.location.LocationServices
 import io.reactivex.schedulers.Schedulers
 import java.io.*
+import java.lang.Exception
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -34,7 +36,7 @@ class TexDriveDemoApplication : Application() {
 
     val logFileName = "axa-dil-tex.txt"
 
-    val rxScheduler = Schedulers.single()
+    val rxScheduler = Schedulers.io()
     private var myTripId : TripId? = null
     internal  val CHANNEL_ID = "tex-channel-id"
     internal  val CHANNEL_NAME = "Notification"
@@ -67,42 +69,51 @@ class TexDriveDemoApplication : Application() {
     }
 
     fun configure() {
-        val sensorServiceFake = SensorServiceFake(applicationContext, rxScheduler)
-        sensorService = sensorServiceFake
-        val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceFake, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
-        config = newConfig
-        val newService = TexService.configure(newConfig)
-        service = newService
-        val autoModeHandler = newService.automodeHandler()
 
-        newService.logStream().subscribeOn(Schedulers.io()).subscribe({ it ->
-            FileManager.log( "[" + it.file + "][" + it.function + "]" + it.description + "\n", logFileName, applicationContext)
-            Thread{
-                println("["+it.file +"]["+ it.function + "]"+ it.description )
-            }.start()
-        })
+        println("["+Thread.currentThread().getName()+"][Configure]")
+        //val sensorServiceFake = SensorServiceFake(applicationContext, rxScheduler)
+        //sensorService = sensorServiceFake
+        try {
+            val sensorServiceImpl = SensorServiceImpl(applicationContext, rxScheduler, LocationServices.getFusedLocationProviderClient(this))
+            val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceImpl, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
+            config = newConfig
+            val newService = TexService.configure(newConfig)
+            service = newService
+            val autoModeHandler = newService.automodeHandler()
+            newService.logStream().subscribeOn(Schedulers.computation()).subscribe({ it ->
+                //println("["+it.file +"]["+ it.function + "]"+ it.description )
+                FileManager.log( "[" + it.file + "][" + it.function + "]" + it.description + "\n", logFileName, applicationContext)
+                Thread{
+                   // println("["+it.file +"]["+ it.function + "]"+ it.description )
+                }.start()
+            })
 
-        newService.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
-            var timeDelay: Long = 0
-            if (oldLocation == null) {
-            } else {
-                // time  UTC time of this fix, in milliseconds since January 1, 1970.
-                timeDelay = it.location.time - oldLocation!!.time
+            newService.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
+                var timeDelay: Long = 0
+                if (oldLocation == null) {
+                } else {
+                    // time  UTC time of this fix, in milliseconds since January 1, 1970.
+                    timeDelay = it.location.time - oldLocation!!.time
+                }
+
+                oldLocation = it.location
+                // Save trip for reuse
+                //saveLocation(it.location, timeDelay)
+                FileManager.log("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]\n", logFileName, applicationContext)
+                Thread{
+                    println("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]")
+                }.start()
+            }, {throwable ->
+                println("[TripProgress][ERROR]" + throwable)
+            })
+            if(!autoModeHandler.running) {
+                Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
+               // autoModeHandler.activateAutomode(applicationContext,false, isSimulatedDriving = true)
+            }else{
+                Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
             }
-
-            oldLocation = it.location
-            // Save trip for reuse
-            //saveLocation(it.location, timeDelay)
-            FileManager.log("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]\n", logFileName, applicationContext)
-            Thread{
-                println("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]")
-            }.start()
-        })
-        if(!autoModeHandler.running) {
-            Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
-            autoModeHandler.activateAutomode(applicationContext,true, isSimulatedDriving = false)
-        }else{
-            Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
+        } catch (ex: Exception) {
+            println(ex.stackTrace)
         }
         // Show all log text
         //updateLogsText()
@@ -115,7 +126,7 @@ class TexDriveDemoApplication : Application() {
 
         // Launch recorded trip
         Timer("SettingUp", false).schedule(1000) {
-            sensorServiceFake.loadTrip(applicationContext, 1000L)
+            //sensorServiceFake.loadTrip(applicationContext, 1000L)
         }
 
     }
