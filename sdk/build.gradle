@@ -6,7 +6,20 @@ apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'org.sonarqube'
 
-def currentVersionName = "3.0.4--beta--08092020"
+buildscript {
+    repositories {
+        jcenter()
+
+    }
+    dependencies {
+        //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+    }
+}
+
+
+
+def currentVersionName = "3.0.4--beta--10092020"
 def getVersionName = { ->
     return currentVersionName
 }
@@ -60,7 +73,9 @@ android {
         exclude("META-INF/*.kotlin_module")
     }
 }
+
 project(":sdk") {
+    apply plugin: "com.jfrog.artifactory"
     sonarqube {
         properties {
             property "sonar.projectKey", "drive-sdk-android-next"
