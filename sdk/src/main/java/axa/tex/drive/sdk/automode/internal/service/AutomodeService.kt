@@ -88,7 +88,7 @@ internal class AutomodeService : Service() {
         val myRunnable = Runnable() {
 
             try {
-                TexConfig.setupKoin(applicationContext, Schedulers.single(), SensorServiceImpl(applicationContext, Schedulers.single()))
+                TexConfig.setupKoin(applicationContext, Schedulers.single(), SensorServiceImpl(applicationContext, Schedulers.single(), null))
             } catch (e: Exception) {
                 LOGGER.error("${e.printStackTrace().toString()}", "activateAutomode")
             }

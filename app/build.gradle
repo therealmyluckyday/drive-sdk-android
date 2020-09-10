@@ -35,6 +35,7 @@ dependencies {
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 
     // Android
     def build_tools_version = "29.0.1"

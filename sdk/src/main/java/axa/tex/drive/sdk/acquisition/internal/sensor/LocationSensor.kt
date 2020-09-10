@@ -25,7 +25,6 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
     private var lastLocation: Location? = null
     internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
     private var context: Context? = null
-    private var locationManager: LocationManager? = null
     private val fixProducer: PublishSubject<List<Fix>> = PublishSubject.create()
     private val speedFilter: SpeedFilter
 
@@ -60,7 +59,6 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
 
     constructor(automode: Automode, sensorService: SensorService, speedFilter: SpeedFilter, context: Context?, canBeEnabled: Boolean = true) {
         LOGGER.info("context "+context, "constructor")
-        locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         this.context = context
         this.canBeEnabled = canBeEnabled
         this.automode = automode

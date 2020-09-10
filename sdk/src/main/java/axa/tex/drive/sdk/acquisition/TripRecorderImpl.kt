@@ -39,7 +39,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     private var mCurrentSpeed: Int = 0
     private var mConfig: Config? = null
     private var start : Long  = 0
-    private var disposable : Disposable
+    private var disposable : Disposable? = null
     private val sensorService: SensorService
     private val tripProgress = PublishSubject.create<TripProgress>()
     internal val logger = LoggerFactory().getLogger(this::class.java.name).logger
@@ -54,7 +54,12 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
     constructor(context: Context, sensorService:SensorService, scheduler: Scheduler) {
         this.context = context
         this.sensorService = sensorService
+        configureLocationSubscribe()
+    }
+
+    fun configureLocationSubscribe() {
         disposable = sensorService.speedFilter().locations.subscribe({
+            logger.info("Start: "+start, "sensorService.speedFilter().locations.subscribe")
             if (start > 0) {
                 var deltaDistance = 0.0
                 if (mCurrentLocation != null) { // this is not the first point GPS received
@@ -75,12 +80,12 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
 
 
 
-
     override fun startTrip(startTime: Long) : TripId?{
         if (mConfig != null) {
             val config = mConfig!!
             start = startTime
             mCurrentDistance = 0.toDouble()
+            configureLocationSubscribe()
             logger.info("${Date()} TripRecorder : Start tracking.", function = "startTrip")
             this.sensorService.requestForLocationPermission()
             val serviceIntent = Intent(context, CollectorService::class.java)
@@ -98,13 +103,12 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
             return fixProcessor.startTrip(startTime, config)
         }
 
-        logger.error("TripREcorderImpl has no config", "startTrip")
+        logger.error("TripRecorderImpl has no config", "startTrip")
         return null
     }
 
     override fun stopTrip(endTime: Long) {
         logger.info("TripRecorder : Stop tracking.", function = "fun stopTrip(startTime: Long) : TripId?")
-        this.sensorService.requestForLocationPermission()
         start = 0
         fixProcessor.endTrip(endTime)
         val serviceIntent = Intent(context, CollectorService::class.java)
@@ -120,7 +124,8 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
                 logger.info(" CollectorService : onServiceDisconnected", function = "onServiceDisconnected")
             }
         }, 0)
-        disposable.dispose()
+        disposable?.dispose()
+        disposable = null
     }
 
     override fun isRecording(): Boolean {

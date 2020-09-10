@@ -7,6 +7,7 @@ import android.os.Build
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.core.ActivityRecognitionService
 import axa.tex.drive.sdk.core.logger.LoggerFactory
+import com.google.android.gms.location.FusedLocationProviderClient
 import io.reactivex.Scheduler
 
 
@@ -16,9 +17,9 @@ class SensorServiceImpl: SensorService {
     private var locationSensorService: LocationSensorService
     private var activityRecognitionService: ActivityRecognitionService
 
-    constructor(context: Context, scheduler: Scheduler) {
+    constructor(context: Context, scheduler: Scheduler, fusedLocationClient: FusedLocationProviderClient?) {
         this.context = context
-        this.locationSensorService = LocationSensorService(context, scheduler)
+        this.locationSensorService = LocationSensorService(context, scheduler, fusedLocationClient)
         this.activityRecognitionService = ActivityRecognitionService(context, scheduler)
     }
 

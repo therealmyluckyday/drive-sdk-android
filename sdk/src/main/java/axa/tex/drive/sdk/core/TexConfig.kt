@@ -27,6 +27,7 @@ import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.android.gms.location.FusedLocationProviderClient
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import org.koin.core.context.startKoin
@@ -96,7 +97,7 @@ class TexConfig {
 
         fun loadAutoModeModule(context: Context) {
             val scheduler = Schedulers.single()
-            val sensorService = SensorServiceImpl(context, scheduler)
+            val sensorService = SensorServiceImpl(context, scheduler, null)
             val myModule = module {
                 single { SpeedFilter() }
                 single { Automode(get(), scheduler) }
@@ -161,7 +162,7 @@ class TexConfig {
             TexConfig.user = user
             this.clientId = clientId
             this.scheduler = rxScheduler
-            this.sensorService = SensorServiceImpl(context, rxScheduler)
+            this.sensorService = SensorServiceImpl(context, rxScheduler, null)
         }
 
         constructor(context: Context, appName: String, clientId: String, sensor: SensorService, rxScheduler: Scheduler = Schedulers.single()) {
@@ -173,13 +174,13 @@ class TexConfig {
             this.sensorService = sensor
         }
 
-        constructor(context: Context, appName: String, clientId: String, rxScheduler: Scheduler = Schedulers.single()) {
+        constructor(context: Context, appName: String, clientId: String, fusedLocationClient: FusedLocationProviderClient, rxScheduler: Scheduler = Schedulers.single()) {
             LOGGER.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
             this.context = context
             this.appName = appName
             this.clientId = clientId
             this.scheduler = rxScheduler
-            this.sensorService = SensorServiceImpl(context, rxScheduler)
+            this.sensorService = SensorServiceImpl(context, rxScheduler, fusedLocationClient)
         }
 
         fun build(): TexConfig {
