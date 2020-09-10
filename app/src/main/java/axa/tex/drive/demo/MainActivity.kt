@@ -33,188 +33,94 @@ class MainActivity : AppCompatActivity() {
 
         println("["+Thread.currentThread().getName()+"][Configure]")
         val texApplication = application as TexDriveDemoApplication
-        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
-            texApplication.configure()
-            val service = texApplication.service
-            tripRecorder = texApplication.tripRecorder
+        texApplication.configure()
+        val service = texApplication.service
+        tripRecorder = texApplication.tripRecorder
 
-            play.setOnClickListener {
+        play.setOnClickListener {
 
-                runOnUiThread {
+            runOnUiThread {
 
-                    play.visibility = View.GONE
-                    stop.visibility = View.VISIBLE
-
-                    startService()
-                }
-            }
-            stop.setOnClickListener {
-                speedView.speedTo(0f)
-                speedView.isWithTremble = false
-                speedView.stop()
-                stop.visibility = View.GONE
-                play.visibility = View.VISIBLE
-                stopService()
-            }
-
-            if (tripRecorder?.isRecording()!!) {
                 play.visibility = View.GONE
                 stop.visibility = View.VISIBLE
+
+                startService()
             }
+        }
+        stop.setOnClickListener {
+            speedView.speedTo(0f)
+            speedView.isWithTremble = false
+            speedView.stop()
+            stop.visibility = View.GONE
+            play.visibility = View.VISIBLE
+            stopService()
+        }
+
+        if (tripRecorder?.isRecording()!!) {
+            play.visibility = View.GONE
+            stop.visibility = View.VISIBLE
+        }
 
 
 
 
-            val scoreRetriever = service?.scoreRetriever()
-            scoreRetriever?.getScoreListener()?.subscribe ( {
-                it?.let { score ->
-                    println("ScoreWorker result" + score) }
-            }, {throwable ->
-                print(throwable)
-            })
+        val scoreRetriever = service?.scoreRetriever()
+        scoreRetriever?.getScoreListener()?.subscribe ( {
+            it?.let { score ->
+                println("ScoreWorker result" + score) }
+        }, {throwable ->
+            print(throwable)
+        })
 
-            (application as TexDriveDemoApplication).tripRecorder?.endedTripListener()?.subscribe ( {
-                print(it)
-            }, {throwable ->
-                print(throwable)
-            })
+        (application as TexDriveDemoApplication).tripRecorder?.endedTripListener()?.subscribe ( {
+            print(it)
+        }, {throwable ->
+            print(throwable)
+        })
 
-            trips.setOnLongClickListener {
-                val intent = Intent(this, Trips::class.java)
-                startActivity(intent)
-                true
-            }
+        trips.setOnLongClickListener {
+            val intent = Intent(this, Trips::class.java)
+            startActivity(intent)
+            true
+        }
 
-            val autoModeHandler = service?.automodeHandler()
-            autoModeHandler?.state?.subscribe( {driving ->
-                if(driving){
-                    runOnUiThread {
-                        play.visibility = View.GONE
-                        stop.visibility = View.VISIBLE
-                        startService()
-
-                    }
-
-                }else{
-                    runOnUiThread {
-                        stopService()
-                        play.visibility = View.VISIBLE
-                        stop.visibility = View.GONE
-                        speedView.speedTo(0f)
-                        speedView.stop()
-                        speedView.isWithTremble = false
-                    }
-                }
-
-            }, {throwable ->
-                print(throwable)
-            })
-
-            service?.getSensorService()!!.speedFilter()?.gpsStream?.subscribe({
-                speedView.speedTo(it.speed*1f, 50)
-            }, {throwable ->
-                print(throwable)
-            })
-            service?.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
-                distanceTextView.text = "Distance : "+it.distance+"Km\nSpeed : "+it.speed+"Km/h\nDuration : "+it.duration/1000+"s"
-                Thread{
-                    //distanceTextView.text = "Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]"
-                    print("Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]")
-                }.start()
-            })
-        } else {
-            println("SUPER")
-            Handler(Looper.getMainLooper()).postDelayed( {
-                texApplication.configure()
-                val service = texApplication.service
-                tripRecorder = texApplication.tripRecorder
-
-                play.setOnClickListener {
-
-                   runOnUiThread {
-
-                        play.visibility = View.GONE
-                        stop.visibility = View.VISIBLE
-
-                    }
-                        startService()
-                }
-                stop.setOnClickListener {
-                    speedView.speedTo(0f)
-                    speedView.isWithTremble = false
-                    speedView.stop()
-                    stop.visibility = View.GONE
-                    play.visibility = View.VISIBLE
-                    stopService()
-                }
-
-                if (tripRecorder?.isRecording()!!) {
+        val autoModeHandler = service?.automodeHandler()
+        autoModeHandler?.state?.subscribe( {driving ->
+            if(driving){
+                runOnUiThread {
                     play.visibility = View.GONE
                     stop.visibility = View.VISIBLE
+                    startService()
+
                 }
 
-
-
-
-                val scoreRetriever = service?.scoreRetriever()
-                scoreRetriever?.getScoreListener()?.subscribe ( {
-                    it?.let { score ->
-                        println("ScoreWorker result" + score) }
-                }, {throwable ->
-                    print(throwable)
-                })
-
-                (application as TexDriveDemoApplication).tripRecorder?.endedTripListener()?.subscribe ( {
-                    print(it)
-                }, {throwable ->
-                    print(throwable)
-                })
-
-                trips.setOnLongClickListener {
-                    val intent = Intent(this, Trips::class.java)
-                    startActivity(intent)
-                    true
+            }else{
+                runOnUiThread {
+                    stopService()
+                    play.visibility = View.VISIBLE
+                    stop.visibility = View.GONE
+                    speedView.speedTo(0f)
+                    speedView.stop()
+                    speedView.isWithTremble = false
                 }
+            }
 
-                val autoModeHandler = service?.automodeHandler()
-                autoModeHandler?.state?.subscribe( {driving ->
-                    if(driving){
-                        runOnUiThread {
-                            play.visibility = View.GONE
-                            stop.visibility = View.VISIBLE
+        }, {throwable ->
+            print(throwable)
+        })
 
-                        }
-                            startService()
-
-                    }else{
-                        runOnUiThread {
-                            stopService()
-                            play.visibility = View.VISIBLE
-                            stop.visibility = View.GONE
-                            speedView.speedTo(0f)
-                            speedView.stop()
-                            speedView.isWithTremble = false
-                        }
-                    }
-
-                }, {throwable ->
-                    print(throwable)
-                })
-
-                service?.getSensorService()!!.speedFilter()?.gpsStream?.subscribe({
-                    speedView.speedTo(it.speed*1f, 50)
-                }, {throwable ->
-                    print(throwable)
-                })
-                service?.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
-                    distanceTextView.text = "Distance : "+it.distance+"Km\nSpeed : "+it.speed+"Km/h\nDuration : "+it.duration/1000+"s"
-                    Thread{
-                        //distanceTextView.text = "Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]"
-                        print("Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]")
-                    }.start()
-                })
-            }, 2000)
-        }
+        service?.getSensorService()!!.speedFilter()?.gpsStream?.subscribe({
+            speedView.speedTo(it.speed*1f, 50)
+        }, {throwable ->
+            print(throwable)
+        })
+        service?.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
+            distanceTextView.text = "Distance : "+it.distance+"Km\nSpeed : "+it.speed+"Km/h\nDuration : "+it.duration/1000+"s"
+            Thread{
+                //distanceTextView.text = "Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]"
+                print("Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]")
+            }.start()
+        })
     }
 
 

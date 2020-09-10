@@ -14,7 +14,7 @@ final class FileManager {
         internal val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
         fun loadFileMessage(messages: PublishSubject<String>, fileName:String, context: Context) {
-            println("loadTrip")
+            LOGGER.info("Load trip", function = "loadFileMessage")
             val logFile: File? = getLogFile(context, fileName)
             if (logFile !== null && logFile.exists()) {
                 Thread {

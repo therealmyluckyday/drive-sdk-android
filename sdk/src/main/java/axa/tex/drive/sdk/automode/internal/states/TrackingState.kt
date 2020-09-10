@@ -52,7 +52,6 @@ internal class TrackingState : AutoModeDetectionState {
                             var subscription: Disposable? = null
                             subscription = filterer.gpsStream.subscribeOn(automode.rxScheduler).filter { it.speed >= SPEED_MOVEMENT_THRESHOLD }.subscribe {
                                 LOGGER.info(Date().toString() + ":Speed of ${it.speed} reached", function = "fun gpsStream.subscribeOn()")
-                                println(  ":Speed of ${it.speed} reached"+Thread.currentThread().getName())
                                 subscription?.dispose()
                                 goNext()
                             }

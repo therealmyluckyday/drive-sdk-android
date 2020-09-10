@@ -81,10 +81,9 @@ class TexDriveDemoApplication : Application() {
             service = newService
             val autoModeHandler = newService.automodeHandler()
             newService.logStream().subscribeOn(Schedulers.computation()).subscribe({ it ->
-                //println("["+it.file +"]["+ it.function + "]"+ it.description )
-                FileManager.log( "[" + it.file + "][" + it.function + "]" + it.description + "\n", logFileName, applicationContext)
+                FileManager.log( "[" + it.threadName + "]["+ it.file + "][" + it.function + "]" + it.description + "\n", logFileName, applicationContext)
                 Thread{
-                   // println("["+it.file +"]["+ it.function + "]"+ it.description )
+                   println("[" + it.threadName + "]["+ it.file + "][" + it.function + "]" + it.description  )
                 }.start()
             })
 
@@ -132,7 +131,6 @@ class TexDriveDemoApplication : Application() {
     }
     fun saveLocation(location: Location, delay:Long) {
         var message = "${location.latitude},${location.longitude},${location.accuracy},${location.speed},${location.bearing},${location.altitude},${delay}\n"
-        //println(message)
         FileManager.log(message, tripLogFileName, applicationContext)
     }
 

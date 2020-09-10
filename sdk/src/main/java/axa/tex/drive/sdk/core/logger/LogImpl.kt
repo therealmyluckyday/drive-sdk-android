@@ -13,7 +13,6 @@ internal class LogImpl : Log {
     override fun print(description: String, type: LogType, function: String) {
         val className = if (file != null) file!!.splitToSequence(".").last() else "Unknown"
         val logDetail = LogMessage(description, type, className, function)
-        println("["+Thread.currentThread().getName()+"]["+className+"]"+"["+function+"]"+logDetail.description)
         logSubject.onNext(logDetail)
     }
 

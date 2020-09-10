@@ -290,7 +290,7 @@ class AutomaticModeTest : KoinTest {
         val currentState = DrivingState(automode!!)
         val answer = Answer {
             val drivingState = it as DrivingState
-            println("YOUHOUHOUHOUHOU")
+            println("testFromDrivingStateToIdleStateUsingEnable_Fail_watchGPS drivingState.goNext()")
             drivingState.goNext()
             null
         }
