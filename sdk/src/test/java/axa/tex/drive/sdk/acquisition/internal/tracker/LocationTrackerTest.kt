@@ -36,23 +36,29 @@ class LocationTrackerTest {
         val signal = CountDownLatch(1)
         var isCalled= false
         val locationProducer = locationTracker.provideFixProducer()
-        locationProducer.subscribe { fixes ->
+        locationProducer.doOnError {
+            println(it.printStackTrace())
+            signal.countDown()
+        }
+        .subscribe ({ fixes ->
             try {
                 val fix = fixes.first()
                 Assert.assertTrue("fix is LocationFix", fix is LocationFix)
                 val locationFix = (fix as LocationFix)
-                print(fix)
                 Assert.assertTrue("latitude : ${locationFix.latitude}",locationFix.latitude.toString() == "12.0")
-                Assert.assertTrue("longitude : ${locationFix.longitude}",locationFix.latitude.toString() == "1.88282")
+                Assert.assertTrue("longitude : |${locationFix.longitude}|1.88282|",locationFix.longitude.toString() == "1.88282")
                 isCalled = true
                 signal.countDown()
             } catch (e: Throwable) {
-                isCalled = true
                 signal.countDown()
-                Assert.assertNull(e.printStackTrace().toString(), e)
+                print(e.printStackTrace())
             }
 
-        }
+        }, {throwable ->
+            print(throwable)
+            Assert.assertNull(throwable.printStackTrace().toString(), throwable)
+            signal.countDown()
+        })
         locationTracker.enableTracking()
         signal.await()
         Assert.assertTrue("isCalled", isCalled)
