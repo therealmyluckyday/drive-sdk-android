@@ -41,7 +41,6 @@ class TextInstrumentedTest : KoinTest {
         tripRecorder = TexService.configure(config).getTripRecorder()
         tripRecorder?.locationObservable()?.subscribe { fix -> lastLocation = fix }
         tripRecorder?.startTrip(Date().time)
-
         var newLocation = Location("")
         val latitude = 10.0
         newLocation.latitude = latitude
@@ -68,14 +67,16 @@ class TextInstrumentedTest : KoinTest {
     }
 
     @Test
-    fun testLastLocation() {
-        Thread.sleep(1000)
-        Assert.assertTrue(lastLocation != null)
+    fun testGetCurrentTripId() {
+        Thread.sleep(100)
+        Assert.assertNotNull(tripRecorder)
+        Assert.assertNotNull(tripRecorder!!.getCurrentTripId())
     }
 
 
     @Test
     fun testIsRecording() {
+        Assert.assertNotNull(tripRecorder)
         Assert.assertTrue(tripRecorder!!.isRecording())
         tripRecorder?.stopTrip(Date().time)
         Thread.sleep(100)
