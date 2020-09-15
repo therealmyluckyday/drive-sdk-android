@@ -119,6 +119,9 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
             LOGGER.error("RESPONSE CODES ${connection.responseCode}"+" Exception ${e}", "scoreRequest")
             val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
             scoreRetriever.getScoreListener().onNext(ScoreResult(scoreError = scoreError))
+            if (connection.responseCode == 202) {
+                return Result.success()
+            }
         } catch (err: Error) {
             LOGGER.error("RESPONSE CODES ${connection.responseCode}"+" Error ${err}", "scoreRequest")
             val scoreError = mapper.readValue(responseString.toString(), ScoreError::class.java)
