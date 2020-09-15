@@ -41,7 +41,8 @@ class AutomodeIntegratedTest {
         sensorService = sensorServiceFake
         Assert.assertNotNull(sensorService)
 
-        val doneSignal = CountDownLatch(934) // Number of GPS point used for the trip
+        val doneSignal = CountDownLatch(937) // Number of GPS point used for the trip
+        val drivingSignal = CountDownLatch(1)
         val scoreSignal = CountDownLatch(1)
         val appName = "APP-TEST"
         config = TexConfig.Builder(context, appName, "22910000",sensorService!!, rxScheduler).enableTrackers().platformHost(Platform.PRODUCTION).build()
@@ -55,10 +56,10 @@ class AutomodeIntegratedTest {
             assert(it.type!= LogType.ERROR)
         })
 
-        var endTripTime = Date().time
         val autoModeHandler = service!!.automodeHandler()
         autoModeHandler.activateAutomode(context,false, isSimulatedDriving = false)
-        val timeStart = System.currentTimeMillis() - 50000000
+        val timeStart = System.currentTimeMillis() - 86400000
+        var endTripTime = timeStart + 3600000
         autoModeHandler?.state?.subscribe( {driving ->
             if(driving){
                 println("-DRIVING START TRIP : ")
@@ -114,18 +115,21 @@ class AutomodeIntegratedTest {
             println("-SUBSCRIBE "+ it)
             if (it == "activelyScanSpeed") {
                 println("-LOAD TRIP")
+                drivingSignal.countDown()
                 endTripTime = loadTrip(sensorService!!, timeStart)// 57 600 000 = 16 Hour  86400000 = 24 Hour
             }
         })
 
-
         sensorServiceFake.speedFilter().activityStream.onNext(DetectedActivity(DetectedActivity.IN_VEHICLE, confidence))
 
-        println("Sleep")
+        println("drivingSignal.await")
+        drivingSignal.await()
+        println("Sleep 1 s")
         Thread.sleep(1000)
         println("doneSignal.await")
         doneSignal.await()
-        Thread.sleep(1000)
+        println("Sleep 10s")
+        Thread.sleep(10000)
         println("scoreSignal.await")
         scoreSignal.await()
         println("scoreSignal.done")

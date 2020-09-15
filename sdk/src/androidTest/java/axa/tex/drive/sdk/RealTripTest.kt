@@ -51,7 +51,7 @@ class RealTripTest  {
         assertNotNull(service)
 
         service.logStream().subscribeOn(AndroidSchedulers.mainThread()).subscribe({ it ->
-            println(it.description)
+            println(it.toString())
             assert(it.type!= LogType.ERROR)
         })
         val timeStart = System.currentTimeMillis() - 86400000// 50000000
@@ -71,6 +71,7 @@ class RealTripTest  {
             }
         }, {throwable ->
             assertFalse("Exception: "+throwable,true)
+            scoreSignal.countDown()
         })
 
         service!!.getTripRecorder().tripProgress()?.subscribe({
@@ -90,17 +91,21 @@ class RealTripTest  {
             assertNotNull(it)
             assert(it!! == tripId!!.value)
             it?.let { score ->
-                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION, true, delay = 12)
+                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION, true, delay = 10)
             }
         })
 
         val endTripTime = sensorService!!.loadTrip(context, 1L)
        // val endTripTime = loadTrip(sensorService!!, timeStart)// 57 600 000 = 16 Hour  86400000 = 24 Hour
+        println("-doneSignal await")
         doneSignal.await()
-        Thread.sleep(1000)
+        println("-Thread sleep 12s")
+        Thread.sleep(1000)  // 93 sec
+        println("-stop trip")
         service!!.getTripRecorder().stopTrip(System.currentTimeMillis()- (86400000-3600000))
-
+        println("-Thread sleep 1s")
         Thread.sleep(1000)
+        println("-scoreSignal await")
         scoreSignal.await()
     }
 }
