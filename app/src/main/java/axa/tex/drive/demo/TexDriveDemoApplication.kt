@@ -71,11 +71,11 @@ class TexDriveDemoApplication : Application() {
     fun configure() {
 
         println("["+Thread.currentThread().getName()+"][Configure]")
-        //val sensorServiceFake = SensorServiceFake(applicationContext, rxScheduler)
-        //sensorService = sensorServiceFake
+        val sensorServiceFake = SensorServiceFake(applicationContext, rxScheduler)
+        sensorService = sensorServiceFake
         try {
-            val sensorServiceImpl = SensorServiceImpl(applicationContext, rxScheduler, LocationServices.getFusedLocationProviderClient(this))
-            val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceImpl, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
+            //val sensorServiceImpl = SensorServiceImpl(applicationContext, rxScheduler, LocationServices.getFusedLocationProviderClient(this))
+            val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceFake, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
             config = newConfig
             val newService = TexService.configure(newConfig)
             service = newService
@@ -98,9 +98,9 @@ class TexDriveDemoApplication : Application() {
                 oldLocation = it.location
                 // Save trip for reuse
                 //saveLocation(it.location, timeDelay)
-                FileManager.log("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]\n", logFileName, applicationContext)
+                //FileManager.log("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]\n", logFileName, applicationContext)
                 Thread{
-                    println("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]")
+                    //println("[TripProgress][" + it.duration + "][" + it.distance + "]["+it.speed+"]")
                 }.start()
             }, {throwable ->
                 println("[TripProgress][ERROR]" + throwable)
@@ -124,10 +124,14 @@ class TexDriveDemoApplication : Application() {
         //FileManager.getLogFile(applicationContext, tripLogFileName)
 
         // Launch recorded trip
-        Timer("SettingUp", false).schedule(1000) {
-            //sensorServiceFake.loadTrip(applicationContext, 1000L)
+        Timer("SettingUp", false).schedule(5000) {
+            sensorServiceFake.loadTrip(applicationContext, 1L)
         }
 
+
+        Timer("SettingUp", false).schedule(45000) {
+            sensorServiceFake.loadTrip(applicationContext, 1L)
+        }
     }
     fun saveLocation(location: Location, delay:Long) {
         var message = "${location.latitude},${location.longitude},${location.accuracy},${location.speed},${location.bearing},${location.altitude},${delay}\n"
