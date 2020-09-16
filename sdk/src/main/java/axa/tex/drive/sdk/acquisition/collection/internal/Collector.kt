@@ -60,8 +60,9 @@ internal class Collector : KoinComponentCallbacks {
         fixData = tracker.provideFixProducer()
 
         fixData?.subscribeOn(rxScheduler)?.subscribe( { fixes ->
-                fixProcessor.addFixes(fixes)
-            if (fixes.size == 1 && fixes[0] is LocationFix) {
+            LOGGER.info("Number of fixes : "+fixes.count(), function = "fixData.subscribe")
+            fixProcessor.addFixes(fixes)
+            if (fixes.size >= 1 && fixes[0] is LocationFix) {
                 locations.onNext(fixes[0] as LocationFix)
             }
         }, {throwable ->
