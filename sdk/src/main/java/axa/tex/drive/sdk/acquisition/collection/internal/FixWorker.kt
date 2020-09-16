@@ -24,7 +24,7 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
     : Worker(appContext, workerParams), KoinComponentCallbacks {
 
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
-    private val uid: String = DeviceInfo.getUid(appContext)
+
 
 
 
@@ -45,12 +45,13 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
         }
         val data = inputData.getString(Constants.DATA_KEY) ?: ""
         LOGGER.info("TRIPCHUNK SIZE :$inputData.keyValueMap.size", "private fun sendFixes(inputData : Data) : Boolean")
-        return sendData(data, appName, platform)
+        val uid = inputData.getString((Constants.UID_KEY)) ?: ""
+        return sendData(data, appName, platform, uid)
     }
 
 
     @Throws(IOException::class)
-    private fun sendData(data: String, appName: String, platform: Platform): Result {
+    private fun sendData(data: String, appName: String, platform: Platform, uid: String): Result {
         val funcName = "enableTracking"
         try {
             val platformToHostConverter = PlatformToHostConverter(platform)

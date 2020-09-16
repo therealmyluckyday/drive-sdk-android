@@ -60,10 +60,11 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
         return packet.toJson()
     }
 
-    fun data(isRetrievingScoreAutomatically: Boolean) : Data {
+    fun data(isRetrievingScoreAutomatically: Boolean, uid: String) : Data {
         return Data.Builder()
                 .putString(Constants.ID_KEY, this.tripInfos.uid)
                 .putString(Constants.DATA_KEY, this.toJson())
+                .putString(Constants.UID_KEY, uid)
                 .putString(Constants.APP_NAME_KEY, this.tripInfos.appName)
                 .putString(Constants.PLATFORM_KEY, this.tripInfos.platform.endPoint)
                 .putString(Constants.CLIENT_ID_KEY, this.tripInfos.clientId)

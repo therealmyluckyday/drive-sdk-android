@@ -15,4 +15,5 @@ object Constants {
     internal const val TRIP_ID_KEY = "tripId"
     internal const val WORK_TAG_KEY = "tag"
     internal const val EMPTY_PACKET = "{}"
+    internal const val UID_KEY = "uuid"
 }
