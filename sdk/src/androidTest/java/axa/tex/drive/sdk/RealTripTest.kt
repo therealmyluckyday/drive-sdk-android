@@ -42,7 +42,7 @@ class RealTripTest  {
         val doneSignal = CountDownLatch(935) // Number of GPS point used for the trip
         val scoreSignal = CountDownLatch(1)
 
-        val appName = "APP-TEST"
+        val appName = "APP-TEST"//"youdrive_france_prospect"
         var config = TexConfig.Builder(context, appName, "22910000",sensorService, rxScheduler).enableTrackers().platformHost(Platform.PRODUCTION).build()
         TexConfig.config!!.isRetrievingScoreAutomatically = false
         assertNotNull(config)
@@ -91,11 +91,11 @@ class RealTripTest  {
             assertNotNull(it)
             assert(it!! == tripId!!.value)
             it?.let { score ->
-                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION, true, delay = 10)
+                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION, true, delay = 12)
             }
         })
 
-        val endTripTime = sensorService!!.loadTrip(context, 1L)
+        val endTripTime = sensorService!!.loadTrip(context, 100L)
        // val endTripTime = loadTrip(sensorService!!, timeStart)// 57 600 000 = 16 Hour  86400000 = 24 Hour
         println("-doneSignal await")
         doneSignal.await()
