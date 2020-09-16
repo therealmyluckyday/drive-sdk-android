@@ -39,6 +39,7 @@ internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters
     }
 
     fun retrieveScore(tripId: String) {
+        LOGGER.info("trip id = $tripId ", "retrieveScore")
         val appName = inputData.getString(Constants.APP_NAME_KEY) ?: "APP_TEST"
         val isRetrievingScoreAutomatically = inputData.getBoolean(Constants.CONFIG_RETRIEVE_SCORE_AUTO_BOOLEAN_KEY, true)
         val platform : Platform
@@ -50,9 +51,11 @@ internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters
         }
         val scoreRetriever: ScoreRetriever by inject()
         if (isRetrievingScoreAutomatically) {
+            LOGGER.info("isRetrievingScoreAutomatically", "retrieveScore")
             scoreRetriever.retrieveScore(tripId, appName, platform, true, delay = 60)
         }
         else {
+            LOGGER.info("scoreRetriever.getAvailableScoreListener", "retrieveScore")
             scoreRetriever.getAvailableScoreListener().onNext(tripId)
         }
     }

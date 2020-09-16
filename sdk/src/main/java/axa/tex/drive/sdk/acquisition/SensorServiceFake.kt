@@ -42,6 +42,7 @@ open class SensorServiceFake : SensorService {
 
     override fun stopSpeedScanning() {
     }
+
     override fun checkWhereAmI() {
         logger.info("sensorFake checkWhereAmI", function = "checkWhereAmI")
         infosMethodCalled.onNext("checkWhereAmI")

@@ -20,7 +20,6 @@ internal class Collector : KoinComponentCallbacks {
     var fixData: Observable<List<Fix>>? = null
     val locations: PublishSubject<LocationFix> = PublishSubject.create()
     val rxScheduler: Scheduler
-    val logger = LoggerFactory().getLogger(this::class.java.name)
 
     internal var currentTripId: TripId? = null
     internal var recording: Boolean = false
@@ -43,13 +42,11 @@ internal class Collector : KoinComponentCallbacks {
         LOGGER.info("startCollecting : ", function = "startCollecting")
         if (trackers != null) {
             for (tracker in trackers) {
-                logger.logger.info("Tracker ${tracker.javaClass.simpleName}", "startCollecting")
+                LOGGER.info("Tracker ${tracker.javaClass.simpleName}", "startCollecting")
                 if (tracker.canBeEnabled()) {
-                    logger.logger.info("Enabling tracker ${tracker.javaClass.simpleName}", "startCollecting")
-
+                    LOGGER.info("Enabling tracker ${tracker.javaClass.simpleName}", "startCollecting")
                     tracker.enableTracking()
-                    logger.logger.info("${tracker.javaClass.simpleName} enabled = ${tracker.isEnabled()}", "startCollecting")
-
+                    LOGGER.info("${tracker.javaClass.simpleName} enabled = ${tracker.isEnabled()}", "startCollecting")
                     collect(tracker)
                 }
             }
