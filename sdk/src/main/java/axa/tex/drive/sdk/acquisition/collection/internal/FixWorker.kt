@@ -6,12 +6,9 @@ import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import axa.tex.drive.sdk.core.CertificateAuthority
-import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.core.internal.utils.PlatformToHostConverter
-import axa.tex.drive.sdk.core.internal.utils.DeviceInfo
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import axa.tex.drive.sdk.internal.compress
 import org.koin.android.ext.android.inject
@@ -36,26 +33,20 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
     fun sendFixes(inputData: Data): Result {
         LOGGER.info("Sending data to the server", "private fun sendFixes(inputData : Data) : Boolean")
         val appName = inputData.getString(Constants.APP_NAME_KEY) ?: "APP_TEST"
-        val platform : Platform
-        when (inputData.getString(Constants.PLATFORM_KEY)) {
-            Platform.PRODUCTION.endPoint -> platform = Platform.PRODUCTION
-            Platform.TESTING.endPoint -> platform = Platform.TESTING
-            Platform.PREPROD.endPoint -> platform = Platform.PREPROD
-            else -> platform = Platform.PRODUCTION
-        }
+        val serverUrl = inputData.getString(Constants.PLATFORM_URL) ?: "https://gw-preprod.tex.dil.services/v2.0"
         val data = inputData.getString(Constants.DATA_KEY) ?: ""
         LOGGER.info("TRIPCHUNK SIZE :$inputData.keyValueMap.size", "private fun sendFixes(inputData : Data) : Boolean")
         val uid = inputData.getString((Constants.UID_KEY)) ?: ""
-        return sendData(data, appName, platform, uid)
+        return sendData(data, appName, serverUrl, uid)
     }
 
 
     @Throws(IOException::class)
-    private fun sendData(data: String, appName: String, platform: Platform, uid: String): Result {
+    private fun sendData(data: String, appName: String, serverUrl: String, uid: String): Result {
         val funcName = "enableTracking"
         try {
-            val platformToHostConverter = PlatformToHostConverter(platform)
-            val url = URL(platformToHostConverter.getHost() + "/data")
+
+            val url = URL(serverUrl + "/data")
             LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = $data", funcName)
             val urlConnection: HttpURLConnection
             val certificate: CertificateAuthority by inject()

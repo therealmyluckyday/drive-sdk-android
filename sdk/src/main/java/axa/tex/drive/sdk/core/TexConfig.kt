@@ -83,7 +83,7 @@ class TexConfig {
                             get<BatteryTracker>()),
                             scheduler
                     ) }
-                single { TripRecorderImpl(context, sensorService, scheduler) as TripRecorder } bind TripRecorder::class
+                single { TripRecorderImpl(context, sensorService, scheduler) } bind TripRecorder::class
             }
             try {
                 startKoin {
@@ -92,24 +92,6 @@ class TexConfig {
                 }
             } catch (e: Exception) {
                 LOGGER.error("Exception during setup koin: "+e, "setupKoin")
-            }
-        }
-
-        fun loadAutoModeModule(context: Context) {
-            val scheduler = Schedulers.single()
-            val sensorService = SensorServiceImpl(context, scheduler, null)
-            val myModule = module {
-                single { SpeedFilter() }
-                single { Automode(get(), scheduler) }
-            }
-
-            try {
-                startKoin {
-                    // module list
-                    modules(listOf(myModule))
-                }
-            } catch (e: Exception) {
-                LOGGER.error("Exception during koin load automodule", "loadAutoModeModule")
             }
         }
 
@@ -142,10 +124,10 @@ class TexConfig {
         private var clientId: String
         val logger = LoggerFactory().getLogger(this::class.java.name)
         private val scheduler: Scheduler
-
         private val sensorService: SensorService
+        private val isAPIV2: Boolean
 
-        constructor(user: TexUser?, context: Context, clientId: String, sensor: SensorService, rxScheduler: Scheduler = Schedulers.single()) {
+        constructor(user: TexUser?, context: Context, clientId: String, sensor: SensorService, rxScheduler: Scheduler = Schedulers.single(), isAPIV2: Boolean) {
             LOGGER.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
             this.user = user
             this.context = context
@@ -153,9 +135,10 @@ class TexConfig {
             this.clientId = clientId
             this.scheduler = rxScheduler
             this.sensorService = sensor
+            this.isAPIV2 = isAPIV2
         }
 
-        constructor(user: TexUser?, context: Context, clientId: String, rxScheduler: Scheduler = Schedulers.single()) {
+        constructor(user: TexUser?, context: Context, clientId: String, rxScheduler: Scheduler = Schedulers.single(), isAPIV2: Boolean) {
             LOGGER.info("Done configuring user and application context", "constructor(user: TexUser?, context: Context?)")
             this.user = user
             this.context = context
@@ -163,24 +146,27 @@ class TexConfig {
             this.clientId = clientId
             this.scheduler = rxScheduler
             this.sensorService = SensorServiceImpl(context, rxScheduler, null)
+            this.isAPIV2 = isAPIV2
         }
 
-        constructor(context: Context, appName: String, clientId: String, sensor: SensorService, rxScheduler: Scheduler = Schedulers.single()) {
+        constructor(context: Context, appName: String, clientId: String, sensor: SensorService, rxScheduler: Scheduler = Schedulers.single(), isAPIV2: Boolean) {
             LOGGER.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
             this.context = context
             this.appName = appName
             this.clientId = clientId
             this.scheduler = rxScheduler
             this.sensorService = sensor
+            this.isAPIV2 = isAPIV2
         }
 
-        constructor(context: Context, appName: String, clientId: String, fusedLocationClient: FusedLocationProviderClient, rxScheduler: Scheduler = Schedulers.single()) {
+        constructor(context: Context, appName: String, clientId: String, fusedLocationClient: FusedLocationProviderClient, rxScheduler: Scheduler = Schedulers.single(), isAPIV2: Boolean) {
             LOGGER.info("Configuring user and application context", "constructor(context: Context?, appName: String, clientId: String)")
             this.context = context
             this.appName = appName
             this.clientId = clientId
             this.scheduler = rxScheduler
             this.sensorService = SensorServiceImpl(context, rxScheduler, fusedLocationClient)
+            this.isAPIV2 = isAPIV2
         }
 
         fun build(): TexConfig {
@@ -197,7 +183,7 @@ class TexConfig {
 
             LOGGER.info("Done configuring ssl certificate", "init")
 
-            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform, this.scheduler)
+            val config = Config(batteryTrackerEnabled, locationTrackerEnabled, motionTrackerEnabled, appName, clientId, platform, isAPIV2, this.scheduler)
             TexConfig.config = config
             LOGGER.info("Create koin module", "build")
 

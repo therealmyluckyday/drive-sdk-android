@@ -32,7 +32,7 @@ internal class FixProcessor : KoinComponentCallbacks {
         val clientId = config.clientId
         this.apiTrip.isRetrievingScoreAutomatically = config.isRetrievingScoreAutomatically
         val start = Event(listOf("start"), startTime)
-        val tripInfos = TripInfos(appName, clientId, config.endPoint)
+        val tripInfos = TripInfos(appName, clientId, config.endPoint, isAPIV2 = config.isAPIV2)
         currentTripChunk = TripChunk(tripInfos, 0)
         LOGGER.info("Start trip, tripId : "+tripInfos.tripId.value, "startTrip")
         addFix(start)

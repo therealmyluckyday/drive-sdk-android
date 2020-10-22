@@ -15,6 +15,7 @@ internal class Config {
     var clientId: String
     var endPoint: Platform
     var rxScheduler: Scheduler
+    var isAPIV2: Boolean
 
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
 
@@ -23,7 +24,12 @@ internal class Config {
     constructor(batteryTrackerEnabled: Boolean,
                 locationTrackerEnabled: Boolean,
                 motionTrackerEnabled: Boolean,
-                appName: String, clientId: String, endPoint: Platform?, scheduler: Scheduler = Schedulers.single(), retrieveScoreAutomatically: Boolean = true) {
+                appName: String,
+                clientId: String,
+                endPoint: Platform?,
+                isAPIV2: Boolean,
+                scheduler: Scheduler = Schedulers.single(),
+                retrieveScoreAutomatically: Boolean = true) {
         this.batteryTrackerEnabled = batteryTrackerEnabled
         this.locationTrackerEnabled = locationTrackerEnabled
         this.motionTrackerEnabled = motionTrackerEnabled
@@ -32,6 +38,7 @@ internal class Config {
         this.endPoint = endPoint ?: Platform.PRODUCTION
         this.rxScheduler = scheduler
         this.isRetrievingScoreAutomatically = retrieveScoreAutomatically
+        this.isAPIV2 = isAPIV2
     }
 
     internal fun toJson(): String {

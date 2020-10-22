@@ -93,7 +93,7 @@ internal class TripRecorderImpl : TripRecorder, KoinComponentCallbacks {
                 serviceIntent.putExtra("notif", myCustomNotification)
             }
             serviceIntent.putExtra(Constants.APP_NAME_KEY, config.appName)
-            serviceIntent.putExtra(Constants.PLATFORM_KEY, config.endPoint.endPoint)
+            serviceIntent.putExtra(Constants.PLATFORM_URL, config.endPoint.generateUrl(config.isAPIV2))
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startService(serviceIntent)
             }else{

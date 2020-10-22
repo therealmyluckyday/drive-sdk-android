@@ -27,11 +27,11 @@ class ScoreRetriever: KoinComponentCallbacks {
         return availableScoreListener
     }
 
-    fun retrieveScore(tripId: String, appName: String, platform: Platform, isFinalScore: Boolean, delay: Long = 0) {
+    fun retrieveScore(tripId: String, appName: String, serverUrl: String, isFinalScore: Boolean, delay: Long = 0) {
         val data: Data = Data.Builder()
                 .putBoolean(Constants.FINAL_SCORE_BOOLEAN_KEY, isFinalScore)
                 .putString(Constants.APP_NAME_KEY, appName)
-                .putString(Constants.PLATFORM_KEY, platform.endPoint)
+                .putString(Constants.PLATFORM_URL, serverUrl)
                 .putString(Constants.TRIP_ID_KEY, tripId)
                 .build()
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED)

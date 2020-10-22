@@ -42,17 +42,11 @@ internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters
         LOGGER.info("trip id = $tripId ", "retrieveScore")
         val appName = inputData.getString(Constants.APP_NAME_KEY) ?: "APP_TEST"
         val isRetrievingScoreAutomatically = inputData.getBoolean(Constants.CONFIG_RETRIEVE_SCORE_AUTO_BOOLEAN_KEY, true)
-        val platform : Platform
-        when (inputData.getString(Constants.PLATFORM_KEY)) {
-            Platform.PRODUCTION.endPoint -> platform = Platform.PRODUCTION
-            Platform.TESTING.endPoint -> platform = Platform.TESTING
-            Platform.PREPROD.endPoint -> platform = Platform.PREPROD
-            else -> platform = Platform.PRODUCTION
-        }
+        val serverUrl = inputData.getString(Constants.PLATFORM_URL) ?: "https://gw-preprod.tex.dil.services/v2.0"
         val scoreRetriever: ScoreRetriever by inject()
         if (isRetrievingScoreAutomatically) {
             LOGGER.info("isRetrievingScoreAutomatically", "retrieveScore")
-            scoreRetriever.retrieveScore(tripId, appName, platform, true, delay = 60)
+            scoreRetriever.retrieveScore(tripId, appName, serverUrl, true, delay = 60)
         }
         else {
             LOGGER.info("scoreRetriever.getAvailableScoreListener", "retrieveScore")

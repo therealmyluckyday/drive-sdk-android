@@ -7,12 +7,9 @@ import androidx.work.WorkerParameters
 import axa.tex.drive.sdk.acquisition.score.model.ScoreError
 import axa.tex.drive.sdk.acquisition.score.model.ScoreResult
 import axa.tex.drive.sdk.acquisition.score.model.ScoreStatus
-import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
 import axa.tex.drive.sdk.core.CertificateAuthority
-import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.core.internal.utils.PlatformToHostConverter
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -20,7 +17,6 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.koin.android.ext.android.inject
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 import javax.net.ssl.HttpsURLConnection
@@ -33,19 +29,12 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
 
     override fun doWork(): Result {
         val appName = inputData.getString(Constants.APP_NAME_KEY) ?: "APP_TEST"
-        val platform : Platform
-        when (inputData.getString(Constants.PLATFORM_KEY)) {
-            Platform.PRODUCTION.endPoint -> platform = Platform.PRODUCTION
-            Platform.TESTING.endPoint -> platform = Platform.TESTING
-            Platform.PREPROD.endPoint -> platform = Platform.PREPROD
-            else -> platform = Platform.PRODUCTION
-        }
-
+        val serverUrl = inputData.getString(Constants.PLATFORM_URL) ?: "https://gw-preprod.tex.dil.services/v2.0"
         val tripId = inputData.getString(Constants.TRIP_ID_KEY)
         val finalScore = inputData.getBoolean(Constants.FINAL_SCORE_BOOLEAN_KEY, true)
 
         if (tripId != null) {
-            return scoreRequest(tripId, finalScore, platform, appName)
+            return scoreRequest(tripId, finalScore, serverUrl, appName)
         }
 
         return Result.success()
@@ -65,12 +54,11 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
     }
 
     @Throws(Exception::class)
-    private fun scoreRequest(tripId: String, finalScore: Boolean, platform: Platform, appName: String): Result {
+    private fun scoreRequest(tripId: String, finalScore: Boolean, serverUrl: String, appName: String): Result {
         LOGGER.info("scoreRequest "+ tripId, "scoreRequest")
         val scoreRetriever: ScoreRetriever by inject()
         val responseString = StringBuffer("")
         val locale = null
-        val serverUrl = PlatformToHostConverter(platform).getHost()
         val url: URL
         val theLocal = getLocaleId(locale)
         if (!finalScore) {
