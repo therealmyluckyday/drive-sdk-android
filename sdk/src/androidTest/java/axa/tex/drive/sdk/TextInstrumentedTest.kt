@@ -2,16 +2,12 @@ package axa.tex.drive.sdk
 
 
 import android.location.Location
-import androidx.test.InstrumentationRegistry.getTargetContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import axa.tex.drive.sdk.acquisition.SensorService
 import axa.tex.drive.sdk.acquisition.SensorServiceFake
-import axa.tex.drive.sdk.acquisition.SensorServiceImpl
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.TexUser
-import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
 import io.reactivex.schedulers.Schedulers
@@ -37,7 +33,7 @@ class TextInstrumentedTest : KoinTest {
         val appContext = InstrumentationRegistry.getInstrumentation().getTargetContext()
         sensorService = SensorServiceFake(appContext, rxScheduler)
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
-        val config: TexConfig = TexConfig.Builder(user, appContext, "clientIDToto",sensorService!!).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build()
+        val config: TexConfig = TexConfig.Builder(user, appContext, "clientIDToto",sensorService!!,isAPIV2 = false).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build()
         tripRecorder = TexService.configure(config).getTripRecorder()
         tripRecorder?.locationObservable()?.subscribe { fix -> lastLocation = fix }
         tripRecorder?.startTrip(Date().time)

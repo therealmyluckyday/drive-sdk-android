@@ -12,13 +12,12 @@ import axa.tex.drive.sdk.core.TexService
 import axa.tex.drive.sdk.core.logger.LogType
 import com.google.android.gms.location.DetectedActivity
 import io.reactivex.schedulers.Schedulers
-import org.junit.Assert
 import org.junit.After
+import org.junit.Assert
 import org.junit.Test
 import org.koin.core.context.stopKoin
 import java.io.IOException
 import java.io.InputStream
-import java.util.*
 import java.util.concurrent.CountDownLatch
 
 class AutomodeIntegratedTest {
@@ -40,12 +39,12 @@ class AutomodeIntegratedTest {
         val sensorServiceFake = SensorServiceFake(context, rxScheduler)
         sensorService = sensorServiceFake
         Assert.assertNotNull(sensorService)
-
+        val isAPIV2 = true
         val doneSignal = CountDownLatch(937) // Number of GPS point used for the trip
         val drivingSignal = CountDownLatch(1)
         val scoreSignal = CountDownLatch(1)
         val appName = "APP-TEST"
-        config = TexConfig.Builder(context, appName, "22910000",sensorService!!, rxScheduler).enableTrackers().platformHost(Platform.PRODUCTION).build()
+        config = TexConfig.Builder(context, appName, "22910000",sensorService!!, rxScheduler, isAPIV2 = isAPIV2).enableTrackers().platformHost(Platform.PRODUCTION).build()
         TexConfig.config!!.isRetrievingScoreAutomatically = false
         Assert.assertNotNull(config)
 
@@ -104,7 +103,7 @@ class AutomodeIntegratedTest {
             Assert.assertNotNull(it)
             println("-AVAILAIBLE Score Listener Trip ID : "+it)
             it?.let { score ->
-                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION, true, delay = 12)
+                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION.generateUrl(isAPIV2), true, delay = 93)
             }
         })
 
@@ -189,6 +188,7 @@ class AutomodeIntegratedTest {
         val delay = locationDetails[6].toLong()
         newLocation.time = delay + time
         sensorService.forceLocationChanged(newLocation)
+        Thread.sleep(100)
         return newLocation.time
     }
 }

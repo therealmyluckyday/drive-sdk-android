@@ -2,24 +2,19 @@ package axa.tex.drive.sdk
 
 
 import android.content.Context
-import android.location.Location
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
 import axa.tex.drive.sdk.acquisition.SensorServiceFake
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
 import axa.tex.drive.sdk.core.logger.LogType
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import org.junit.Assert.*
 import org.junit.After
-import org.junit.Before
+import org.junit.Assert.*
 import org.junit.Test
 import org.koin.core.context.stopKoin
-import java.io.IOException
-import java.io.InputStream
 import java.util.concurrent.CountDownLatch
 
 
@@ -41,9 +36,9 @@ class RealTripTest  {
         assertNotNull(sensorService)
         val doneSignal = CountDownLatch(935) // Number of GPS point used for the trip
         val scoreSignal = CountDownLatch(1)
-
-        val appName = "APP-TEST"//"youdrive_france_prospect"
-        var config = TexConfig.Builder(context, appName, "22910000",sensorService, rxScheduler).enableTrackers().platformHost(Platform.PRODUCTION).build()
+        val isAPIV2 = false
+        val appName = "youdrive-france-prospect"//"youdrive_france_prospect"
+        var config = TexConfig.Builder(context, appName, "22910000",sensorService, rxScheduler, isAPIV2 = isAPIV2).enableTrackers().platformHost(Platform.INTEGRATION).build()
         TexConfig.config!!.isRetrievingScoreAutomatically = false
         assertNotNull(config)
 
@@ -91,7 +86,7 @@ class RealTripTest  {
             assertNotNull(it)
             assert(it!! == tripId!!.value)
             it?.let { score ->
-                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION, true, delay = 12)
+                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION.generateUrl(isAPIV2), true, delay = 12)
             }
         })
 
