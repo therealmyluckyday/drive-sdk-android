@@ -35,8 +35,8 @@ class TextInstrumentedTest : KoinTest {
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
         val config: TexConfig = TexConfig.Builder(user, appContext, "clientIDToto",sensorService!!,isAPIV2 = false).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build()
         tripRecorder = TexService.configure(config).getTripRecorder()
-        tripRecorder?.locationObservable()?.subscribe { fix -> lastLocation = fix }
-        tripRecorder?.startTrip(Date().time)
+        tripRecorder!!.locationObservable()?.subscribe { fix -> lastLocation = fix }
+        tripRecorder!!.startTrip(Date().time)
         var newLocation = Location("")
         val latitude = 10.0
         newLocation.latitude = latitude
@@ -74,10 +74,10 @@ class TextInstrumentedTest : KoinTest {
     fun testIsRecording() {
         Assert.assertNotNull(tripRecorder)
         Assert.assertTrue(tripRecorder!!.isRecording())
-        tripRecorder?.stopTrip(Date().time)
+        tripRecorder!!.stopTrip(Date().time)
         Thread.sleep(100)
         Assert.assertFalse(tripRecorder!!.isRecording())
-        tripRecorder?.startTrip(Date().time)
+        tripRecorder!!.startTrip(Date().time)
         Thread.sleep(100)
         Assert.assertTrue(tripRecorder!!.isRecording())
     }
