@@ -37,21 +37,25 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
         val data = inputData.getString(Constants.DATA_KEY) ?: ""
         LOGGER.info("TRIPCHUNK SIZE :$inputData.keyValueMap.size", "private fun sendFixes(inputData : Data) : Boolean")
         val uid = inputData.getString((Constants.UID_KEY)) ?: ""
-        return sendData(data, appName, serverUrl, uid)
+        val isAPIV2 = inputData.getBoolean(Constants.PLATFORM_VERSION, false)
+        return sendData(data, appName, serverUrl, uid, isAPIV2)
     }
 
 
     @Throws(IOException::class)
-    private fun sendData(data: String, appName: String, serverUrl: String, uid: String): Result {
+    private fun sendData(data: String, appName: String, serverUrl: String, uid: String, isAPIV2: Boolean): Result {
         val funcName = "enableTracking"
         try {
-
             val url = URL(serverUrl + "/data")
             LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = $data", funcName)
             val urlConnection: HttpURLConnection
-            val certificate: CertificateAuthority by inject()
-            urlConnection = url.openConnection() as HttpsURLConnection
-            certificate.configureSSLSocketFactory(urlConnection)
+            if (!isAPIV2) {
+                val certificate: CertificateAuthority by inject()
+                urlConnection = url.openConnection() as HttpsURLConnection
+                certificate.configureSSLSocketFactory(urlConnection)
+            } else {
+                urlConnection = url.openConnection() as HttpsURLConnection
+            }
             urlConnection.doOutput = true
             urlConnection.requestMethod = "PUT"
             urlConnection.setRequestProperty("Content-Type", "application/json")

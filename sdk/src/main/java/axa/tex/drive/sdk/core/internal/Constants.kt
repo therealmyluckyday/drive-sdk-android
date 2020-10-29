@@ -8,6 +8,7 @@ object Constants {
     internal const val DEFAULT_APP_NAME = "youdrive_france_prospect"
     internal const val APP_NAME_KEY = "appName"
     internal const val PLATFORM_URL = "platform_url"
+    internal const val PLATFORM_VERSION = "platform_version"
     internal const val CLIENT_ID_KEY = "clientId"
     internal const val ID_KEY = "id"
     internal const val FINAL_SCORE_BOOLEAN_KEY = "isFinalScore"

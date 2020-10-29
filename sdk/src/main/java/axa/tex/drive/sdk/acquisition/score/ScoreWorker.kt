@@ -32,9 +32,9 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
         val serverUrl = inputData.getString(Constants.PLATFORM_URL) ?: "https://gw-preprod.tex.dil.services/v2.0"
         val tripId = inputData.getString(Constants.TRIP_ID_KEY)
         val finalScore = inputData.getBoolean(Constants.FINAL_SCORE_BOOLEAN_KEY, true)
-
+        val isAPIV2 = inputData.getBoolean(Constants.PLATFORM_VERSION, false)
         if (tripId != null) {
-            return scoreRequest(tripId, finalScore, serverUrl, appName)
+            return scoreRequest(tripId, finalScore, serverUrl, appName, isAPIV2)
         }
 
         return Result.success()
@@ -54,23 +54,30 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
     }
 
     @Throws(Exception::class)
-    private fun scoreRequest(tripId: String, finalScore: Boolean, serverUrl: String, appName: String): Result {
+    private fun scoreRequest(tripId: String, finalScore: Boolean, serverUrl: String, appName: String, isAPIV2: Boolean): Result {
         LOGGER.info("scoreRequest "+ tripId, "scoreRequest")
         val scoreRetriever: ScoreRetriever by inject()
         val responseString = StringBuffer("")
         val locale = null
         val url: URL
         val theLocal = getLocaleId(locale)
-        if (!finalScore) {
-            url = URL("$serverUrl/score?trip_id=$tripId&lang=$theLocal")
+        val connection: HttpsURLConnection
+        if (isAPIV2) {
+            url = URL("$serverUrl/score/$tripId")
+            connection = url.openConnection() as HttpsURLConnection
         } else {
-            url = URL("$serverUrl/score?trip_id=$tripId&lang=$theLocal&final=true")
-        }
-        val certificate: CertificateAuthority by inject()
-        val connection = url.openConnection() as HttpsURLConnection
-        certificate.configureSSLSocketFactory(connection)
-        connection.requestMethod = "GET"
+            if (!finalScore) {
+                url = URL("$serverUrl/score?trip_id=$tripId&lang=$theLocal")
+            } else {
+                url = URL("$serverUrl/score?trip_id=$tripId&lang=$theLocal&final=true")
+            }
 
+            val certificate: CertificateAuthority by inject()
+            connection = url.openConnection() as HttpsURLConnection
+            certificate.configureSSLSocketFactory(connection)
+        }
+
+        connection.requestMethod = "GET"
         connection.addRequestProperty("X-AppKey", appName)
         connection.connect()
         val inputStream = connection.inputStream
