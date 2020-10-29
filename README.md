@@ -37,7 +37,7 @@ artifactory_{username,password} must be set in $HOME/.gradle/gradle.properties.
 Then, open build.gradle inside the module where you want to use the library and simply add a dependency:
 
 dependencies {
-implementation 'drive-sdk-android-next:sdk:3.0.4--beta'
+implementation 'drive-sdk-android-next:sdk:3.0.4'
 }
 
 
