@@ -75,7 +75,8 @@ class TexDriveDemoApplication : Application() {
         sensorService = sensorServiceFake
         try {
             //val sensorServiceImpl = SensorServiceImpl(applicationContext, rxScheduler, LocationServices.getFusedLocationProviderClient(this))
-            val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceFake, rxScheduler ).enableTrackers().platformHost(Platform.PRODUCTION).build()
+            val isAPIV2  = true
+            val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceFake, rxScheduler, isAPIV2).enableTrackers().platformHost(Platform.PRODUCTION).build()
             config = newConfig
             val newService = TexService.configure(newConfig)
             service = newService
