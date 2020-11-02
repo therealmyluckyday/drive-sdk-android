@@ -16,10 +16,19 @@ class EventTest {
     }
 
     @Test
-    fun testEventOutput() {
+    fun testEventOutputAPIV1() {
         val time = 1543938100057
         val end = Event(listOf("stop"), time)
-        val json = end.toJson()
-        Assert.assertTrue(json == "{\"timestamp\":1543938100057,\"event\":[\"stop\"]}")
+        val resultExpected = "{\"timestamp\":1543938100057,\"event\":[\"stop\"]}"
+        val json = end.toJson(false)
+        Assert.assertEquals("Real $json expected $resultExpected", resultExpected, json)
+    }
+    @Test
+    fun testEventOutputAPIV2() {
+        val time = 1543938100057
+        val end = Event(listOf("stop"), time)
+        val json = end.toJson(true)
+        val resultExpected = "{\"events\":[\"stop\"],\"timestamp\":1543938100057}"
+        Assert.assertEquals("Real $json expected $resultExpected", resultExpected, json)
     }
 }

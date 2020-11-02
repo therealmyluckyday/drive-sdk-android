@@ -33,8 +33,6 @@ class MotionBuffer {
         }
 
         cleanBuffer()
-
-        logger.info("NUMBER OF MOTIONS : ${buffer.size}", function = "fun addFix(fix: MotionFix?)")
     }
 
 

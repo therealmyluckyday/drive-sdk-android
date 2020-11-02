@@ -58,6 +58,7 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
             }
             urlConnection.doOutput = true
             urlConnection.requestMethod = "PUT"
+            urlConnection.connectTimeout = 5000
             urlConnection.setRequestProperty("Content-Type", "application/json")
             urlConnection.setRequestProperty("Content-Encoding", "gzip")
             urlConnection.addRequestProperty("X-UserId", uid)

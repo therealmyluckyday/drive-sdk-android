@@ -29,7 +29,7 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
 
     fun canUpload() : Boolean {
         val funcName = "canUpload"
-        val json = this.toJson()
+        val json = this.toJson(tripInfos.isAPIV2)
         if ( json == Constants.EMPTY_PACKET) {
             LOGGER.info("this.toJson() == Constants.EMPTY_PACKET TRUE", function = funcName)
             return false
@@ -54,16 +54,16 @@ class TripChunk(internal val tripInfos: TripInfos, internal var idPacket : Int) 
 
     // Private Method
     // MARK: Serialize
-    fun toJson() : String {
+    fun toJson(isAPIV2: Boolean) : String {
         val currentFixes = fixes
         val packet = FixPacket(currentFixes, tripInfos.model, tripInfos.os, tripInfos.timezone, tripInfos.uid, tripInfos.version, tripInfos.tripId.value, tripInfos.appName, tripInfos.clientId)
-        return packet.toJson()
+        return packet.toJson(isAPIV2)
     }
 
     fun data(isRetrievingScoreAutomatically: Boolean, uid: String) : Data {
         return Data.Builder()
                 .putString(Constants.ID_KEY, this.tripInfos.uid)
-                .putString(Constants.DATA_KEY, this.toJson())
+                .putString(Constants.DATA_KEY, this.toJson(this.tripInfos.isAPIV2 ))
                 .putString(Constants.UID_KEY, uid)
                 .putString(Constants.APP_NAME_KEY, this.tripInfos.appName)
                 .putString(Constants.PLATFORM_URL, this.tripInfos.platform.generateUrl(this.tripInfos.isAPIV2))
