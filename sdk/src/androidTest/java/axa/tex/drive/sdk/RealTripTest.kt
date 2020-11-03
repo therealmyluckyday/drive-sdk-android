@@ -5,6 +5,8 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import axa.tex.drive.sdk.acquisition.SensorServiceFake
+import axa.tex.drive.sdk.acquisition.score.ScoreV1
+import axa.tex.drive.sdk.acquisition.score.model.ScoreStatus
 import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
@@ -60,8 +62,9 @@ class RealTripTest  {
             it?.let { score ->
                 assertNull("Error in Score: "+score.scoreError, score.scoreError)
                 assertNotNull("Score null: ", score.score)
-                assertNotNull("TripId null: ", score.score!!.tripId)
-                assert(score.score!!.tripId!!.value == tripId.value)
+                val scoreV1 = score.score as ScoreV1
+                assertNotNull("TripId null: ", scoreV1.tripId)
+                assert(scoreV1.tripId!!.value == tripId.value)
                 scoreSignal.countDown()
             }
         }, {throwable ->
@@ -136,8 +139,7 @@ class RealTripTest  {
             it?.let { score ->
                 assertNull("Error in Score: "+score.scoreError, score.scoreError)
                 assertNotNull("Score null: ", score.score)
-                assertNotNull("TripId null: ", score.score!!.tripId)
-                assert(score.score!!.tripId!!.value == tripId.value)
+                assert(score.score!!.status == ScoreStatus.found)
                 scoreSignal.countDown()
             }
         }, {throwable ->
@@ -162,7 +164,7 @@ class RealTripTest  {
             assertNotNull(it)
             assert(it!! == tripId!!.value)
             it?.let { score ->
-                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION.generateUrl(isAPIV2), true, isAPIV2, delay = 12)
+                scoreRetriever?.retrieveScore(it, appName, Platform.TESTING.generateUrl(isAPIV2), true, isAPIV2, delay = 30)
             }
         })
 
@@ -175,8 +177,8 @@ class RealTripTest  {
         println("-stop trip")
         service!!.getTripRecorder().stopTrip(System.currentTimeMillis()- (86400000-3600000))
         println("-Thread sleep 1s")
-        //Thread.sleep(1000)
-        //println("-scoreSignal await")
-        //scoreSignal.await()
+        Thread.sleep(1000)
+        println("-scoreSignal await")
+        scoreSignal.await()
     }
 }

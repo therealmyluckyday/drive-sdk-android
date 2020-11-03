@@ -18,5 +18,9 @@ enum class ScoreStatus {
     @JsonProperty("no_external_data")
     noExternalData,
     @JsonProperty("error")
-    error
+    error,
+    @JsonProperty("found")
+    found,
+    @JsonProperty("not_found")
+    notFound
 }

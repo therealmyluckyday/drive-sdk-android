@@ -5,12 +5,16 @@ import axa.tex.drive.sdk.acquisition.score.model.ScoreStatus
 import axa.tex.drive.sdk.acquisition.score.model.ScoreType
 import axa.tex.drive.sdk.acquisition.score.model.ScoresDil
 import axa.tex.drive.sdk.acquisition.score.model.TripInfo
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 
 
-class Score {
+open class Score {
     var status: ScoreStatus = ScoreStatus.invalid
+}
+
+
+
+class ScoreV1: Score {
     var alerts: List<String>? = null
     var end_time: Long = -1
     var flags: List<String>? = null
@@ -25,37 +29,6 @@ class Score {
     var tripId: TripId? = null
     var trip_info: TripInfo? = null
     var uid: String? = null
-
-    /*@JsonCreator // constructor can be public, private, whatever
-    private fun Score(alerts: List<String>?,
-                      end_time: Long,
-                      flags: List<String>?,
-                      score_type: ScoreType?,
-                      scoregw_version: String?,
-                      scores_dil: ScoresDil?,
-                      scoring_version: String?,
-                      start_time: Long,
-                      status: ScoreStatus?,
-                      tags: List<String>?,
-                      timezone: String?,
-                      trip_id: String,
-                      trip_info: TripInfo?,
-                      uid: String?) {
-        this.alerts = alerts
-        this.end_time = end_time
-        this.flags = flags
-        this.score_type = score_type
-        this.scoregw_version = scoregw_version
-        this.scores_dil = scores_dil
-        this.scoring_version = scoring_version
-        this.start_time = start_time
-        this.status = status
-        this.tags = tags
-        this.timezone = timezone
-        this.tripId = TripId(trip_id)
-        this.trip_info = trip_info
-        this.uid = uid
-    }*/
 
     constructor(alerts: List<String>?,
                 end_time: Long,
@@ -87,7 +60,6 @@ class Score {
         this.uid = uid
     }
 }
-
 
 
 
