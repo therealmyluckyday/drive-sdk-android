@@ -26,7 +26,6 @@ class CertificateAuthority: KoinComponentCallbacks {
             certAuthInputStream = appContext.resources?.openRawResource(R.raw.tex_elb_ssl)
             sslSocketFactory = createSSLSocketFactory(this.certAuthInputStream!!)
         } catch (e: Exception) {
-
             LOGGER.error("Exception"+e.toString(), "build")
         }
     }

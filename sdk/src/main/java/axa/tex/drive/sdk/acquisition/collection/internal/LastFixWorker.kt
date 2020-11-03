@@ -39,18 +39,17 @@ internal class LastFixWorker(appContext: Context, workerParams: WorkerParameters
     }
 
     fun retrieveScore(tripId: String) {
-        LOGGER.info("trip id = $tripId ", "retrieveScore")
         val appName = inputData.getString(Constants.APP_NAME_KEY) ?: "APP_TEST"
         val isRetrievingScoreAutomatically = inputData.getBoolean(Constants.CONFIG_RETRIEVE_SCORE_AUTO_BOOLEAN_KEY, true)
         val serverUrl = inputData.getString(Constants.PLATFORM_URL) ?: "https://gw-preprod.tex.dil.services/v2.0"
         val isAPIV2 = inputData.getBoolean(Constants.PLATFORM_VERSION, false)
         val scoreRetriever: ScoreRetriever by inject()
         if (isRetrievingScoreAutomatically) {
-            LOGGER.info("isRetrievingScoreAutomatically", "retrieveScore")
+            LOGGER.info("isRetrievingScoreAutomatically serverUrl $serverUrl", "retrieveScore")
             scoreRetriever.retrieveScore(tripId, appName, serverUrl, true, isAPIV2, delay = 60)
         }
         else {
-            LOGGER.info("scoreRetriever.getAvailableScoreListener", "retrieveScore")
+            LOGGER.info("scoreRetriever.getAvailableScoreListener trip id = $tripId ", "retrieveScore")
             scoreRetriever.getAvailableScoreListener().onNext(tripId)
         }
     }

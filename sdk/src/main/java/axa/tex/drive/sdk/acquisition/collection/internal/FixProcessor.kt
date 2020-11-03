@@ -4,15 +4,14 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 import android.content.Context
 import axa.tex.drive.sdk.API.Trip.APITrip
 import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.model.Event
-import axa.tex.drive.sdk.acquisition.model.Fix
-import axa.tex.drive.sdk.acquisition.model.TripChunk
-import axa.tex.drive.sdk.acquisition.model.TripId
+import axa.tex.drive.sdk.acquisition.model.*
 import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.TripInfos
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 
 internal class FixProcessor : KoinComponentCallbacks {
@@ -20,11 +19,17 @@ internal class FixProcessor : KoinComponentCallbacks {
     private val apiTrip: APITrip
     internal var currentTripChunk: TripChunk? = null
     private val LOGGER = LoggerFactory().getLogger(this::class.java.name).logger
+    internal var fixToSend: PublishSubject<Fix> = PublishSubject.create()
 
 
     constructor(context: Context) {
         this.context = context
         this.apiTrip = APITrip(context)
+        this.fixToSend.observeOn(Schedulers.single()).subscribe( { fix ->
+            this.addFix(fix)
+        }, {throwable ->
+            LOGGER.warn("Exception : "+throwable, function = "enable")
+        })
     }
 
     fun startTrip(startTime: Long, config: Config) : TripId {
@@ -35,30 +40,36 @@ internal class FixProcessor : KoinComponentCallbacks {
         val tripInfos = TripInfos(appName, clientId, config.endPoint, isAPIV2 = config.isAPIV2)
         currentTripChunk = TripChunk(tripInfos, 0)
         LOGGER.info("Start trip, tripId : "+tripInfos.tripId.value, "startTrip")
-        addFix(start)
+        this.fixToSend.onNext(start)
         return tripInfos.tripId
     }
     
     fun endTrip(endTime: Long) {
-        LOGGER.info("stop trip Begin", "endTrip")
+        LOGGER.info("stop trip", "endTrip")
         val end = Event(listOf("stop"), endTime)
-        addFix(end)
-        currentTripChunk = null
-        LOGGER.info("stop trip End", "endTrip")
+        this.fixToSend.onNext(end)
     }
 
 
-    fun push() {
+    fun push(tripChunk: TripChunk) {
         LOGGER.info("push tripchunk ", "push")
-        apiTrip.sendTrip(this.currentTripChunk!!)
-        this.currentTripChunk?.clear()
+        apiTrip.sendTrip(tripChunk)
+        tripChunk.clear()
     }
 
 
     fun addFix(fix: Fix) {
         currentTripChunk?.append(fix)
-        if ((currentTripChunk != null) && (currentTripChunk!!.canUpload())) {
-            push()
+        val tripChunk = this.currentTripChunk
+        if ((fix is Event)) {
+            val eventFound = fix
+            if (eventFound.event.contains("stop")) {
+                currentTripChunk = null
+            }
+        }
+        if ((tripChunk != null) && (tripChunk.canUpload())) {
+            LOGGER.info("WillPush", "addFix")
+            push(tripChunk)
         }
     }
 
@@ -66,7 +77,7 @@ internal class FixProcessor : KoinComponentCallbacks {
     fun addFixes(fixes: List<Fix>) {
         if (currentTripChunk != null) {
             for (fix in fixes) {
-                addFix(fix)
+                this.fixToSend.onNext(fix)
             }
         }
     }

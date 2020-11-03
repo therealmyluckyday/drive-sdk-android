@@ -33,12 +33,14 @@ internal class CollectorService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder {
+        LOGGER.info("BEGIN", "onBind")
         return binder
     }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
+        LOGGER.info("BEGIN", "createNotification")
         val channelId = Constants.CHANNEL_ID
         val channelName = Constants.CHANNEL_NAME
         val chan = NotificationChannel(channelId,
@@ -46,6 +48,7 @@ internal class CollectorService : Service() {
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         service.createNotificationChannel(chan)
+        LOGGER.info("END", "createNotification")
         return channelId
     }
 
@@ -56,6 +59,7 @@ internal class CollectorService : Service() {
 
     @TargetApi(26)
     fun startNotification(intent: Intent?) {
+        LOGGER.info("BEGIN", "startNotification")
         val channelId = createNotificationChannel()
         val notification: Notification?
 
@@ -73,9 +77,11 @@ internal class CollectorService : Service() {
                 this.startForeground(NOTIFICATION_ID, notification)
             }
         }
+        LOGGER.info("END", "startNotification")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        LOGGER.info("BEGIN", "onStartCommand")
         super.onStartCommand(intent, flags, startId)
         val collector: Collector by inject()
         this.collector = collector
@@ -85,22 +91,26 @@ internal class CollectorService : Service() {
         if (isNewerPhone()) {
             startNotification(intent)
         }
-        
+        LOGGER.info("END", "onStartCommand")
         return START_STICKY
     }
 
 
     fun stopCollectorService() {
+        LOGGER.info("BEGIN", "stopCollectorService")
         collector?.stopCollecting()
         stopSelf()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             stopForeground(true)
         }
         collector?.recording = false
+        LOGGER.info("END", "stopCollectorService")
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        LOGGER.info("BEGIN", "onTaskRemoved")
         super.onTaskRemoved(rootIntent)
         stopSelf()
+        LOGGER.info("END", "onTaskRemoved")
     }
 }

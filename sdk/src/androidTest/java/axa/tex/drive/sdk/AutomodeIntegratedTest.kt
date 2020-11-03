@@ -21,6 +21,7 @@ import org.koin.core.context.stopKoin
 import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class AutomodeIntegratedTest {
     private val tripLogFileName = "trip_location_test.csv"
@@ -78,6 +79,7 @@ class AutomodeIntegratedTest {
 
         val scoreRetriever = service!!.scoreRetriever()
         scoreRetriever!!.getScoreListener()!!.subscribe ( {
+            println("-SCORE RETRIEVED "+it)
             Assert.assertNotNull(it)
             it?.let { score ->
                 Assert.assertNull("Error in Score: " + score.scoreError, score.scoreError)
@@ -176,6 +178,7 @@ class AutomodeIntegratedTest {
             }
         }, {throwable ->
             print(throwable)
+            Assert.assertFalse("Exception: " + throwable, true)
         })
 
         val confidence = 100
@@ -183,14 +186,19 @@ class AutomodeIntegratedTest {
 
         val scoreRetriever = service!!.scoreRetriever()
         scoreRetriever!!.getScoreListener()!!.subscribe ( {
+            println("-SCORE RETRIEVED")
             Assert.assertNotNull(it)
             it?.let { score ->
+                println("-SCORE")
                 Assert.assertNull("Error in Score: " + score.scoreError, score.scoreError)
+                println("-SCORE "+score.score)
                 Assert.assertNotNull("Score null: ", score.score)
-                assert(score.score!!.status == ScoreStatus.found)
+                println("-SCORE is found "+score.score!!.status)
+                Assert.assertEquals(ScoreStatus.found, score.score!!.status)
                 scoreSignal.countDown()
             }
         }, {throwable ->
+            println("-Exception ")
             Assert.assertFalse("Exception: " + throwable, true)
         })
 
@@ -210,7 +218,8 @@ class AutomodeIntegratedTest {
             Assert.assertNotNull(it)
             println("-AVAILAIBLE Score Listener Trip ID : "+it)
             it?.let { score ->
-                scoreRetriever?.retrieveScore(it, appName, Platform.PRODUCTION.generateUrl(isAPIV2), true, isAPIV2, delay = 93)
+                println("-retrieveScore : "+it)
+                scoreRetriever?.retrieveScore(it, appName, Platform.TESTING.generateUrl(isAPIV2), true, isAPIV2, delay = 3)
             }
         })
 
@@ -234,11 +243,11 @@ class AutomodeIntegratedTest {
         Thread.sleep(1000)
         println("doneSignal.await")
         doneSignal.await()
-        //xprintln("Sleep 10s")
-        //Thread.sleep(10000)
-        //println("scoreSignal.await")
-        //scoreSignal.await()
-        //println("scoreSignal.done")
+        println("Sleep 10s")
+        Thread.sleep(10000)
+        println("scoreSignal.await")
+        scoreSignal.await(180, TimeUnit.SECONDS)
+        println("scoreSignal.done")
     }
 
 

@@ -2,10 +2,10 @@
 <network-security-config>
 
     <domain-config>
-        <domain includeSubdomains="true">dil.services</domain>
+        <domain includeSubdomains="true">text.dil.services</domain>
         <trust-anchors>
             <certificates src="@raw/tex_elb_ssl" />
-            <!--certificates src="system"/-->
+            <certificates src="system"/>
         </trust-anchors>
     </domain-config>
 

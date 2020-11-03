@@ -14,10 +14,12 @@ import axa.tex.drive.sdk.core.logger.LogType
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
 import org.koin.core.context.stopKoin
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 
 class RealTripTest  {
@@ -135,16 +137,17 @@ class RealTripTest  {
 
         val scoreRetriever = service!!.scoreRetriever()
         scoreRetriever!!.getScoreListener()!!.subscribe ( {
+            println("-SCORE RETRIEVED")
             assertNotNull(it)
             it?.let { score ->
                 assertNull("Error in Score: "+score.scoreError, score.scoreError)
                 assertNotNull("Score null: ", score.score)
-                assert(score.score!!.status == ScoreStatus.found)
+                println("-SCORE is found "+score.score!!.status)
+                Assert.assertEquals(ScoreStatus.found, score.score!!.status)
                 scoreSignal.countDown()
             }
         }, {throwable ->
             assertFalse("Exception: "+throwable,true)
-            scoreSignal.countDown()
         })
 
         service!!.getTripRecorder().tripProgress()?.subscribe({
@@ -161,10 +164,14 @@ class RealTripTest  {
         })
 
         scoreRetriever!!.getAvailableScoreListener()?.subscribe({
+            println("-AVAILAIBLE Score Listener Trip ID : "+it)
             assertNotNull(it)
-            assert(it!! == tripId!!.value)
+            println("-")
+            println("-")
+            assertEquals(tripId!!.value, it!!)
             it?.let { score ->
-                scoreRetriever?.retrieveScore(it, appName, Platform.TESTING.generateUrl(isAPIV2), true, isAPIV2, delay = 30)
+                println("-retrieveScore : "+it)
+                scoreRetriever?.retrieveScore(it, appName, Platform.TESTING.generateUrl(isAPIV2), true, isAPIV2, delay = 12)
             }
         })
 
@@ -179,6 +186,7 @@ class RealTripTest  {
         println("-Thread sleep 1s")
         Thread.sleep(1000)
         println("-scoreSignal await")
-        scoreSignal.await()
+        scoreSignal.await(150, TimeUnit.SECONDS)
+        println("scoreSignal.done")
     }
 }
