@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
+import axa.tex.drive.sdk.acquisition.score.ScoreV1
 import axa.tex.drive.sdk.core.Platform
 import kotlinx.android.synthetic.main.activity_scores.*
 
@@ -23,8 +24,9 @@ class Scores : AppCompatActivity() {
 
         scoreRetriever.getScoreListener().subscribe {
             this.runOnUiThread {
-                if (it.score?.scores_dil != null) {
-                    val scoreDil = it.score?.scores_dil!!
+                val scoreV1: ScoreV1 = it.score as ScoreV1
+                if (scoreV1.scores_dil != null) {
+                    val scoreDil = scoreV1.scores_dil!!
                     speed.visibility = View.VISIBLE
                     speed.text = "${scoreDil.acceleration}"
 
@@ -45,7 +47,9 @@ class Scores : AppCompatActivity() {
         val appName = "APP-TEST"
         val platform = Platform.PRODUCTION
 
-        Thread { scoreRetriever.retrieveScore(tripId!!, appName, platform.generateUrl(false), true) }.start()
+        Thread {
+            scoreRetriever.retrieveScore(tripId!!, appName, platform.generateUrl(false), true, isAPIV2 = false)
+        }.start()
 
     }
 }
