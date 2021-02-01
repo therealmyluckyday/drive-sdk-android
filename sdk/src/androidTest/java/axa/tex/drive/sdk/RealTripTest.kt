@@ -111,7 +111,7 @@ class RealTripTest  {
 
     @Test
     @LargeTest
-    fun testTexServiceInitializationAPIV2() {
+    fun testTripAPIV2() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val sensorService = SensorServiceFake(context, rxScheduler)
         assertNotNull(sensorService)
@@ -127,7 +127,7 @@ class RealTripTest  {
         assertNotNull(service)
 
         service.logStream().subscribeOn(AndroidSchedulers.mainThread()).subscribe({ it ->
-            println(it.toString())
+            //println(it.toString())
             assert(it.type!= LogType.ERROR)
         })
         val timeStart = System.currentTimeMillis() - 86400000// 50000000
@@ -219,7 +219,7 @@ class RealTripTest  {
         assertNotNull(service)
 
         service.logStream().subscribeOn(AndroidSchedulers.mainThread()).subscribe({ it ->
-            println(it.toString())
+            //println(it.toString())
             assert(it.type!= LogType.ERROR)
         })
         val timeStart = System.currentTimeMillis() - 86400000// 50000000

@@ -62,7 +62,6 @@ class FixPacket(val fixes: List<Fix>,
             objectNode.set<ObjectNode>("os", mapper.readTree(mapper.writeValueAsString(os)))
             objectNode.set<ObjectNode>("device_id", mapper.readTree(mapper.writeValueAsString(uid)))
             objectNode.set<ObjectNode>("trip_id", mapper.readTree(mapper.writeValueAsString(trip_id)))
-            objectNode.set<ObjectNode>("program_id", mapper.readTree(mapper.writeValueAsString(app_name)))
             objectNode.set<ObjectNode>("client_id", mapper.readTree(mapper.writeValueAsString(client_id)))
             objectNode.set<ObjectNode>("device_info", mapper.readTree(mapper.writeValueAsString("$model/$os/$version")))
             jsonNode.toString()
