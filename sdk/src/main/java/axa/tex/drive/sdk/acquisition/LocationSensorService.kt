@@ -35,7 +35,7 @@ class LocationSensorService: LocationCallback, LocationListener, KoinComponentCa
         this.context = context
         this.locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         this.fusedLocationClient = mFusedLocationClient
-        val handlerThread = HandlerThread("MyHandlerThread")
+        val handlerThread = HandlerThread("LocationSensorServiceMyHandlerThread")
         handlerThread.start()
         // Now get the Looper from the HandlerThread
         // NOTE: This call will block until the HandlerThread gets control and initializes its Looper
