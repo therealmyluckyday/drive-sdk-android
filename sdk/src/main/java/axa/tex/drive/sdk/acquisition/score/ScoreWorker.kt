@@ -157,7 +157,7 @@ internal class ScoreWorker(appContext: Context, workerParams: WorkerParameters)
             }
             if (fullScore.status == ScoreStatus.notFound) {
                 LOGGER.info("scoreRequest RETRY", "scoreRequestV2")
-                return Result.failure()
+                return Result.retry()//failure
             } else if (fullScore.status == ScoreStatus.found) {
                 scoreRetriever.getScoreListener().onNext(ScoreResult(fullScore))
             } else {
