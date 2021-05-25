@@ -29,7 +29,7 @@ class LocationSensorService: LocationCallback, LocationListener, KoinComponentCa
     private var context: Context
     val looper : Looper
     private val locationRequest: LocationRequest = LocationRequest()
-    private var locationCallback: LocationCallback = LocationCallback()
+    private var locationCallback: LocationCallback
 
     constructor(context: Context, scheduler: Scheduler, mFusedLocationClient: FusedLocationProviderClient?) {
         this.context = context

@@ -19,7 +19,7 @@ buildscript {
 
 
 
-def currentVersionName = "3.0.5--alpha--01022021"
+def currentVersionName = "3.0.6--alpha--25052021"
 def getVersionName = { ->
     return currentVersionName
 }
@@ -95,7 +95,7 @@ dependencies {
 
     // Kotlin
     // Google Location service
-    def play_services_version = "17.0.0"
+    def play_services_version = "18.0.0"
     implementation "com.google.android.gms:play-services-location:$play_services_version"
 
     // Koin
@@ -106,7 +106,7 @@ dependencies {
 
 
     // WorkManager
-    def work_version = "2.2.0"
+    def work_version = "2.5.0"
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
@@ -116,10 +116,10 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:$rx_kotlin_version")
 
     testImplementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    testImplementation 'io.reactivex.rxjava2:rxjava:2.2.19'
+    testImplementation 'io.reactivex.rxjava2:rxjava:2.2.21'
 
     // Jackson
-    def jackson_version = '2.10.0'
+    def jackson_version = '2.12.3'
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version"
     implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_version"
     implementation "com.fasterxml.jackson.core:jackson-core:$jackson_version"
@@ -130,15 +130,15 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     // Optional -- Robolectric environment
     testImplementation 'org.robolectric:robolectric:4.2.1'
-    testImplementation 'androidx.test:core:1.2.0'
-    testImplementation 'androidx.test:runner:1.2.0'
+    testImplementation 'androidx.test:core:1.3.0'
+    testImplementation 'androidx.test:runner:1.3.0'
     // Optional -- Mockito framework
     testImplementation 'org.mockito:mockito-core:3.3.0'
 
     androidTestImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test:core:1.2.0'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:core:1.3.0'
+    androidTestImplementation 'androidx.test:runner:1.3.0'
     androidTestImplementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
 }
