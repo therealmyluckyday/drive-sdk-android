@@ -2,12 +2,10 @@ package axa.tex.drive.sdk.core.internal.utils
 
 import android.content.Context
 import axa.tex.drive.sdk.acquisition.model.TripId
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.koin.android.ext.android.inject
 import java.util.*
 
 private const val TRIP_ID = "TRIP_ID"

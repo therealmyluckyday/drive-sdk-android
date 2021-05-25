@@ -5,8 +5,8 @@ import android.location.Location
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.automode.internal.tracker.model.TexLocation
-import io.reactivex.Scheduler
 import axa.tex.drive.sdk.core.logger.LoggerFactory
+import io.reactivex.Scheduler
 import io.reactivex.subjects.PublishSubject
 import java.io.IOException
 

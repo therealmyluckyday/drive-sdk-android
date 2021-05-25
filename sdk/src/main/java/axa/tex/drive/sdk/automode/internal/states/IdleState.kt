@@ -3,9 +3,7 @@ package axa.tex.drive.sdk.automode.internal.states
 
 import android.os.Handler
 import android.os.Looper
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
-import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import java.util.*
 import kotlin.concurrent.schedule

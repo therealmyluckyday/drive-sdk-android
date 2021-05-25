@@ -6,7 +6,6 @@ import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import axa.tex.drive.sdk.core.CertificateAuthority
-import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory

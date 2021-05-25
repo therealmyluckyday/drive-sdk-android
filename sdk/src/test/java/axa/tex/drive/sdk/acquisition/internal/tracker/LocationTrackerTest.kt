@@ -2,9 +2,7 @@ package axa.tex.drive.sdk.acquisition.internal.tracker
 
 
 import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeLocationSensor
-import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.LocationFix
-import io.reactivex.Observable
 import org.junit.Assert
 import org.junit.Test
 import java.util.concurrent.CountDownLatch

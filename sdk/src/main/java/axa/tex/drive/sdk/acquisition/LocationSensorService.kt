@@ -16,7 +16,6 @@ import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
-import com.google.android.gms.tasks.OnCompleteListener
 import io.reactivex.Scheduler
 import org.koin.android.ext.android.inject
 

@@ -4,7 +4,6 @@ import axa.tex.drive.sdk.acquisition.internal.tracker.fake.FakeBatterySensor
 import axa.tex.drive.sdk.acquisition.model.BatteryFix
 import axa.tex.drive.sdk.acquisition.model.BatteryState
 import axa.tex.drive.sdk.acquisition.model.Fix
-import io.reactivex.Observable
 import org.junit.Assert
 import org.junit.Test
 import java.util.*

@@ -2,7 +2,6 @@ package axa.tex.drive.sdk.core
 
 
 import android.content.Context
-import androidx.work.WorkManager
 import axa.tex.drive.sdk.R
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory

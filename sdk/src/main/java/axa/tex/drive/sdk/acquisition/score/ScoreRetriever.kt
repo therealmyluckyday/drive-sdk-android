@@ -3,7 +3,6 @@ package axa.tex.drive.sdk.acquisition.score
 import android.content.Context
 import androidx.work.*
 import axa.tex.drive.sdk.acquisition.score.model.ScoreResult
-import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import io.reactivex.subjects.PublishSubject

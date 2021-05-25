@@ -13,8 +13,6 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import axa.tex.drive.sdk.R
-import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
-import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject

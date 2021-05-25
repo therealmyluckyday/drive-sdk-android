@@ -2,9 +2,11 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.Data
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
-import axa.tex.drive.sdk.core.Platform
 import axa.tex.drive.sdk.core.internal.Constants
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import org.koin.android.ext.android.inject

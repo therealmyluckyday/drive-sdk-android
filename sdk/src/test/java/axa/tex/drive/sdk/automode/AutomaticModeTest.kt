@@ -2,8 +2,6 @@ package axa.tex.drive.sdk.automode
 
 
 import android.location.Location
-import android.os.Handler
-import android.os.Looper
 import axa.tex.drive.sdk.acquisition.SensorServiceFake
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.states.DrivingState
@@ -21,16 +19,9 @@ import io.reactivex.schedulers.Schedulers
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.koin.test.KoinTest
-import org.mockito.AdditionalAnswers.answer
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito.*
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.stubbing.Answer
 import java.util.*
 

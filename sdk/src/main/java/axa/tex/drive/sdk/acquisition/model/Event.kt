@@ -3,7 +3,6 @@ package axa.tex.drive.sdk.acquisition.model
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import com.fasterxml.jackson.annotation.JsonRootName
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 

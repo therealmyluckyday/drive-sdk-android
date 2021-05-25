@@ -10,7 +10,6 @@ import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.Observable
 import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 

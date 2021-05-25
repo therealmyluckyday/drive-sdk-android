@@ -10,12 +10,10 @@ import android.os.*
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import axa.tex.drive.sdk.R
+import axa.tex.drive.sdk.acquisition.SensorServiceImpl
 import axa.tex.drive.sdk.acquisition.TripRecorder
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.states.DrivingState
-import axa.tex.drive.sdk.acquisition.SensorServiceImpl
-import axa.tex.drive.sdk.automode.internal.states.IdleState
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.schedulers.Schedulers

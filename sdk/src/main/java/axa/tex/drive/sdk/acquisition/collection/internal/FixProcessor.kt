@@ -3,16 +3,16 @@ package axa.tex.drive.sdk.acquisition.collection.internal
 
 import android.content.Context
 import axa.tex.drive.sdk.API.Trip.APITrip
-import axa.tex.drive.sdk.acquisition.collection.internal.db.CollectionDb
-import axa.tex.drive.sdk.acquisition.model.*
+import axa.tex.drive.sdk.acquisition.model.Event
+import axa.tex.drive.sdk.acquisition.model.Fix
+import axa.tex.drive.sdk.acquisition.model.TripChunk
+import axa.tex.drive.sdk.acquisition.model.TripId
 import axa.tex.drive.sdk.core.Config
 import axa.tex.drive.sdk.core.TripInfos
 import axa.tex.drive.sdk.core.internal.KoinComponentCallbacks
-import axa.tex.drive.sdk.core.internal.utils.TripManager
 import axa.tex.drive.sdk.core.logger.LoggerFactory
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import org.koin.android.ext.android.inject
 
 internal class FixProcessor : KoinComponentCallbacks {
     private var context: Context

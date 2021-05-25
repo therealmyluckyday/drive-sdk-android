@@ -19,7 +19,6 @@ import axa.tex.drive.sdk.acquisition.internal.tracker.MotionTracker
 import axa.tex.drive.sdk.acquisition.internal.tracker.Tracker
 import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.acquisition.score.ScoreRetriever
-import axa.tex.drive.sdk.automode.AutomodeHandler
 import axa.tex.drive.sdk.automode.internal.Automode
 import axa.tex.drive.sdk.automode.internal.tracker.SpeedFilter
 import axa.tex.drive.sdk.core.internal.Constants
