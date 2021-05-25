@@ -65,11 +65,6 @@ class SensorServiceImpl: SensorService {
                 val exception = PermissionException("need permission.ACCESS_COARSE_LOCATION")
                 throw exception
             }
-
-            if ((Build.VERSION.SDK_INT >= 29) && (context.checkSelfPermission(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
-                val exception = PermissionException("need permission.ACCESS_BACKGROUND_LOCATION")
-                throw exception
-            }
         }
     }
 }

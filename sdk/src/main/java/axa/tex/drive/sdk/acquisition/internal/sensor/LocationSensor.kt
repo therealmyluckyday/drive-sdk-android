@@ -120,20 +120,7 @@ internal class LocationSensor : TexSensor, KoinComponentCallbacks {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ) {
             val hasForegroundLocationPermission = ActivityCompat.checkSelfPermission(this.context!!,
                     Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-
                     LOGGER.info("hasForegroundLocationPermission "+hasForegroundLocationPermission, "checkPermission")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ) {
-                val hasBackgroundLocationPermission = ActivityCompat.checkSelfPermission(this.context!!,
-                        Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED
-                if (!hasBackgroundLocationPermission || !hasForegroundLocationPermission) {
-                    LOGGER.info("hasBackgroundLocationPermission "+hasBackgroundLocationPermission, "checkPermission")
-                    return
-                }
-            } else {
-                if (!hasForegroundLocationPermission) {
-                    return
-                }
-            }
         }
     }
 }
