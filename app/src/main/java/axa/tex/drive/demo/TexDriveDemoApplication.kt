@@ -71,12 +71,12 @@ class TexDriveDemoApplication : Application() {
     fun configure() {
 
         println("["+Thread.currentThread().getName()+"][Configure]")
-        val sensorServiceFake = SensorServiceFake(applicationContext, rxScheduler)
-        sensorService = sensorServiceFake
+        //val sensorServiceFake = SensorServiceFake(applicationContext, rxScheduler)
+        //sensorService = sensorServiceFake
         try {
-            //val sensorServiceImpl = SensorServiceImpl(applicationContext, rxScheduler, LocationServices.getFusedLocationProviderClient(this))
-            val isAPIV2  = true
-            val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceFake, rxScheduler, isAPIV2).enableTrackers().platformHost(Platform.PRODUCTION).build()
+            val sensorServiceImpl = SensorServiceImpl(applicationContext, rxScheduler, LocationServices.getFusedLocationProviderClient(this))
+            val isAPIV2  = false
+            val newConfig = TexConfig.Builder(applicationContext, "APP-TEST", "22910000", sensorServiceImpl, rxScheduler, isAPIV2).enableTrackers().platformHost(Platform.PRODUCTION).build()
             config = newConfig
             val newService = TexService.configure(newConfig)
             service = newService
@@ -108,7 +108,7 @@ class TexDriveDemoApplication : Application() {
             })
             if(!autoModeHandler.running) {
                 Toast.makeText(applicationContext, "ACTIVATING.....", Toast.LENGTH_SHORT).show()
-               // autoModeHandler.activateAutomode(applicationContext,false, isSimulatedDriving = true)
+                autoModeHandler.activateAutomode(applicationContext,true, isSimulatedDriving = false)
             }else{
                 Toast.makeText(applicationContext, "Already running.....", Toast.LENGTH_SHORT).show()
             }
@@ -126,12 +126,12 @@ class TexDriveDemoApplication : Application() {
 
         // Launch recorded trip
         Timer("SettingUp", false).schedule(5000) {
-            sensorServiceFake.loadTrip(applicationContext, 1L)
+            //sensorServiceFake.loadTrip(applicationContext, 1L)
         }
 
 
         Timer("SettingUp", false).schedule(45000) {
-            sensorServiceFake.loadTrip(applicationContext, 1L)
+            //sensorServiceFake.loadTrip(applicationContext, 1L)
         }
     }
     fun saveLocation(location: Location, delay:Long) {

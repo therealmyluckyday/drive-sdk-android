@@ -202,28 +202,21 @@ class MainActivity : AppCompatActivity() {
     private fun requestForLocationPermission() {
         ActivityCompat.requestPermissions(this,
                 arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION, android.Manifest.permission.ACTIVITY_RECOGNITION), 123)
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACTIVITY_RECOGNITION), 123)
         if (Build.VERSION.SDK_INT >= 23 ) {
             val hasForegroundLocationPermission = ActivityCompat.checkSelfPermission(this,
                     android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
             if (Build.VERSION.SDK_INT >= 29 ) {
                 if (hasForegroundLocationPermission) {
-                    val hasBackgroundLocationPermission = ActivityCompat.checkSelfPermission(this,
-                            android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                            ) == PackageManager.PERMISSION_GRANTED
-                    if (!hasBackgroundLocationPermission) {
-                        ActivityCompat.requestPermissions(this,
-                                arrayOf(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
-                    }
+
                 } else {
                     ActivityCompat.requestPermissions(this,
-                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
+                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_CODE_BACKGROUND)
                 }
             } else {
                 if (!hasForegroundLocationPermission) {
                     ActivityCompat.requestPermissions(this,
-                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_CODE_BACKGROUND)
+                            arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), REQUEST_CODE_BACKGROUND)
                 }
             }
         }
