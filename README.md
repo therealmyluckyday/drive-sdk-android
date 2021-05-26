@@ -21,7 +21,6 @@ along with the credentials inside project level build.gradle.
 
 allprojects {
 repositories {
-            jcenter()
             maven {
                 url 'https://axadil.jfrog.io/axadil/android-tex'
                 credentials {

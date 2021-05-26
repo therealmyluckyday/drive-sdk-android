@@ -48,10 +48,10 @@ class LocationSensorService: LocationCallback, LocationListener, KoinComponentCa
         locationRequest.setPriority(PRIORITY_HIGH_ACCURACY)
 
         locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult?) {
+            override fun onLocationResult(locationResult: LocationResult) {
                 super.onLocationResult(locationResult)
-                val locations = locationResult?.locations
-                if (locations != null && locations!!.isNotEmpty()) {
+                val locations = locationResult.locations
+                if (locations.isNotEmpty()) {
                     LOGGER.info("\"Location callback", "onLocationResult")
                     val location = locations[0]
                     sendLocation(location)
@@ -122,17 +122,9 @@ class LocationSensorService: LocationCallback, LocationListener, KoinComponentCa
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
         LOGGER.info("\"Status $status", "onStatusChanged")
     }
-    //LocationListener,
-    override fun onProviderEnabled(provider: String?) {
-        LOGGER.info("", "onProviderEnabled")
-    }
-    // LocationListener,
-    override fun onProviderDisabled(provider: String?) {
-        LOGGER.info("", "onProviderDisabled")
-    }
 
     // LocationCallback
-    override fun onLocationAvailability(p0: LocationAvailability?) {
+    override fun onLocationAvailability(p0: LocationAvailability) {
         super.onLocationAvailability(p0)
     }
 }

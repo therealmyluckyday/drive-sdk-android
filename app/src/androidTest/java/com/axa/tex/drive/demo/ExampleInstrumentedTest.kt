@@ -1,7 +1,6 @@
 package com.axa.tex.drive.demo
 
 import androidx.test.InstrumentationRegistry
-import androidx.test.runner.AndroidJUnit4
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.TexUser
@@ -22,8 +21,7 @@ import java.util.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-@RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest : KoinTest {
+class ExampleInstrumentedTest {
 
     var tripRecorder: TripRecorder? = null;
     private var lastLocation: Fix? = null;
@@ -32,7 +30,7 @@ class ExampleInstrumentedTest : KoinTest {
     fun beforeTest() {
         val appContext = InstrumentationRegistry.getTargetContext()
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
-        val config: TexConfig = TexConfig.Builder(user, appContext, "clientIdToto").enableBatteryTracker().enableLocationTracker().enableMotionTracker().build()
+        val config: TexConfig = TexConfig.Builder(user, appContext, "clientToto", isAPIV2 = false).enableBatteryTracker().enableLocationTracker().enableMotionTracker().build()
         tripRecorder = TexService.configure(config)?.getTripRecorder()
         tripRecorder?.locationObservable()?.subscribe { fix -> lastLocation = fix }
         tripRecorder?.startTrip(Date().time)
