@@ -19,7 +19,7 @@ buildscript {
 
 
 
-def currentVersionName = "3.0.6--alpha--25052021"
+def currentVersionName = "3.0.6--alpha--27052021"
 def getVersionName = { ->
     return currentVersionName
 }
