@@ -1,8 +1,7 @@
 package axa.tex.drive.sdk
-
-
 import android.location.Location
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import axa.tex.drive.sdk.acquisition.SensorServiceFake
 import axa.tex.drive.sdk.acquisition.TripRecorder
@@ -11,6 +10,7 @@ import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.delay
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -19,9 +19,7 @@ import org.koin.test.KoinTest
 import java.util.*
 
 
-@RunWith(AndroidJUnit4::class)
-class TextInstrumentedTest : KoinTest {
-
+public class TextInstrumentedTest : KoinTest {
     private val tripLogFileName = "trip_location_test.csv"
     var sensorService: SensorServiceFake? = null
     var tripRecorder: TripRecorder? = null
@@ -29,7 +27,7 @@ class TextInstrumentedTest : KoinTest {
     val rxScheduler = Schedulers.single()
 
     @Before
-    fun beforeTest() {
+    public fun beforeTest() {
         val appContext = InstrumentationRegistry.getInstrumentation().getTargetContext()
         sensorService = SensorServiceFake(appContext, rxScheduler)
         val user = TexUser("appId", "FFFDIHOVA3131IJA1")
