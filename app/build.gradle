@@ -35,14 +35,14 @@ dependencies {
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
 
     // Android
     def build_tools_version = "29.0.1"
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
 
     // Recycler view
-    def recyclerview_version = "1.0.0"
+    def recyclerview_version = '1.2.1'
 
     implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
 
@@ -50,7 +50,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
 
     // ConstraintLayout Deprecated to remove
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
 
     //Rx
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:$rx_kotlin_version")
 
     // WorkManager
-    def work_version = "2.2.0"
+    def work_version = '2.5.0'
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
@@ -67,22 +67,22 @@ dependencies {
     def multidex_version = "2.0.1"
     implementation "androidx.multidex:multidex:$multidex_version"
 
-    implementation 'com.github.anastr:speedviewlib:1.3.1'
+    implementation 'com.github.anastr:speedviewlib:1.5.5'
 
     implementation project(':sdk')
 
     // Add the Firebase SDK for Google Analytics
-    implementation 'com.google.firebase:firebase-analytics:17.4.3'
+    implementation 'com.google.firebase:firebase-analytics:19.0.0'
     // add SDKs for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
     // Add the Firebase Crashlytics SDK.
-    implementation 'com.google.firebase:firebase-crashlytics:17.1.0'
+    implementation 'com.google.firebase:firebase-crashlytics:18.1.0'
 
     // JUnit 4 framework
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'junit:junit:4.13.2'
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
 
     def koin_version = '2.0.1'
     androidTestImplementation "org.koin:koin-test:$koin_version"
