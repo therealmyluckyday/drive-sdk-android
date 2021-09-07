@@ -10,13 +10,13 @@ enum class Platform () {
         if (isAPIV2) {
             when (this) {
                 PRODUCTION ->
-                    return "https://mobile-sink.youdrive.next.dil.services"
+                    return "https://mobile-sink.youdrive.next.dil.services/mobile"
                 PREPROD ->
-                    return "https://mobile-sink.youdrive-pp.next.dil.services"
+                    return "https://mobile-sink.youdrive-pp.next.dil.services/mobile"
                 TESTING ->
                     return "https://mobile-sink.youdrive-dev.next.dil.services/mobile"
                 INTEGRATION ->
-                    return "https://mobile-sink.youdrive-uat.next.dil.services"
+                    return "https://mobile-sink.youdrive-uat.next.dil.services/mobile"
             }
         } else {
             when (this) {

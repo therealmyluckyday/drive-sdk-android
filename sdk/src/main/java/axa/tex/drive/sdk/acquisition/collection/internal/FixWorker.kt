@@ -34,6 +34,7 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
         val appName = inputData.getString(Constants.APP_NAME_KEY) ?: "APP_TEST"
         val serverUrl = inputData.getString(Constants.PLATFORM_URL) ?: "https://gw-preprod.tex.dil.services/v2.0"
         val data = inputData.getString(Constants.DATA_KEY) ?: ""
+        LOGGER.info("APPNAME: $appName , SERVERURL: $serverUrl", "private fun sendFixes(inputData : Data) : Boolean")
         LOGGER.info("TRIPCHUNK SIZE :$inputData.keyValueMap.size", "private fun sendFixes(inputData : Data) : Boolean")
         val uid = inputData.getString((Constants.UID_KEY)) ?: ""
         val isAPIV2 = inputData.getBoolean(Constants.PLATFORM_VERSION, false)
@@ -43,7 +44,8 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
 
     @Throws(IOException::class)
     private fun sendData(data: String, appName: String, serverUrl: String, uid: String, isAPIV2: Boolean): Result {
-        val funcName = "enableTracking"
+        val funcName = "sendData"
+        LOGGER.info("SENDING DATA DATA = $data", funcName)
         try {
             val url = URL(serverUrl + "/data")
             LOGGER.info("SENDING DATA URL = ${url.toURI()}, DATA = $data", funcName)
@@ -67,6 +69,8 @@ internal open class FixWorker(appContext: Context, workerParams: WorkerParameter
             urlConnection.outputStream.close()
             if (urlConnection.responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
                 LOGGER.error("SENDING : error CODE = ${urlConnection.responseCode}", funcName)
+                LOGGER.error("SENDING : error responseMessage = ${urlConnection.responseMessage}", funcName)
+
                 return when (urlConnection.responseCode) {
                     HttpURLConnection.HTTP_INTERNAL_ERROR -> {
                         LOGGER.error("SENDING : error RETRY = ${urlConnection.responseCode}", funcName)

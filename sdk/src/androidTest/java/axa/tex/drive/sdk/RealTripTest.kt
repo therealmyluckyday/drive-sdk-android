@@ -45,6 +45,7 @@ class RealTripTest  {
         })
         val timeStart = System.currentTimeMillis() - 86400000// 50000000
         val tripId =  service!!.getTripRecorder().startTrip(timeStart)
+
         Assert.assertNotNull("tripId NULL", tripId)
         Assert.assertNotNull("tripId VALUE NULL", tripId!!.value)
 
@@ -108,8 +109,8 @@ class RealTripTest  {
         val doneSignal = CountDownLatch(930) // Number of GPS point used for the trip
         val scoreSignal = CountDownLatch(1)
         val isAPIV2 = true
-        val appName = "youdrive_france_prospect"//"youdrive_france_prospect"
-        var config = TexConfig.Builder(context, appName, "22910000",sensorService, rxScheduler, isAPIV2 = isAPIV2).enableTrackers().platformHost(Platform.TESTING).build()
+        val appName = "youdrive-france-prospect"//"youdrive_france_prospect"
+        var config = TexConfig.Builder(context, appName, "a74c2918-a66c-4182-b7a6-a1668301deb1",sensorService, rxScheduler, isAPIV2 = isAPIV2).enableTrackers().platformHost(Platform.INTEGRATION).build()
         TexConfig.config!!.isRetrievingScoreAutomatically = false
         assertNotNull(config)
 
@@ -117,30 +118,31 @@ class RealTripTest  {
         assertNotNull(service)
 
         service.logStream().subscribeOn(AndroidSchedulers.mainThread()).subscribe({ it ->
-            //println(it.toString())
+                println("TEXSDKV3: "+it.toString())
             //assert(it.type!= LogType.ERROR)
         })
         val timeStart = System.currentTimeMillis() - 86400000// 50000000
         val tripId =  service!!.getTripRecorder().startTrip(timeStart)
+        println("TEXSDKV3 tripId: "+tripId)
         assertNotNull(tripId)
         assertNotNull(tripId!!.value)
 
         val scoreRetriever = service!!.scoreRetriever()
         scoreRetriever!!.getScoreListener()!!.subscribe (
                 {
-                    println("-")
-            println("-SCORE RETRIEVED")
+                    println("TEXSDKV3 -")
+            println("TEXSDKV3 -SCORE RETRIEVED")
                     println("-")
             assertNotNull(it)
             it?.let { score ->
                 assertNull("Error in Score: "+score.scoreError, score.scoreError)
                 assertNotNull("Score null: ", score.score)
-                println("-SCORE is found "+score.score!!.status)
-                println("-")
+                println("TEXSDKV3 -SCORE is found "+score.score!!.status)
+                println("TEXSDKV3 -")
 
                 println("------------------------------------------------------------------")
                 Assert.assertEquals(ScoreStatus.found, score.score!!.status)
-                //scoreSignal.countDown()
+                scoreSignal.countDown()
             }
         }, {throwable ->
             assertFalse("Exception: "+throwable,true)
@@ -160,18 +162,18 @@ class RealTripTest  {
         })
 
         scoreRetriever!!.getAvailableScoreListener()?.subscribe({
-            println("-AVAILAIBLE Score Listener Trip ID : "+it)
+            println("TEXSDKV3 -AVAILAIBLE Score Listener Trip ID : "+it)
             assertNotNull(it)
-            println("-")
-            println("-")
+            println("TEXSDKV3 -")
+            println("TEXSDKV3 -")
             assertEquals(tripId!!.value, it!!)
             it?.let { score ->
-                println("-retrieveScore : "+it)
-                scoreRetriever?.retrieveScore(it, appName, Platform.TESTING.generateUrl(isAPIV2), true, isAPIV2, delay = 1)
+                println("TEXSDKV3 -retrieveScore : "+it)
+                scoreRetriever?.retrieveScore(it, appName, Platform.INTEGRATION.generateUrl(isAPIV2), true, isAPIV2, delay = 100)
             }
         })
 
-        val endTripTime = sensorService!!.loadTrip(context, 100L)
+        val endTripTime = sensorService!!.loadTrip(context, 200L)
         // val endTripTime = loadTrip(sensorService!!, timeStart)// 57 600 000 = 16 Hour  86400000 = 24 Hour
         println("-doneSignal await")
         doneSignal.await()
