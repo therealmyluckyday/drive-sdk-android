@@ -303,7 +303,7 @@ class AutomodeIntegratedTest {
         val delay = locationDetails[6].toLong()
         newLocation.time = delay + time
         sensorService.forceLocationChanged(newLocation)
-        Thread.sleep(200)
+        Thread.sleep(100)
         return newLocation.time
     }
 }

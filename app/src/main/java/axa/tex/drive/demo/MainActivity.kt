@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         }
         stop.setOnClickListener {
             speedView.speedTo(0f)
-            speedView.isWithTremble = false
             speedView.stop()
             stop.visibility = View.GONE
             play.visibility = View.VISIBLE
@@ -101,7 +100,6 @@ class MainActivity : AppCompatActivity() {
                     stop.visibility = View.GONE
                     speedView.speedTo(0f)
                     speedView.stop()
-                    speedView.isWithTremble = false
                 }
             }
 
