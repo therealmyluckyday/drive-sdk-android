@@ -39,7 +39,7 @@ dependencies {
 
     // Android
     def build_tools_version = "29.0.1"
-    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
 
     // Recycler view
     def recyclerview_version = '1.2.1'
@@ -50,7 +50,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
 
     // ConstraintLayout Deprecated to remove
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
 
 
     //Rx
@@ -58,7 +58,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:$rx_kotlin_version")
 
     // WorkManager
-    def work_version = '2.5.0'
+    def work_version = '2.6.0'
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
@@ -67,22 +67,22 @@ dependencies {
     def multidex_version = "2.0.1"
     implementation "androidx.multidex:multidex:$multidex_version"
 
-    implementation 'com.github.anastr:speedviewlib:1.5.5'
+    implementation 'com.github.anastr:speedviewlib:1.5.51'
 
     implementation project(':sdk')
 
     // Add the Firebase SDK for Google Analytics
-    implementation 'com.google.firebase:firebase-analytics:19.0.0'
+    implementation 'com.google.firebase:firebase-analytics:19.0.1'
     // add SDKs for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
     // Add the Firebase Crashlytics SDK.
-    implementation 'com.google.firebase:firebase-crashlytics:18.1.0'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.1'
 
     // JUnit 4 framework
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'junit:junit:4.13.2'
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
 
     def koin_version = '2.0.1'
     androidTestImplementation "org.koin:koin-test:$koin_version"
