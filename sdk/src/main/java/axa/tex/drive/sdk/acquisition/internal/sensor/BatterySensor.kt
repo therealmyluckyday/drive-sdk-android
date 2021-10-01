@@ -3,6 +3,7 @@ package axa.tex.drive.sdk.acquisition.internal.sensor
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_BATTERY_CHANGED
 import android.content.IntentFilter
 import android.os.BatteryManager
 import axa.tex.drive.sdk.acquisition.model.BatteryFix
@@ -65,6 +66,9 @@ internal class BatterySensor : TexSensor, BroadcastReceiver {
 
 
     override fun onReceive(context: Context?, intent: Intent?) {
+        if (intent?.action != Intent.ACTION_BATTERY_CHANGED) {
+            return
+        }
         // Battery level
         val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
         val scale = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
