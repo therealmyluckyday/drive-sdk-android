@@ -66,7 +66,7 @@ internal class BatterySensor : TexSensor, BroadcastReceiver {
 
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (intent?.action != Intent.ACTION_BATTERY_CHANGED) {
+        if (intent == null || intent?.action != Intent.ACTION_BATTERY_CHANGED) {
             return
         }
         // Battery level
