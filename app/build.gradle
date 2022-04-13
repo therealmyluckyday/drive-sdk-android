@@ -6,11 +6,11 @@ apply plugin: 'com.google.firebase.crashlytics' // Apply the Crashlytics Gradle 
 
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "axa.tex.drive.demo"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 2
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -23,7 +23,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    buildToolsVersion = '30.0.2'
+    buildToolsVersion = '30.0.3'
     compileOptions {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
@@ -34,12 +34,13 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.google.android.gms:play-services-location:18.0.0'
+    //implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
 
     // Android
     def build_tools_version = "29.0.1"
-    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
 
     // Recycler view
     def recyclerview_version = '1.2.1'
@@ -50,7 +51,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
 
     // ConstraintLayout Deprecated to remove
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
 
     //Rx
@@ -58,7 +59,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxkotlin:$rx_kotlin_version")
 
     // WorkManager
-    def work_version = '2.6.0'
+    def work_version = '2.7.1'
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$work_version"
 
@@ -72,11 +73,11 @@ dependencies {
     implementation project(':sdk')
 
     // Add the Firebase SDK for Google Analytics
-    implementation 'com.google.firebase:firebase-analytics:19.0.1'
+    implementation 'com.google.firebase:firebase-analytics:20.1.2'
     // add SDKs for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
     // Add the Firebase Crashlytics SDK.
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.1'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.9'
 
     // JUnit 4 framework
     testImplementation 'junit:junit:4.13.2'

@@ -43,17 +43,20 @@ class ActivityRecognitionService {
         activityReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val result = ActivityRecognitionResult.extractResult(intent)
-                val activity: DetectedActivity = result.mostProbableActivity
-                LOGGER.info("\"ActivityRecognition: "+result.mostProbableActivity.toString(), "addOnSuccessListener")
-                var isSimulateDriving = true
-                if (isSimulateDriving) {
-                    LOGGER.info("\"isSimulateDriving", "startActivityScanning")
-                    val confidence = 100
-                    activityStream.onNext(DetectedActivity(DetectedActivity.IN_VEHICLE, confidence))
+                result?.also {
+                    val activity: DetectedActivity = result.mostProbableActivity
+                    LOGGER.info("\"ActivityRecognition: "+result.mostProbableActivity.toString(), "addOnSuccessListener")
+                    var isSimulateDriving = true
+                    if (isSimulateDriving) {
+                        LOGGER.info("\"isSimulateDriving", "startActivityScanning")
+                        val confidence = 100
+                        activityStream.onNext(DetectedActivity(DetectedActivity.IN_VEHICLE, confidence))
+                    }
+                    else {
+                        activityStream.onNext(activity)
+                    }
                 }
-                else {
-                    activityStream.onNext(activity)
-                }
+
             }
         }
         context.registerReceiver(activityReceiver, IntentFilter(ACTIVITY_INTENT_ACTION))
