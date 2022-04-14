@@ -4,19 +4,21 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import axa.tex.drive.demo.databinding.ActivityTripsBinding
 import axa.tex.drive.sdk.core.tools.FileManager
 import com.example.android.recyclerview.TripAdapter
-import java.io.File
 
 class Trips : AppCompatActivity() {
-
+    private lateinit var binding: ActivityTripsBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_trips)
+        binding = ActivityTripsBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
 
         viewManager = LinearLayoutManager(this)

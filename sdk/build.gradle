@@ -1,7 +1,7 @@
 apply plugin: 'jacoco'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+//apply plugin: 'kotlin-android-extensions'
 //apply plugin: 'com.jfrog.artifactory'
 //apply plugin: 'maven-publish'
 //apply plugin: 'org.sonarqube'

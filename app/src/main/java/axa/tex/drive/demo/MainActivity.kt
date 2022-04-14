@@ -15,20 +15,25 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.viewbinding.ViewBinding
+import axa.tex.drive.demo.databinding.ActivityMainBinding
 import axa.tex.drive.sdk.acquisition.PermissionException
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.core.tools.FileManager
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
     private var tripRecorder: TripRecorder? = null
     val REQUEST_CODE_BACKGROUND = 1545
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
         requestForLocationPermission();
 
         println("["+Thread.currentThread().getName()+"][Configure]")
@@ -37,27 +42,27 @@ class MainActivity : AppCompatActivity() {
         val service = texApplication.service
         tripRecorder = texApplication.tripRecorder
 
-        play.setOnClickListener {
+        binding.play.setOnClickListener {
 
             runOnUiThread {
 
-                play.visibility = View.GONE
-                stop.visibility = View.VISIBLE
+                binding.play.visibility = View.GONE
+                binding.stop.visibility = View.VISIBLE
 
                 startService()
             }
         }
-        stop.setOnClickListener {
-            speedView.speedTo(0f)
-            speedView.stop()
-            stop.visibility = View.GONE
-            play.visibility = View.VISIBLE
+        binding.stop.setOnClickListener {
+            binding.speedView.speedTo(0f)
+            binding.speedView.stop()
+            binding.stop.visibility = View.GONE
+            binding.play.visibility = View.VISIBLE
             stopService()
         }
 
         if (tripRecorder?.isRecording()!!) {
-            play.visibility = View.GONE
-            stop.visibility = View.VISIBLE
+            binding.play.visibility = View.GONE
+            binding.stop.visibility = View.VISIBLE
         }
 
 
@@ -77,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             print(throwable)
         })
 
-        trips.setOnLongClickListener {
+        binding.trips.setOnLongClickListener {
             val intent = Intent(this, Trips::class.java)
             startActivity(intent)
             true
@@ -87,8 +92,8 @@ class MainActivity : AppCompatActivity() {
         autoModeHandler?.state?.subscribe( {driving ->
             if(driving){
                 runOnUiThread {
-                    play.visibility = View.GONE
-                    stop.visibility = View.VISIBLE
+                    binding.play.visibility = View.GONE
+                    binding.stop.visibility = View.VISIBLE
                     startService()
 
                 }
@@ -96,10 +101,10 @@ class MainActivity : AppCompatActivity() {
             }else{
                 runOnUiThread {
                     stopService()
-                    play.visibility = View.VISIBLE
-                    stop.visibility = View.GONE
-                    speedView.speedTo(0f)
-                    speedView.stop()
+                    binding.play.visibility = View.VISIBLE
+                    binding.stop.visibility = View.GONE
+                    binding.speedView.speedTo(0f)
+                    binding.speedView.stop()
                 }
             }
 
@@ -108,12 +113,12 @@ class MainActivity : AppCompatActivity() {
         })
 
         service?.getSensorService()!!.speedFilter()?.gpsStream?.subscribe({
-            speedView.speedTo(it.speed*1f, 50)
+            binding.speedView.speedTo(it.speed*1f, 50)
         }, {throwable ->
             print(throwable)
         })
         service?.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
-            distanceTextView.text = "Distance : "+it.distance+"Km\nSpeed : "+it.speed+"Km/h\nDuration : "+it.duration/1000+"s"
+            binding.distanceTextView.text = "Distance : "+it.distance+"Km\nSpeed : "+it.speed+"Km/h\nDuration : "+it.duration/1000+"s"
             Thread{
                 //distanceTextView.text = "Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]"
                 print("Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]")
