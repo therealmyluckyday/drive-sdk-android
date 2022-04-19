@@ -6,7 +6,6 @@ buildscript {
     ext.lifecycle_version = "1.1.1"
     repositories {
         google()
-        //jcenter()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
@@ -14,7 +13,6 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        //classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
         classpath "org.codehaus.groovy:groovy-all:3.0.8"
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8")
         classpath 'com.google.gms:google-services:4.3.10'
@@ -28,10 +26,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        //jcenter()
         mavenCentral()
-        //mavenLocal()
-
     }
 }
 
