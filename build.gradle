@@ -23,6 +23,8 @@ buildscript {
     }
 }
 
+ext.sdkVersion = "3.0.9"
+
 allprojects {
     repositories {
         google()
