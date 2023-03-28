@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import axa.tex.drive.sdk.core.logger.LoggerFactory
+import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityRecognitionClient
 import com.google.android.gms.location.ActivityRecognitionResult
 import com.google.android.gms.location.DetectedActivity
@@ -31,13 +32,13 @@ class ActivityRecognitionService {
     fun startActivityScanning(activityStream: PublishSubject<DetectedActivity>) {
 
         LOGGER.info("\"Create activityRecognitionClient", "startActivityScanning")
-        activityRecognitionClient = ActivityRecognitionClient(context)
+        activityRecognitionClient = ActivityRecognition.getClient(context)
         val activityIntent = Intent(ACTIVITY_INTENT_ACTION)
         pendingIntent = PendingIntent.getBroadcast(
                 context,
                 PENDING_INTENT_REQUEST_CODE,
                 activityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT)
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
 
         activityReceiver = object : BroadcastReceiver() {

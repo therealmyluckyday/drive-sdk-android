@@ -8,7 +8,7 @@
 4. [Recording trip](#recording-trip)
 5. [Getting score](getting-score)
 6. [Logging](#logging)
-
+7. [Publication](#publication)
 
 The AXA DIL Telematic Exchange library is distributed as a self-contained AAR that can be integrated in gradle.
 
@@ -131,3 +131,8 @@ subscribeOn(Schedulers.computation())?.subscribe{log->
 //Use the log message
 }
 ```
+## 7. Publication 
+
+* run publish on maven task
+* apk and pom files are generated here : /Projects/texSDK-repo/android/sdk
+* upload files to myluckyday.com ftp server 
