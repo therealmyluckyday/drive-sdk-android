@@ -24,10 +24,10 @@ def getVersionName = { ->
 ext.sdkVersion = currentVersionName
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 32
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -79,7 +79,7 @@ dependencies {
 
     // Kotlin
     // Google Location service
-    def play_services_version = "19.0.1"
+    def play_services_version = "21.0.1"
     implementation "com.google.android.gms:play-services-location:$play_services_version"
 
     // Koins
