@@ -68,7 +68,7 @@ internal class AutomodeService : Service() {
                 notification = intent.getParcelableExtra("notif")!!
             } else {
                 val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                notification = notificationBuilder.setOngoing(true).setSmallIcon(R.drawable.notification_icon_background)
+                notification = notificationBuilder.setOngoing(true).setSmallIcon(androidx.core.R.drawable.notification_icon_background)
                         .setCategory(Notification.CATEGORY_SERVICE)
                         .build()
             }

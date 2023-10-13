@@ -119,6 +119,7 @@ class LocationSensorService: LocationCallback, LocationListener, KoinComponentCa
         sendLocation(location)
     }
     //LocationListener,
+    @Deprecated("Deprecated in Java")
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
         LOGGER.info("\"Status $status", "onStatusChanged")
     }

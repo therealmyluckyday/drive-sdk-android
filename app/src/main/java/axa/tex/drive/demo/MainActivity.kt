@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
         }, {throwable ->
             print(throwable)
         })
-        service?.getTripRecorder().tripProgress().subscribeOn(Schedulers.io())?.subscribe({ it ->
+        service?.getTripRecorder()?.tripProgress()?.subscribeOn(Schedulers.io())?.subscribe({ it ->
             binding.distanceTextView.text = "Distance : "+it.distance+"Km\nSpeed : "+it.speed+"Km/h\nDuration : "+it.duration/1000+"s"
             Thread{
                 //distanceTextView.text = "Distance["+it.distance+"]\n["+it.speed+"]\n["+it.duration+"]"

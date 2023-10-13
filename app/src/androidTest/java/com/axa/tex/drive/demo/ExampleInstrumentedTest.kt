@@ -1,23 +1,18 @@
 package com.axa.tex.drive.demo
-import android.location.Location
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
-import axa.tex.drive.sdk.acquisition.SensorServiceFake
 import axa.tex.drive.sdk.acquisition.TripRecorder
 import axa.tex.drive.sdk.acquisition.model.Fix
 import axa.tex.drive.sdk.acquisition.model.TexUser
 import axa.tex.drive.sdk.core.TexConfig
 import axa.tex.drive.sdk.core.TexService
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.delay
+import junit.framework.TestCase.assertTrue
 import org.junit.Assert
-import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.KoinTest
+
 import java.util.*
 
 /**
@@ -49,7 +44,7 @@ class ExampleInstrumentedTest {
     @Test
     fun testPackage() {
         val appContext = InstrumentationRegistry.getInstrumentation().getTargetContext()
-        Assert.assertEqual("axa.tex.drive.demo", appContext.packageName)
+        Assert.assertEquals("axa.tex.drive.demo", appContext.packageName)
     }
 
     @Test

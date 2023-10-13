@@ -225,8 +225,8 @@ class TexDriveDemoApplication : Application() {
             val builder = Notification.Builder(applicationContext)
 
             builder.setContentIntent(contentIntent)
-                    .setSmallIcon(R.drawable.ic_logo)
-                    .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.ic_logo))
+                    .setSmallIcon(axa.tex.drive.sdk.R.drawable.ic_logo)
+                    .setLargeIcon(BitmapFactory.decodeResource(res, axa.tex.drive.sdk.R.drawable.ic_logo))
                     .setWhen(System.currentTimeMillis())
                     .setAutoCancel(false).setOngoing(true)
                     .setContentTitle(res.getString(R.string.app_name))
