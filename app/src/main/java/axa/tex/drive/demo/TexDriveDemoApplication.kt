@@ -217,7 +217,7 @@ class TexDriveDemoApplication : Application() {
         }else if (currentApiVersion >= 16) {
 
             val notificationIntent = Intent(applicationContext, MainActivity::class.java)
-            val contentIntent = PendingIntent.getService(applicationContext, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+            val contentIntent = PendingIntent.getService(applicationContext, 0, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
 
 
