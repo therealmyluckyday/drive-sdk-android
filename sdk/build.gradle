@@ -16,7 +16,7 @@ buildscript {
 
 
 
-def currentVersionName = "3.0.9"
+def currentVersionName = "3.0.11"
 def getVersionName = { ->
     return currentVersionName
 }
