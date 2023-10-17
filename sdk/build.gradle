@@ -151,21 +151,49 @@ def docPath = "$repoPath/android/docs/${rootProject.sdkVersion}"
 def javadocPath = "$docPath/javadoc/"
 def readmeSourcePath = "${rootProject.projectDir}/README.md"
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                groupId = myGroupId
-                artifactId = myArtifactId
-                version rootProject.sdkVersion
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = myGroupId
+            artifactId = myArtifactId
+            version = rootProject.sdkVersion
+
+            afterEvaluate {
                 from components.release
             }
         }
-        repositories {
-            maven { url publishingPath }
+    }
+    repositories {
+        maven {
+            name = 'AxaSDK'
+            url = "${project.buildDir}/repo"
         }
     }
 }
+
+tasks.register('generateRepo', Zip) {
+    def publishTask = tasks.named('publishReleasePublicationToAxaSDKRepository')
+    from publishTask.map { it.getRepository().getUrl() }
+    into 'mylibrary'
+    archiveFileName.set('mylibrary.zip')
+}
+
+
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            release(MavenPublication) {
+//                groupId = myGroupId
+//                artifactId = myArtifactId
+//                version rootProject.sdkVersion
+//                from components.release
+//            }
+//        }
+//        repositories {
+//            maven { url publishingPath }
+//        }
+//    }
+//}
 
 //project.afterEvaluate {
 //    android.libraryVariants.all { variant ->
