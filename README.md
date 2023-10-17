@@ -132,7 +132,9 @@ subscribeOn(Schedulers.computation())?.subscribe{log->
 }
 ```
 ## 7. Publication 
-
-* run publish on maven task
-* apk and pom files are generated here : /Projects/texSDK-repo/android/sdk
-* upload files to myluckyday.com ftp server 
+New : jitpack.io
+* tag and push on Github
+* Prepare release on github
+* on JitPack.io select the release from https://github.com/therealmyluckyday/drive-sdk-android
+* Clik on get and wait for the build finish
+* Lib is availbable with : implementation 'com.github.therealmyluckyday:drive-sdk-android:TAG'
