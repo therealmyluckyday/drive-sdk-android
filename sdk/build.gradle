@@ -143,8 +143,8 @@ tasks.withType(Test) {
 }
 
 
-def myGroupId = 'axa.tex.drive'
-def myArtifactId = 'sdk'
+def myGroupId = 'com.github.therealmyluckyday'
+def myArtifactId = 'drive-sdk-android'
 def repoPath = "${System.getProperty('user.home')}/Projects/texSDK-repo"
 def publishingPath = "$repoPath/android/sdk"
 def docPath = "$repoPath/android/docs/${rootProject.sdkVersion}"
